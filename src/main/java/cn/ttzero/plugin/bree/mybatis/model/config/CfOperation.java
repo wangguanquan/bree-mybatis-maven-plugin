@@ -91,6 +91,11 @@ public class CfOperation {
     private Map<String, String> primitiveForeachParams = Maps.newHashMap();
 
     /**
+     * If exist customize count operation
+     */
+    private boolean customizeCount;
+
+    /**
      * Gets name.
      *
      * @return the name
@@ -346,5 +351,23 @@ public class CfOperation {
 
     public void setNoCount(String noCount) {
         this.noCount = "yes".equals(noCount);
+    }
+
+    /**
+     * Returns true if has customize count
+     *
+     * @return true if has customize count
+     */
+    public boolean isCustomizeCount() {
+        return customizeCount;
+    }
+
+    /**
+     * Setting the customize flag
+     *
+     * @param customizeCount the customize count flag
+     */
+    public void setCustomizeCount(boolean customizeCount) {
+        this.customizeCount = customizeCount;
     }
 }

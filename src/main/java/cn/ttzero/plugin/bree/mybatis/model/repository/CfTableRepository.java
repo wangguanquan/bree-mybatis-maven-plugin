@@ -497,6 +497,7 @@ public class CfTableRepository {
         List<Element> list = e.selectNodes("//operation[@name='" + cfOperation.getName() + "Count']");
         // 如果已有count语句则跳过
         if (list != null && !list.isEmpty()) {
+            cfOperation.setCustomizeCount(true);
             return;
         }
 

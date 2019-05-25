@@ -516,8 +516,7 @@ public class BreeLoader extends AbstractLoader {
 
             paging.setClassName(prefix + StringUtil.upperFirst(operation.getVo()) + suffix);
             paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
-            resultType = getClassAndImport(dao,
-                paging.getPackageName() + "." + paging.getClassName());
+            resultType = getClassAndImport(dao, paging.getPackageName() + "." + paging.getClassName());
             DOMapperMethodParam param = new DOMapperMethodParam(resultType,
                 StringUtil.lowerFirst(operation.getVo()));
             method.setPagingFlag("true");
@@ -671,7 +670,8 @@ public class BreeLoader extends AbstractLoader {
 
         paging.setResultType(resultType);
         pagingResultMethod.setReturnClass("List<" + resultType + ">");
-        if (!operation.isNoCount()) {
+        // If exists customize count
+        if (!operation.isNoCount() && !operation.isCustomizeCount()) {
             try {
                 DOMapperMethod pagingCountMethod = (DOMapperMethod) BeanUtils
                     .cloneBean(pagingResultMethod);
