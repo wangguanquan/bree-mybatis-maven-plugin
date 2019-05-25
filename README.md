@@ -24,6 +24,18 @@ CRUD操作。
 
 ## 配置说明
 
+### operation
+
+- name(required) 
+- vo 参数对象,配置了此值则paramType强制为object
+- paramType (object|primitive) object 会自动生成对象默认为DO对象,primitive 将按方法参数列表处理
+- multiplicity (one|many|paging) 结果类型，one返回对象，many返回List<T>, paging分页
+- remark 
+- resultType 返回值类型
+- resultMap 指定使用哪个resultMap 不写则使用自动生成的resultMap
+- timeout
+- noCount 不需要count总页数的分页，移动端常用
+
 ## 示例
 
 1. 增加分页查询的count语句自定义，在分页查询的name后加Count即可自动匹配，而不会自动生成count语句。

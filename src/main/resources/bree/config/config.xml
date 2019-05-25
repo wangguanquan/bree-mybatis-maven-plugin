@@ -17,6 +17,8 @@
   <type-map from="java.math.BigDecimal" to="Long"/>
   <type-map from="byte" to="int"/>
   <type-map from="short" to="int"/>
+  <!-- 此参数会将未知类型转为String-->
+  <type-map from="other" to="String" />
 
   <!-- ========================================================== -->
   <!-- datasource config  可以配置多个-->
