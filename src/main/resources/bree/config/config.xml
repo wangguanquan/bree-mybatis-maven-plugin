@@ -23,9 +23,9 @@
   <!-- ========================================================== -->
 
   <database name="sdm" class="org.gjt.mm.mysql.Driver" type="mysql">
-    <property name="url" value="jdbc:mysql://192.168.7.113:3306/vipmro_sdm"/>
-    <property name="user" value="vipmro_dev"/>
-    <property name="password" value="vip123~mro"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+    <property name="user" value="root"/>
+    <property name="password" value="root"/>
     <!-- 省略前置 支持多个 -->
     <prefix value="sdm"/>
     <!--分库分表规则  分表后缀 支持多个-->
