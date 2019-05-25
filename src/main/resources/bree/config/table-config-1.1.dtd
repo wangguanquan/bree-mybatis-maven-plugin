@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+  <!--
+  table 下包含多个 column resultmap operation sql 相应说明见定义
+  namespace    命名空间
+  sqlName      sql名
+  remark      说明
+  sequence     oracle使用
+  physicalName 物理表名,分库分表使用
+  -->
+  <!ELEMENT table (column* | resultMap* | operation* | sql)+>
+  <!ATTLIST table
+    sqlName CDATA #IMPLIED
+    sequence CDATA #IMPLIED
+    physicalName CDATA #IMPLIED
+    remark CDATA #IMPLIED
+    >
+
+  <!ELEMENT id EMPTY>
+  <!ATTLIST id
+    property CDATA #IMPLIED
+    javaType CDATA #IMPLIED
+    column CDATA #IMPLIED
+    jdbcType CDATA #IMPLIED
+    typeHandler CDATA #IMPLIED
+    >
+  <!--
+  column 字段定义,定义字段对应javaType
+  name          数据中字段名
+  javaType      对应转为那种javaType
+  relatedColumn 针对 com.alipay.fc.common.lang.money.MultiCurrencyMoney 扩展
+  -->
+  <!ELEMENT column EMPTY>
+  <!ATTLIST column
+    name CDATA #REQUIRED
+    javaType CDATA #REQUIRED
+    jdbcType CDATA #REQUIRED
+    remark CDATA #REQUIRED
+    relatedColumn CDATA #IMPLIED
+    >
+
+  <!--
+   自定义resultMap 会生成 customer/${type}.java
+   name        提供给operation 使用
+   type        自定义映射名
+   -->
+  <!ELEMENT resultMap (id*,column*,association*,collection*)>
+  <!ATTLIST resultMap
+    name CDATA #REQUIRED
+    type CDATA #REQUIRED
+    remark CDATA #IMPLIED
+    >
+  <!--
+  最定义操作, 根据这里生成对应的 操作
+  name          name
+  paging        分页设置  - 暂时没想好怎么扩展 -后续加上(思路,如果设置paging 则自动添加分页参数 不需要自己写limit 只需要写查询条件即可)
+  paramType     参数类型: object 会自动翻译为 生成的对象,primitive 根据字段类型生成
+  multiplicity  one 返回对象,many 返回list, paging 返回分页
+  resultType    指定返回类型(Map)
+  resultMap     指定使用哪个resultMap 不写则使用自动生成的resultMap
+  timeout       设置超时时间
+  noCount       不生成count语句
+  auto           - 暂时没想好怎么用,设想新增字段时自动修复
+  -->
+  <!ELEMENT operation (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ATTLIST operation
+    name CDATA #REQUIRED
+    vo CDATA #IMPLIED
+    paramType (object|primitive) #IMPLIED
+    multiplicity (one|many|paging) #IMPLIED
+    remark CDATA #IMPLIED
+    resultType CDATA #IMPLIED
+    resultMap CDATA #IMPLIED
+    timeout CDATA #IMPLIED
+    noCount (yes|no) #IMPLIED
+    >
+
+  <!ELEMENT property EMPTY>
+  <!ATTLIST property
+    name CDATA #REQUIRED
+    value CDATA #REQUIRED
+    >
+
+  <!ELEMENT selectKey (#PCDATA | include)*>
+  <!ATTLIST selectKey
+    resultType CDATA #IMPLIED
+    keyProperty CDATA #IMPLIED
+    order (BEFORE|AFTER) #IMPLIED
+    >
+
+  <!ELEMENT collection (id*,column*,association*,collection*)>
+  <!ATTLIST collection
+    property CDATA #REQUIRED
+    ofType CDATA #IMPLIED
+    resultMap CDATA #IMPLIED
+    remark CDATA #IMPLIED
+    >
+
+  <!ELEMENT association (id*,column*,association*,collection*)>
+  <!ATTLIST association
+    property CDATA #REQUIRED
+    column CDATA #IMPLIED
+    javaType CDATA #IMPLIED
+    select CDATA #IMPLIED
+    resultMap CDATA #IMPLIED
+    remark CDATA #IMPLIED
+    >
+
+  <!--
+   自定义sql被mapper.xml共用
+   id         sql id唯一
+   remark     注释
+   -->
+  <!ELEMENT sql (#PCDATA | where | if | include | trim | set | foreach | choose | if | bind)*>
+  <!ATTLIST sql
+    id CDATA #REQUIRED
+    remark CDATA #IMPLIED
+    >
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - -
+                   DYNAMIC ELEMENTS
+    - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!ELEMENT include (property+)?>
+  <!ATTLIST include
+    refid CDATA #REQUIRED
+    >
+
+  <!ELEMENT bind EMPTY>
+  <!ATTLIST bind
+    name CDATA #REQUIRED
+    value CDATA #REQUIRED
+    >
+
+  <!ELEMENT trim (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ATTLIST trim
+    prefix CDATA #IMPLIED
+    prefixOverrides CDATA #IMPLIED
+    suffix CDATA #IMPLIED
+    suffixOverrides CDATA #IMPLIED
+    >
+  <!ELEMENT where (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ELEMENT set (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+
+  <!ELEMENT foreach (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ATTLIST foreach
+    collection CDATA #REQUIRED
+    item CDATA #IMPLIED
+    index CDATA #IMPLIED
+    open CDATA #IMPLIED
+    close CDATA #IMPLIED
+    separator CDATA #IMPLIED
+    >
+
+  <!ELEMENT choose (when* , otherwise?)>
+  <!ELEMENT when (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ATTLIST when
+    test CDATA #REQUIRED
+    >
+  <!ELEMENT otherwise (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+
+  <!ELEMENT if (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ATTLIST if
+    test CDATA #REQUIRED
+    >
+

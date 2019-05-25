@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ============================================================== -->
+<!-- Master configuration file for auto-generation of iPaycore dal. -->
+<!-- ============================================================== -->
+
+<config>
+  <!-- ========================================================== -->
+  <!-- The typemap("Type Map") maps from one java type to another -->
+  <!-- java type. If you feel the original sql data type to java -->
+  <!-- type mapping is not satisfactory, you can use typemap to -->
+  <!-- convert it to a more appropriate one. -->
+  <!-- ========================================================== -->
+  <type-map from="java.sql.Date" to="java.util.Date"/>
+  <type-map from="java.sql.Time" to="java.util.Date"/>
+  <type-map from="java.sql.Timestamp" to="java.util.Date"/>
+  <type-map from="java.math.BigDecimal" to="Long"/>
+  <type-map from="byte" to="int"/>
+  <type-map from="short" to="int"/>
+
+  <!-- ========================================================== -->
+  <!-- datasource config  可以配置多个-->
+  <!-- ========================================================== -->
+
+  <database name="sdm" class="org.gjt.mm.mysql.Driver" type="mysql">
+    <property name="url" value="jdbc:mysql://192.168.7.113:3306/vipmro_sdm"/>
+    <property name="user" value="vipmro_dev"/>
+    <property name="password" value="vip123~mro"/>
+    <!-- 省略前置 支持多个 -->
+    <prefix value="sdm"/>
+    <!--分库分表规则  分表后缀 支持多个-->
+    <!--<split-suffix value="_000"/>-->
+  </database>
+
+  <!-- ========project.name pom.xml中的值========================= -->
+  <package value="net.vipmro.hades.${database.name}"/>
+
+  <!-- 是不创建默认的insert/update/deleteById/getById 默认true-->
+  <!-- 如果项目使用了第三方的插件包含这些基础功能，可以将此配置设为false-->
+  <create-default-operation value="true"/>
+
+  <!-- ========================================================== -->
+  <!-- 以下配置影响最终生成文件 -->
+  <!-- 如果配置项包含<>请转为&lt;和&gt;-->
+  <!-- ========================================================== -->
+
+  <!-- DO配置-->
+  <!-- 数据库表对应实体 data object-->
+  <data-object>
+    <!-- 包名 默认do-->
+    <namespace value="model"/>
+    <!-- 前缀 默认无-->
+    <prefix />
+    <!-- 后缀 默认无-->
+    <suffix />
+    <!-- 配置DO类的继承 默认无-->
+    <!-- java只支持类单继承，此节点只能存在一个-->
+    <extend class="BaseModel&lt;${DO.className}&gt;"
+            import="net.vipmro.athena.boot.starter.model.BaseModel" />
+    <!-- 配置DO类的实现 默认无-->
+    <implements />
+    <!-- 配置DO类的注解 默认无-->
+    <annotations>
+      <annotation class='TableName("${DO.tableName}")'
+                  import="com.baomidou.mybatisplus.annotations.TableName"/>
+    </annotations>
+    <!-- 因为实体有继承，这里配置忽略父类的字段，不然会根本表定义生成全字段 -->
+    <ignore>
+      <field value="id"/>
+      <field value="createAt"/>
+      <field value="createBy"/>
+      <field value="createByName"/>
+      <field value="updateAt"/>
+      <field value="updateBy"/>
+      <field value="updateByName"/>
+    </ignore>
+  </data-object>
+
+  <!-- XMLMapper配置-->
+  <!-- mapper xml存放位置 默认与resources/${package} 同级-->
+  <!-- 例: resources/cn/ttzero/sdm/mapper-->
+  <xml-mapper output="resources/mapper" />
+
+  <!-- DOMapper配置-->
+  <!-- 最终生成XXXMapper.java接口-->
+  <do-mapper>
+    <!-- 包名 默认mapper-->
+    <namespace />
+    <!-- 前缀 默认无-->
+    <prefix />
+    <!-- 后缀 默认Mapper-->
+    <suffix />
+    <!-- 配置DOMapper类的继承 默认无-->
+    <!-- java只支持类单继承，此节点只能存在一个-->
+    <extend class="BaseMapper&lt;${doMapper.className}&gt;"
+            import="com.baomidou.mybatisplus.mapper.BaseMapper" />
+    <!-- 配置DOMapper类的实现 默认无-->
+    <implements />
+    <!-- 配置DOMapper类的注解 默认无-->
+    <annotations>
+      <annotation class="Mapper"
+                  import="org.apache.ibatis.annotations.Mapper" />
+    </annotations>
+  </do-mapper>
+
+  <!-- 最终生成XXXVo.java接口-->
+  <vo>
+    <!-- 包名 默认vo-->
+    <namespace />
+    <!-- 前缀 默认无-->
+    <prefix />
+    <!-- 后缀 默认Vo-->
+    <suffix />
+    <!-- 分页基础vo，不配置false时bree提供一个默认BasePage-->
+    <useBasePageVo value="false" />
+    <!-- 配置vo类的继承 默认无-->
+    <!-- 让分页vo继承定义PageVo 此处PageVo放在vo包下，所以省掉import-->
+    <extend  class="PageVo" if ="paging" />
+    <!-- 配置vo类的实现 默认无-->
+    <implements />
+    <!-- 配置vo类的注解 默认无-->
+    <annotations />
+  </vo>
+
+  <!-- ========================================================== -->
+  <!-- 以下配置非必须可使用ignore属性忽略 -->
+  <!-- ========================================================== -->
+
+  <!-- Dao配置-->
+  <!-- 最终生成XXXDao.java接口-->
+  <dao ignore="true">
+    <!-- 包名 默认mapper-->
+    <namespace />
+    <!-- 前缀 默认无-->
+    <prefix />
+    <!-- 后缀 默认Mapper-->
+    <suffix />
+    <!-- 配置DOMapper类的继承 默认无-->
+    <!-- java只支持类单继承，此节点只能存在一个-->
+    <extend />
+    <!-- 配置DOMapper类的实现 默认无-->
+    <implements />
+    <!-- 配置DOMapper类的注解 默认无-->
+    <annotations />
+  </dao>
+
+  <!-- 生成service配置-->
+  <service ignore="true">
+    <!-- 包名 默认service-->
+    <namespace />
+    <!-- 前缀 默认无-->
+    <prefix />
+    <!-- 后缀 默认Service-->
+    <suffix />
+    <!-- 配置Service类的继承 默认无-->
+    <extend />
+    <!-- 配置Service类的实现 默认无-->
+    <!-- java只支持类单继承，此节点只能存在一个-->
+    <implements />
+    <!-- 配置Service类的注解 默认@Service-->
+    <annotations />
+  </service>
+
+  <!-- 生成controller配置-->
+  <controller ignore="true">
+    <!-- 包名 默认controller-->
+    <namespace />
+    <!-- 前缀 默认无-->
+    <prefix />
+    <!-- 后缀 默认Controller-->
+    <suffix />
+    <!-- 配置Controller类的继承 默认无-->
+    <extend />
+    <!-- 配置Controller类的实现 默认无-->
+    <!-- java只支持类单继承，此节点只能存在一个-->
+    <implements />
+    <!-- 配置Controller类的注解 默认无-->
+    <annotations />
+  </controller>
+
+
+  <!-- 新生成文件自动add到git -->
+  <add-to-git-if-new>true</add-to-git-if-new>
+</config>
