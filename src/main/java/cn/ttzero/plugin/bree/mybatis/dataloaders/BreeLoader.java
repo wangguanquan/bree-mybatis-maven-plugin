@@ -720,10 +720,20 @@ public class BreeLoader extends AbstractLoader {
      */
     private void preMethodParam(DO doClass, Base doMapper, CfOperation operation,
                                 DOMapperMethod method, Map<String, String> columnMap) {
+        boolean hasVo;
+        if (hasVo = StringUtil.isNotEmpty(operation.getVo())) {
+            operation.setParamType(ParamTypeEnum.object);
+        }
 
         if (operation.getParamType() == ParamTypeEnum.object) {
-            method.addParam(new DOMapperMethodParam(getClassAndImport(doMapper,
-                doClass.getPackageName() + "." + doClass.getClassName()), "entity"));
+            String vo = null;
+            if (hasVo) {
+                // TODO get vo package
+//                vo =
+            } else {
+                vo = doClass.getPackageName() + "." + doClass.getClassName();
+            }
+            method.addParam(new DOMapperMethodParam(getClassAndImport(doMapper, vo), "entity"));
         } else if (operation.getParamType() == ParamTypeEnum.multiple) {
             method.addParam(new DOMapperMethodParam(getClassAndImport(doMapper,
                 "java.util.List"), "entities"));
