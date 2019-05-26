@@ -16,10 +16,10 @@
 
 package cn.ttzero.plugin.bree.mybatis.model.java.domapper;
 
+import cn.ttzero.plugin.bree.mybatis.exception.BreeException;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
-import com.google.common.primitives.Ints;
 
+import java.io.*;
 import java.util.List;
 
 /**
@@ -106,22 +106,23 @@ public class DOMapperMethod implements Cloneable {
      * @return the params
      */
     public List<DOMapperMethodParam> getParams() {
-        //对params进行排序
-        Ordering<DOMapperMethodParam> byLengthOrdering = new Ordering<DOMapperMethodParam>() {
-            private static final long serialVersionUID = 2293951554121638998L;
-
-            public int compare(DOMapperMethodParam left, DOMapperMethodParam right) {
-                int cr = compare(left.getParamType(), right.getParamType());
-                return cr == 0 ? compare(left.getParam(), right.getParam()) : cr;
-            }
-
-            private int compare(String left, String right) {
-                int cr = Ints.compare(left.length(), right.length());
-                return cr == 0 ? left.compareTo(right) : cr;
-            }
-
-        };
-        return byLengthOrdering.sortedCopy(params);
+        // 对params进行排序
+//        Ordering<DOMapperMethodParam> byLengthOrdering = new Ordering<DOMapperMethodParam>() {
+//            private static final long serialVersionUID = 2293951554121638998L;
+//
+//            public int compare(DOMapperMethodParam left, DOMapperMethodParam right) {
+//                int cr = compare(left.getParamType(), right.getParamType());
+//                return cr == 0 ? compare(left.getParam(), right.getParam()) : cr;
+//            }
+//
+//            private int compare(String left, String right) {
+//                int cr = Ints.compare(left.length(), right.length());
+//                return cr == 0 ? left.compareTo(right) : cr;
+//            }
+//
+//        };
+//        return byLengthOrdering.sortedCopy(params);
+        return params;
     }
 
     /**
@@ -222,5 +223,35 @@ public class DOMapperMethod implements Cloneable {
 
     public void makeNoCount() {
         this.noCount = "true";
+    }
+
+    public DOMapperMethod deepClone() {
+        ObjectOutputStream oos = null;
+        ObjectInputStream ois = null;
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            oos = new ObjectOutputStream(bos);
+            oos.writeObject(this);
+
+            ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
+            return  getClass().cast(ois.readObject());
+        } catch (IOException | ClassNotFoundException e) {
+            throw new BreeException("", e);
+        } finally {
+            if (oos != null) {
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    ;
+                }
+            }
+            if (ois != null) {
+                try {
+                    ois.close();
+                } catch (IOException e) {
+                    ;
+                }
+            }
+        }
     }
 }
