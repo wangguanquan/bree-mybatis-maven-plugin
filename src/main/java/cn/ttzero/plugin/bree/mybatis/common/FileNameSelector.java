@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * 文件类型选择去
- *
  * Created by guanquan.wang at 2019-05-24 21:50
  */
 public class FileNameSelector implements FilenameFilter {

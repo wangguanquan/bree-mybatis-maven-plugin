@@ -1,7 +1,8 @@
 # bree-mybatis-maven-plugin
 
-bree-mybatis-maven-plugin源于github开源项目`mybatis-dalgen`，在此感谢原作者bangis.wangdf
+bree-mybatis-maven-plugin源于github开源项目`mybatis-dalgen`，
 对其进行魔改变为现在的版本，后来作者将项目迁到国内oschina地址是[mybatis.generator](https://gitee.com/bangis/mybatis.generator)
+在此感谢原作者bangis.wangdf
 
 bree与原项目相比有着更加丰富的配置项，可以对Mapper, dao, service, vo, dto等java
 文件的`annotation`，`extends`以及`implements`进行配置，以满足不同项目的需求。
