@@ -48,7 +48,8 @@ public class PrimaryKeys {
      * @return the column list
      */
     public List<Column> getColumnList() {
-        return Lists.sortedCopy(columnList);
+        return columnList;
+//        return Lists.sortedCopy(columnList);
     }
 
     /**

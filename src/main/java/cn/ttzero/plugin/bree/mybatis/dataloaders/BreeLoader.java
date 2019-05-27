@@ -37,7 +37,6 @@ import cn.ttzero.plugin.bree.mybatis.model.repository.*;
 import cn.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import cn.ttzero.plugin.bree.mybatis.utils.StringUtil;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.maven.plugin.logging.Log;
@@ -672,15 +671,10 @@ public class BreeLoader extends AbstractLoader {
         pagingResultMethod.setReturnClass("List<" + resultType + ">");
         // If exists customize count
         if (!operation.isNoCount() && !operation.isCustomizeCount()) {
-            try {
-                DOMapperMethod pagingCountMethod = (DOMapperMethod) BeanUtils
-                    .cloneBean(pagingResultMethod);
-                pagingCountMethod.setName(operation.getName() + "Count");
-                pagingCountMethod.setReturnClass("int");
-                doMapper.addMethod(pagingCountMethod);
-            } catch (Exception e) {
-                LOG.error("", e);
-            }
+            DOMapperMethod pagingCountMethod = pagingResultMethod.deepClone();
+            pagingCountMethod.setName(operation.getName() + "Count");
+            pagingCountMethod.setReturnClass("int");
+            doMapper.addMethod(pagingCountMethod);
         } else {
             pagingResultMethod.makeNoCount();
         }
