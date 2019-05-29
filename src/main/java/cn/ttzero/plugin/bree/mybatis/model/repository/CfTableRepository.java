@@ -357,10 +357,11 @@ public class CfTableRepository {
         List<Element> elements = table.elements("sql");
         for (Element e : elements) {
             String id = getAttr(e, "id");
-            if (sqlCache.containsKey(id)) {
+            String key = cfTable.getSqlname() + id;
+            if (sqlCache.containsKey(key)) {
                 throw new BreeException("Sql id重复：" + id);
             }
-            sqlCache.put(id, e);
+            sqlCache.put(key, e);
             Attribute remark = e.attribute("remark");
             if (remark != null) {
                 e.remove(remark);
