@@ -340,7 +340,7 @@ public class CfTableRepository {
             //setCfOperationCdata
             setCfOperationCdata(cfTable, e, cfOperation, table);
 
-            fillOperationParams(e, cfOperation);
+            fillOperationParams(e, cfOperation, cfTable.getSqlname());
 
             cfTable.addOperation(cfOperation);
         }
@@ -357,7 +357,7 @@ public class CfTableRepository {
         List<Element> elements = table.elements("sql");
         for (Element e : elements) {
             String id = getAttr(e, "id");
-            String key = cfTable.getSqlname() + id;
+            String key = cfTable.getSqlname() + "_" + id;
             if (sqlCache.containsKey(key)) {
                 throw new BreeException("Sql id重复：" + id);
             }
@@ -711,8 +711,9 @@ public class CfTableRepository {
      *
      * @param e           the e
      * @param cfOperation the cf operation
+     * @param tableName   the table name
      */
-    private void fillOperationParams(Element e, CfOperation cfOperation) {
+    private void fillOperationParams(Element e, CfOperation cfOperation, String tableName) {
 
         if (cfOperation.getParamType() != ParamTypeEnum.primitive) {
             return;
@@ -721,7 +722,7 @@ public class CfTableRepository {
         // TODO 对象里包含对象逻辑
 //        LOG.info("---------------" + cfOperation.getName() + "-----------------");
 
-        String content = getReplaceInclude(e);
+        String content = getReplaceInclude(e, tableName);
         Element newElement = stringToXml(content);
         // #\\{(.*?)\\}
         Matcher m = PARAM_PATTERN.matcher(content);
@@ -858,9 +859,10 @@ public class CfTableRepository {
      * with include content
      *
      * @param e current element
+     * @param tableName the current table name
      * @return element's innerHTML
      */
-    private String getReplaceInclude(Element e) {
+    private String getReplaceInclude(Element e, String tableName) {
         String cdata = e.asXML();
         // If has include tag
         @SuppressWarnings({"unchecked", "retype"})
@@ -875,10 +877,11 @@ public class CfTableRepository {
                     throw new BreeException("operation["+getAttr(e, "name")
                         +"]包含include节点但是未指定refid值。");
                 }
-                Element ref = sqlCache.get(refid);
+                String key = tableName + "_" + refid;
+                Element ref = sqlCache.get(key);
                 if (ref == null) {
                     throw new BreeException("operation["+getAttr(e, "name")
-                        +"]包含include节点但是refidu并未出现在此xml中。");
+                        +"]包含include节点但是refid[" + refid + "]并未出现在此xml中。");
                 }
                 cdata = cdata.replace(ic.asXML(), ref.asXML());
             }
