@@ -94,7 +94,13 @@
     <suffix />
     <!-- 配置DOMapper类的继承 默认无-->
     <!-- java只支持类单继承，此节点只能存在一个-->
-    <extend class="BaseMapper&lt;${doMapper.className}&gt;"
+    <!-- DO, VO, Mapper -->
+    <!-- xx.className 类名-->
+    <!-- xx.tableName 表名-->
+    <!-- xx.classPath -->
+    <!-- xx.packageName -->
+    <!-- xx.desc 描述-->
+    <extend class="BaseMapper&lt;${DO.className}&gt;"
             import="com.baomidou.mybatisplus.mapper.BaseMapper" />
     <!-- 配置DOMapper类的实现 默认无-->
     <implements />
