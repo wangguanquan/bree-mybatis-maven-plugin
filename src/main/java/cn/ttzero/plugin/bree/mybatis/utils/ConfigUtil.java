@@ -172,7 +172,7 @@ public class ConfigUtil {
                 @SuppressWarnings({"unchecked", "retype"})
                 List<Element> ignoreFields = element.elements();
                 for (Element e : ignoreFields) {
-                    doConfig.addIgnoreField(getValue(e));
+                    doConfig.addIgnoreField(getAttr(e, "name"));
                 }
             }
         } else config.setDoConfig(new DataObjectConfig());

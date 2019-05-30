@@ -7,9 +7,9 @@
 <config>
   <!-- ========================================================== -->
   <!-- The typemap("Type Map") maps from one java type to another -->
-  <!-- java type. If you feel the original sql data type to java -->
-  <!-- type mapping is not satisfactory, you can use typemap to -->
-  <!-- convert it to a more appropriate one. -->
+  <!-- java type. If you feel the original sql data type to java  -->
+  <!-- type mapping is not satisfactory, you can use typemap to   -->
+  <!-- convert it to a more appropriate one.                      -->
   <!-- ========================================================== -->
   <type-map from="java.sql.Date" to="java.util.Date"/>
   <type-map from="java.sql.Time" to="java.util.Date"/>
@@ -21,11 +21,11 @@
   <type-map from="other" to="String" />
 
   <!-- ========================================================== -->
-  <!-- datasource config  可以配置多个-->
+  <!-- datasource config  可以配置多个                              -->
   <!-- ========================================================== -->
 
   <database name="sdm" class="org.gjt.mm.mysql.Driver" type="mysql">
-    <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/job"/>
     <property name="user" value="root"/>
     <property name="password" value="root"/>
     <!-- 省略前置 支持多个 -->
@@ -42,8 +42,8 @@
   <create-default-operation value="true"/>
 
   <!-- ========================================================== -->
-  <!-- 以下配置影响最终生成文件 -->
-  <!-- 如果配置项包含<>请转为&lt;和&gt;-->
+  <!-- 以下配置影响最终生成文件                                       -->
+  <!-- 如果配置项包含<>请转为&lt;和&gt;                               -->
   <!-- ========================================================== -->
 
   <!-- DO配置-->
@@ -68,13 +68,13 @@
     </annotations>
     <!-- 因为实体有继承，这里配置忽略父类的字段，不然会根本表定义生成全字段 -->
     <ignore>
-      <field value="id"/>
-      <field value="createAt"/>
-      <field value="createBy"/>
-      <field value="createByName"/>
-      <field value="updateAt"/>
-      <field value="updateBy"/>
-      <field value="updateByName"/>
+      <field name="id"/>
+      <field name="createAt"/>
+      <field name="createBy"/>
+      <field name="createByName"/>
+      <field name="updateAt"/>
+      <field name="updateBy"/>
+      <field name="updateByName"/>
     </ignore>
   </data-object>
 
