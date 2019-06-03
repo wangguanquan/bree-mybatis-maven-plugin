@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Created by guanquan.wang at 2019-05-24 23:53
  */
-public class DOMapperMethod implements Cloneable {
+public class DOMapperMethod implements Cloneable, Serializable {
     /**
      * The Return class.
      */
