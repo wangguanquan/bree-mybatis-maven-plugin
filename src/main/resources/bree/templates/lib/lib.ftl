@@ -7,6 +7,7 @@
 </#function>
 
 <#-- operation 2 sql -->
+<#-- Don't use this function, replace it with operation.om -->
 <#function operation2Sql param>
     <#if param?starts_with("insert")><#return "insert"/></#if>
     <#if param?starts_with("update")><#return "update"/></#if>
@@ -18,9 +19,9 @@
 <#function mapperResult operation>
     <#if operation.resultMap??><#return 'resultMap="${operation.resultMap}"'/></#if>
     <#if operation.resultType??><#return 'resultType="${operation.resultType}"'/></#if>
-    <#if operation.name?starts_with("insert")><#return ''/></#if>
-    <#if operation.name?starts_with("update")><#return ''/></#if>
-    <#if operation.name?starts_with("delete")><#return ''/></#if>
+    <#if operation.om == "insert"><#return ''/></#if>
+    <#if operation.om == "update"><#return ''/></#if>
+    <#if operation.om == "delete"><#return ''/></#if>
     <#return 'resultMap="BaseResultMap"'/>
 </#function>
 

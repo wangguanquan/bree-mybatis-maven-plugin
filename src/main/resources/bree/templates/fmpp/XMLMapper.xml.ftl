@@ -44,20 +44,21 @@
     <#if operation.multiplicity.code=="paging"><#--分页-->
     <#if operation.cdataPageCount??><#--判断是否既有求和语句-->
     <!--${operation.remark!operation.name} PageCount-->
-    <${lib.operation2Sql(operation.name)} id="${operation.name}Count"  resultType="int"${lib.timeout(operation)}>
-    ${operation.cdataPageCount!}
-    </${lib.operation2Sql(operation.name)}>
+    <${operation.om!} id="${operation.name}Count"  resultType="int"${lib.timeout(operation)}>
+        ${operation.cdataPageCount!}
+    </${operation.om!}>
     </#if>
+
     <!--${operation.remark!operation.name} PageResult-->
-    <${lib.operation2Sql(operation.name)} id="${operation.name}Result"  ${lib.mapperResult(operation)}${lib.timeout(operation)}>
-${operation.cdata!}
+    <${operation.om!} id="${operation.name}Result"  ${lib.mapperResult(operation)}${lib.timeout(operation)}>
+        ${operation.cdata!}
         limit ${"#"}{pageSize} offset ${"#"}{offset}
-    </${lib.operation2Sql(operation.name)}>
+    </${operation.om!}>
     <#else><#--非分页-->
     <!--${operation.remark!operation.name}-->
-    <${lib.operation2Sql(operation.name)} id="${operation.name}" ${lib.mapperResult(operation)}${lib.timeout(operation)}>
-${operation.cdata!}
-    </${lib.operation2Sql(operation.name)}>
+    <${operation.om!} id="${operation.name}" ${lib.mapperResult(operation)}${lib.timeout(operation)}>
+        ${operation.cdata!}
+    </${operation.om!}>
     </#if>
     </#list>
 </mapper>
