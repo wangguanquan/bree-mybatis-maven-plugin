@@ -91,6 +91,11 @@ public class CfOperation {
     private Map<String, String> primitiveForeachParams = Maps.newHashMap();
 
     /**
+     * The operation method. see {@link OperationMethod}
+     */
+    private OperationMethod om;
+
+    /**
      * Gets name.
      *
      * @return the name
@@ -346,5 +351,13 @@ public class CfOperation {
 
     public void setNoCount(String noCount) {
         this.noCount = "yes".equals(noCount);
+    }
+
+    public OperationMethod getOm() {
+        return om;
+    }
+
+    public void setOm(OperationMethod om) {
+        this.om = om;
     }
 }
