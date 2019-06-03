@@ -844,14 +844,10 @@ public class CfTableRepository {
      * @param e current element
      * @return element's innerHTML
      */
-    private static String getContent(Element e) {
+    static String getContent(Element e) {
         String cXml = e.asXML();
-        String[] lines = StringUtils.split(cXml, "\n");
-        StringBuilder buffer = new StringBuilder(lines[1]);
-        for (int i = 2; i < lines.length - 1; i++) {
-            buffer.append("\n").append(lines[i]);
-        }
-        return buffer.toString();
+        int start = cXml.indexOf('>'), end = cXml.lastIndexOf('<');
+        return cXml.substring(start + 1, end).trim();
     }
 
     /**
