@@ -16,12 +16,12 @@ CRUD操作。
 
 ## 使用方法
 
-使用`mvn tree-mybatis:gen`命令运行插件，初次运行后需要在`config.xml`文件中配置数据源
-和其它代码生成相关配置项，然后再次执行`mvn tree-mybatis:gen`命令，命令窗口会提示你输入要生成
+使用`mvn bree-mybatis:gen`命令运行插件，初次运行后需要在`config.xml`文件中配置数据源
+和其它代码生成相关配置项，然后再次执行`mvn bree-mybatis:gen`命令，命令窗口会提示你输入要生成
 的表名，输入表名回车即完成Mapper接口,vo,dto以及mapper.xml的自动生成。
 
 所有的修改请在bree/xxxTables下对应的表名xml中修改，大部分的写法与直接写mybatis mapper
-没有区别，修改后执行`mvn tree-mybatis:gen`命令
+没有区别，修改后执行`mvn bree-mybatis:gen`命令
 
 ## 配置说明
 
@@ -51,7 +51,7 @@ CRUD操作。
 
 ### package 代码文件目录
 
-此配置为生成java文件的output路径，`XMLMapper`并不放在此目录，可选变数`project.name`和`${database.name}`
+此配置为生成java文件的output路径，`XMLMapper`并不放在此目录，可选变数`${project.name}`和`${database.name}`
 
 示例: `<package value="cn.ttzero.${project.name}.${database.name}"/>`
 
