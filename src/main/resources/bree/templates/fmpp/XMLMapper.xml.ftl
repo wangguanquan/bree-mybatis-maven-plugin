@@ -45,19 +45,19 @@
     <#if operation.cdataPageCount??><#--判断是否既有求和语句-->
     <!--${operation.remark!operation.name} PageCount-->
     <${operation.om!} id="${operation.name}Count"  resultType="int"${lib.timeout(operation)}>
-        ${operation.cdataPageCount!}
+${operation.cdataPageCount!}
     </${operation.om!}>
     </#if>
 
     <!--${operation.remark!operation.name} PageResult-->
     <${operation.om!} id="${operation.name}Result"  ${lib.mapperResult(operation)}${lib.timeout(operation)}>
-        ${operation.cdata!}
+    ${operation.cdata!}
         limit ${"#"}{pageSize} offset ${"#"}{offset}
     </${operation.om!}>
     <#else><#--非分页-->
     <!--${operation.remark!operation.name}-->
     <${operation.om!} id="${operation.name}" ${lib.mapperResult(operation)}${lib.timeout(operation)}>
-        ${operation.cdata!}
+${operation.cdata!}
     </${operation.om!}>
     </#if>
     </#list>
