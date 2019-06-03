@@ -18,10 +18,12 @@ package cn.ttzero.plugin.bree.mybatis.model.java.domapper;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.io.Serializable;
+
 /**
  * Created by guanquan.wang at 2019-05-24 23:59
  */
-public class DOMapperMethodParam {
+public class DOMapperMethodParam implements Serializable {
     /**
      * The Param type.
      */
