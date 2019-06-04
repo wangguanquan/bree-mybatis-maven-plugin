@@ -96,6 +96,11 @@ public class CfOperation {
     private boolean customizeCount;
 
     /**
+     * The operation method. see {@link OperationMethod}
+     */
+    private OperationMethod om;
+
+    /**
      * Gets name.
      *
      * @return the name
@@ -369,5 +374,13 @@ public class CfOperation {
      */
     public void setCustomizeCount(boolean customizeCount) {
         this.customizeCount = customizeCount;
+    }
+
+    public OperationMethod getOm() {
+        return om;
+    }
+
+    public void setOm(OperationMethod om) {
+        this.om = om;
     }
 }

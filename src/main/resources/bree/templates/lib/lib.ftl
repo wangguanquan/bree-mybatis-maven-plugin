@@ -7,6 +7,7 @@
 </#function>
 
 <#-- operation 2 sql -->
+<#-- Don't use this function, replace it with operation.om -->
 <#function operation2Sql param>
     <#if param?starts_with("insert")><#return "insert"/></#if>
     <#if param?starts_with("update")><#return "update"/></#if>
@@ -14,13 +15,13 @@
     <#return "select"/>
 </#function>
 
-<#-- mapperxml result -->
+<#-- mapper-xml result -->
 <#function mapperResult operation>
-    <#if operation.resultmap??><#return 'resultMap="${operation.resultmap}"'/></#if>
-    <#if operation.resulttype??><#return 'resultType="${operation.resulttype}"'/></#if>
-    <#if operation.name?starts_with("insert")><#return ''/></#if>
-    <#if operation.name?starts_with("update")><#return ''/></#if>
-    <#if operation.name?starts_with("delete")><#return ''/></#if>
+    <#if operation.resultMap??><#return 'resultMap="${operation.resultMap}"'/></#if>
+    <#if operation.resultType??><#return 'resultType="${operation.resultType}"'/></#if>
+    <#if operation.om == "insert"><#return ''/></#if>
+    <#if operation.om == "update"><#return ''/></#if>
+    <#if operation.om == "delete"><#return ''/></#if>
     <#return 'resultMap="BaseResultMap"'/>
 </#function>
 
@@ -47,8 +48,8 @@
     <#if column.sqlName == "CREATOR" || column.sqlName == "DATE_CREATED">
         <#return false>
     </#if>
-    <#list primaryKeys as pkcolumn>
-        <#if pkcolumn.sqlName == column.sqlName><#return false></#if>
+    <#list primaryKeys as pkColumn>
+        <#if pkColumn.sqlName == column.sqlName><#return false></#if>
     </#list>
     <#return true>
 </#function>

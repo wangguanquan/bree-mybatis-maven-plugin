@@ -325,7 +325,10 @@ public class CfTableRepository {
             cfOperation.setMultiplicity(MultiplicityEnum.getByCode(getAttr(e, "multiplicity")));
             cfOperation.setVo(getAttr(e, "vo"));
             if (cfOperation.getMultiplicity() == MultiplicityEnum.paging) {
+                cfOperation.setOm(OperationMethod.select);
                 Validate.notEmpty(cfOperation.getVo(), "需要设置paging,用来生成分页类");
+            } else {
+                cfOperation.setOm(testMethod(e));
             }
             cfOperation.setParamType(ParamTypeEnum.getByCode(getAttr(e, "paramType")));
             cfOperation.setResultMap(getAttr(e, "resultMap"));
@@ -844,14 +847,10 @@ public class CfTableRepository {
      * @param e current element
      * @return element's innerHTML
      */
-    private String getContent(Element e) {
+    static String getContent(Element e) {
         String cXml = e.asXML();
-        String[] lines = StringUtils.split(cXml, "\n");
-        StringBuilder buffer = new StringBuilder(lines[1]);
-        for (int i = 2; i < lines.length - 1; i++) {
-            buffer.append("\n").append(lines[i]);
-        }
-        return buffer.toString();
+        int start = cXml.indexOf('>'), end = cXml.lastIndexOf('<');
+        return cXml.substring(start + 1, end).trim();
     }
 
     /**
@@ -894,7 +893,7 @@ public class CfTableRepository {
      * @param string the xml string
      * @return the {@link Element}
      */
-    private Element stringToXml(String string) {
+    static Element stringToXml(String string) {
         try {
             SAXReader reader = new SAXReader();
             Document doc = reader.read(new StringReader(string));
@@ -904,4 +903,22 @@ public class CfTableRepository {
         }
     }
 
+    static OperationMethod testMethod(Element e) {
+        @SuppressWarnings({"unchecked", "retype"})
+        List<Element> sub = e.elements();
+        String content = getContent(e);
+        if (sub != null && !sub.isEmpty()) {
+            for (Element el : sub) {
+                content = content.replace(el.asXML(), "");
+            }
+        }
+
+        content = content.trim();
+        int n = content.indexOf(' ');
+        if (n > 0) {
+            String key = content.substring(0, n);
+            return OperationMethod.of(key.toLowerCase());
+        }
+        return OperationMethod.select;
+    }
 }
