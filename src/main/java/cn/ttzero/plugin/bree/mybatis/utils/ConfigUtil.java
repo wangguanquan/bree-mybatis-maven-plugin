@@ -18,7 +18,10 @@ package cn.ttzero.plugin.bree.mybatis.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import cn.ttzero.plugin.bree.mybatis.model.db.Database;
@@ -67,7 +70,8 @@ public class ConfigUtil {
     public static void readConfig(File configFile) throws IOException, DocumentException {
         if (config == null) {
             SAXReader reader = new SAXReader();
-            Document document = reader.read(Files.newInputStream(configFile.toPath()));
+            Document document = reader.read(Files.newInputStream(
+                Paths.get(URLDecoder.decode(configFile.toPath().toString(), StandardCharsets.UTF_8.name()))));
             config = new Config();
 
             Element root = document.getRootElement();

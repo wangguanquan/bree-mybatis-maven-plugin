@@ -2,6 +2,9 @@ package cn.ttzero.plugin.bree.mybatis;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import cn.ttzero.plugin.bree.mybatis.dataloaders.BreeTableLoader;
 import cn.ttzero.plugin.bree.mybatis.utils.CmdUtil;
@@ -81,10 +84,11 @@ public class BreeMojo extends AbstractMojo {
      * @param templateDirectory the template directory
      * @param config            the config
      */
-    public BreeMojo(File outputDirectory, File templateDirectory, File config, boolean testF) {
-        this.outputDirectory = outputDirectory;
-        this.templateDirectory = templateDirectory;
-        this.config = config;
+    public BreeMojo(File outputDirectory, File templateDirectory, File config, boolean testF) throws UnsupportedEncodingException {
+        // FIXME if path has '%20' or other escape character?
+        this.outputDirectory = new File(URLDecoder.decode(outputDirectory.toString(), StandardCharsets.UTF_8.name()));
+        this.templateDirectory = new File(URLDecoder.decode(templateDirectory.toString(), StandardCharsets.UTF_8.name()));
+        this.config = new File(URLDecoder.decode(config.toString(), StandardCharsets.UTF_8.name()));
         this.testF = testF;
     }
 
