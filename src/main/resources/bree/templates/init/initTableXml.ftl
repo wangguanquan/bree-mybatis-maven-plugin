@@ -8,7 +8,7 @@
     <!-- BaseResultMap 和 Base_Column_List 已全量生成include引用即可-->
 
 <#if table.createDefaultOperation>
-    <operation name="insert" paramType="object" remark="插入表:${table.sqlName}">
+    <insert id="insert" paramType="object" remark="插入表:${table.sqlName}">
         <#if bree.dbType=="MySQL">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
@@ -23,10 +23,10 @@
             <#if column.sqlName != "ID"><#if column_index gt 1>, </#if>${lib.insertVal(column)}</#if>
         </#list>
         )
-    </operation>
+    </insert>
 
 <#if table.primaryKeys??>
-    <operation name="update" paramType="object" remark="更新表:${table.sqlName}">
+    <update id="update" paramType="object" remark="更新表:${table.sqlName}">
         UPDATE ${table.sqlName}
         SET
         <#assign c_idx = 0>
@@ -39,23 +39,23 @@
         <#list table.primaryKeys.columnList as column>
             <#if column_index gt 0>AND </#if>${column.sqlName}${lib.space(column.sqlName)} = ${"#"}{${column.javaName}, jdbcType=${column.sqlType}}
         </#list>
-    </operation>
+    </update>
 
-    <operation name="deleteBy${table.primaryKeys.pkName}" multiplicity="one" remark="根据主键删除数据:${table.sqlName}">
+    <delete id="deleteBy${table.primaryKeys.pkName}" remark="根据主键删除数据:${table.sqlName}">
         DELETE FROM ${table.sqlName}
         WHERE
         <#list table.primaryKeys.columnList as column>
             <#if column_index gt 0>AND </#if>${column.sqlName} = ${"#"}{${column.javaName}, jdbcType=${column.sqlType}}
         </#list>
-    </operation>
+    </delete>
 
-    <operation name="getBy${table.primaryKeys.pkName}" multiplicity="one" remark="根据主键获取数据:${table.sqlName}">
+    <select id="getBy${table.primaryKeys.pkName}" multiplicity="one" remark="根据主键获取数据:${table.sqlName}">
         SELECT * FROM ${table.sqlName}
         WHERE
         <#list table.primaryKeys.columnList as column>
             <#if column_index gt 0>AND </#if>${column.sqlName} = ${"#"}{${column.javaName}, jdbcType=${column.sqlType}}
         </#list>
-    </operation>
+    </select>
 </#if>
 </#if>
 </table>

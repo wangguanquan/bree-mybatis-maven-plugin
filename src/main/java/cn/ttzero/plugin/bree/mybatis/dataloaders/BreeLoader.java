@@ -496,7 +496,7 @@ public class BreeLoader extends AbstractLoader {
                               CfOperation operation, Map<String, String> columnMap) {
 
         DOMapperMethod method = new DOMapperMethod();
-        method.setName(operation.getName());
+        method.setName(operation.getId());
         method.setDesc(operation.getRemark());
         method.setSql(operation.getSqlDesc());
 
@@ -615,8 +615,8 @@ public class BreeLoader extends AbstractLoader {
         if (prefix == null) prefix = "";
         if (suffix == null) suffix = "Vo";
 
-        pagingResultMethod.setName(operation.getName() + "Result");
-        pagingResultMethod.setPagingName(operation.getName());
+        pagingResultMethod.setName(operation.getId() + "Result");
+        pagingResultMethod.setPagingName(operation.getId());
         pagingResultMethod.setDesc(operation.getRemark());
         pagingResultMethod.setSql(operation.getSqlDesc());
         pagingResultMethod.setPagingFlag("true");
@@ -672,7 +672,7 @@ public class BreeLoader extends AbstractLoader {
         // If exists customize count
         if (!operation.isNoCount() && !operation.isCustomizeCount()) {
             DOMapperMethod pagingCountMethod = pagingResultMethod.deepClone();
-            pagingCountMethod.setName(operation.getName() + "Count");
+            pagingCountMethod.setName(operation.getId() + "Count");
             pagingCountMethod.setReturnClass("int");
             doMapper.addMethod(pagingCountMethod);
         } else {
@@ -694,7 +694,7 @@ public class BreeLoader extends AbstractLoader {
     private void preMethod(DO doClass, Map<String, ResultMap> resultMaps, DOMapper doMapper,
                            CfOperation operation, Map<String, String> columnMap) {
         DOMapperMethod method = new DOMapperMethod();
-        method.setName(operation.getName());
+        method.setName(operation.getId());
         method.setDesc(operation.getRemark());
         method.setSql(operation.getSqlDesc());
         preMethodParam(doClass, doMapper, operation, method, columnMap);
@@ -795,9 +795,10 @@ public class BreeLoader extends AbstractLoader {
     private String operationResultType(DO doClass, Base base, CfOperation operation,
                                        Map<String, ResultMap> resultMaps) {
 
-        if (StringUtils.startsWithIgnoreCase(operation.getName(), "insert")
-            || StringUtils.startsWithIgnoreCase(operation.getName(), "update")
-            || StringUtils.startsWithIgnoreCase(operation.getName(), "delete")) {
+        // FIXME use operation type check returns
+        if (StringUtils.startsWithIgnoreCase(operation.getId(), "insert")
+            || StringUtils.startsWithIgnoreCase(operation.getId(), "update")
+            || StringUtils.startsWithIgnoreCase(operation.getId(), "delete")) {
             return "Long";
         }
         //返回类不为null

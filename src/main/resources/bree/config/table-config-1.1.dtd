@@ -7,7 +7,7 @@
   sequence     oracle使用
   physicalName 物理表名,分库分表使用
   -->
-  <!ELEMENT table (column* | resultMap* | operation* | sql)+>
+  <!ELEMENT table (resultMap* | sql* | insert* | update* | delete* | select*)+>
   <!ATTLIST table
     sqlName CDATA #IMPLIED
     sequence CDATA #IMPLIED
@@ -27,15 +27,15 @@
   column 字段定义,定义字段对应javaType
   name          数据中字段名
   javaType      对应转为那种javaType
-  relatedColumn 针对 com.alipay.fc.common.lang.money.MultiCurrencyMoney 扩展
   -->
-  <!ELEMENT column EMPTY>
-  <!ATTLIST column
-    name CDATA #REQUIRED
-    javaType CDATA #REQUIRED
-    jdbcType CDATA #REQUIRED
-    remark CDATA #REQUIRED
-    relatedColumn CDATA #IMPLIED
+  <!ELEMENT result EMPTY>
+  <!ATTLIST result
+    property CDATA #REQUIRED
+    javaType CDATA #IMPLIED
+    column CDATA #IMPLIED
+    jdbcType CDATA #IMPLIED
+    typeHandler CDATA #IMPLIED
+    remark CDATA #IMPLIED
     >
 
   <!--
@@ -43,7 +43,7 @@
    name        提供给operation 使用
    type        自定义映射名
    -->
-  <!ELEMENT resultMap (id*,column*,association*,collection*)>
+  <!ELEMENT resultMap (id*,result*,association*,collection*)>
   <!ATTLIST resultMap
     name CDATA #REQUIRED
     type CDATA #REQUIRED
@@ -61,9 +61,9 @@
   noCount       不生成count语句
   auto           - 暂时没想好怎么用,设想新增字段时自动修复
   -->
-  <!ELEMENT operation (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
-  <!ATTLIST operation
-    name CDATA #REQUIRED
+  <!ELEMENT select (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ATTLIST select
+    id CDATA #REQUIRED
     vo CDATA #IMPLIED
     paramType (object|primitive) #IMPLIED
     multiplicity (one|many|paging) #IMPLIED
@@ -72,6 +72,57 @@
     resultMap CDATA #IMPLIED
     timeout CDATA #IMPLIED
     noCount (yes|no) #IMPLIED
+    resultSetType (FORWARD_ONLY | SCROLL_INSENSITIVE | SCROLL_SENSITIVE | DEFAULT) #IMPLIED
+    statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
+    fetchSize CDATA #IMPLIED
+    flushCache (true|false) #IMPLIED
+    useCache (true|false) #IMPLIED
+    >
+
+  <!--
+    parameterMap 已被官方废弃
+    parameterType 本插件也支持，统一使用内联参数映射
+    paramType 插件新增类型，选择object时参数将以实体传递，选择primitive时参数会平铺传入
+    -->
+  <!ELEMENT insert (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ATTLIST insert
+    id CDATA #REQUIRED
+    remark CDATA #IMPLIED
+    paramType (object|primitive) #IMPLIED
+    timeout CDATA #IMPLIED
+    flushCache (true|false) #IMPLIED
+    statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
+    keyProperty CDATA #IMPLIED
+    useGeneratedKeys (true|false) #IMPLIED
+    keyColumn CDATA #IMPLIED
+    >
+
+  <!--
+    parameterMap 已被官方废弃
+    parameterType 本插件也支持，统一使用内联参数映射
+    paramType 插件新增类型，选择object时参数将以实体传递，选择primitive时参数会平铺传入
+    -->
+  <!ELEMENT update (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ATTLIST update
+    id CDATA #REQUIRED
+    remark CDATA #IMPLIED
+    paramType (object|primitive) #IMPLIED
+    timeout CDATA #IMPLIED
+    flushCache (true|false) #IMPLIED
+    statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
+    keyProperty CDATA #IMPLIED
+    useGeneratedKeys (true|false) #IMPLIED
+    keyColumn CDATA #IMPLIED
+    >
+
+  <!ELEMENT delete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+  <!ATTLIST delete
+    id CDATA #REQUIRED
+    remark CDATA #IMPLIED
+    paramType (object|primitive) #IMPLIED
+    timeout CDATA #IMPLIED
+    flushCache (true|false) #IMPLIED
+    statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
     >
 
   <!ELEMENT property EMPTY>
@@ -80,26 +131,31 @@
     value CDATA #REQUIRED
     >
 
-  <!ELEMENT selectKey (#PCDATA | include)*>
+  <!ELEMENT selectKey (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
   <!ATTLIST selectKey
     resultType CDATA #IMPLIED
     keyProperty CDATA #IMPLIED
+    keyColumn CDATA #IMPLIED
     order (BEFORE|AFTER) #IMPLIED
     >
 
-  <!ELEMENT collection (id*,column*,association*,collection*)>
+  <!ELEMENT collection (id*,result*,association*,collection*)>
   <!ATTLIST collection
     property CDATA #REQUIRED
+    column CDATA #IMPLIED
+    javaType CDATA #IMPLIED
     ofType CDATA #IMPLIED
+    jdbcType CDATA #IMPLIED
     resultMap CDATA #IMPLIED
     remark CDATA #IMPLIED
     >
 
-  <!ELEMENT association (id*,column*,association*,collection*)>
+  <!ELEMENT association (id*,result*,association*,collection*)>
   <!ATTLIST association
     property CDATA #REQUIRED
     column CDATA #IMPLIED
     javaType CDATA #IMPLIED
+    jdbcType CDATA #IMPLIED
     select CDATA #IMPLIED
     resultMap CDATA #IMPLIED
     remark CDATA #IMPLIED

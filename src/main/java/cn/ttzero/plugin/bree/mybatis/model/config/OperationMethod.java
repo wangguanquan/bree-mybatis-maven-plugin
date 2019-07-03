@@ -24,15 +24,4 @@ public enum OperationMethod {
     insert,
     update,
     delete
-    ;
-
-    public static OperationMethod of(String name) {
-        OperationMethod[] values = values();
-        for (OperationMethod e : values) {
-            if (e.name().equals(name)) {
-                return e;
-            }
-        }
-        return select;
-    }
 }

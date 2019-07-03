@@ -316,12 +316,13 @@ public class CfTableRepository {
      * @param table   the table
      */
     private void fillOperation(CfTable cfTable, Element table) {
+        // FIXME no operation tag
         @SuppressWarnings({"unchecked", "retype"})
         List<Element> elements = table.elements("operation");
         for (Element e : elements) {
             CfOperation cfOperation = new CfOperation();
             cfOperation.setRemark(getAttr(e, "remark"));
-            cfOperation.setName(getAttr(e, "name"));
+            cfOperation.setId(getAttr(e, "id"));
             cfOperation.setMultiplicity(MultiplicityEnum.getByCode(getAttr(e, "multiplicity")));
             cfOperation.setVo(getAttr(e, "vo"));
             if (cfOperation.getMultiplicity() == MultiplicityEnum.paging) {
@@ -429,7 +430,8 @@ public class CfTableRepository {
             return cdata;
         }
 //        cfTable.getColumns();
-        if (StringUtils.startsWithIgnoreCase(cfOperation.getName(), "insert")) {
+        // FIXME use tag name
+        if (StringUtils.startsWithIgnoreCase(cfOperation.getId(), "insert")) {
             //TODO cdata中 insert ? 参数替换 不指定类型
             String sql = cdata;
             //sql 特殊处理一下
@@ -498,7 +500,7 @@ public class CfTableRepository {
 
         // 判断是否已有count语句
         @SuppressWarnings({"unchecked", "retype"})
-        List<Element> list = e.selectNodes("//operation[@name='" + cfOperation.getName() + "Count']");
+        List<Element> list = e.selectNodes("//operation[@name='" + cfOperation.getId() + "Count']");
         // 如果已有count语句则跳过
         if (list != null && !list.isEmpty()) {
             cfOperation.setCustomizeCount(true);
@@ -756,9 +758,9 @@ public class CfTableRepository {
         ifs.addAll(whens);
         for (Element ele : ifs) {
             Attribute getAttr = ele.attribute("test");
-            Validate.notNull(getAttr, "<if> 或 <when> 元素未配置test属性 table=" + cfOperation.getName());
+            Validate.notNull(getAttr, "<if> 或 <when> 元素未配置test属性 id=" + cfOperation.getId());
             String test = getAttr.getValue();
-            Validate.notEmpty(test, "<if> 或 <when> 元素配置test属性值空 table=" + cfOperation.getName());
+            Validate.notEmpty(test, "<if> 或 <when> 元素配置test属性值空 id=" + cfOperation.getId());
             String[] tests = test.split(" and | or | AND | OR ");
             for (String t : tests) {
                 String[] kv = getKV(t.trim());
@@ -790,8 +792,8 @@ public class CfTableRepository {
         for (Element item : items) {
             String collName = getAttr(item, "collection");
             String itemName = getAttr(item, "item");
-            Validate.notEmpty(collName, "foreach 元素设置错误 table=" + cfOperation.getName());
-            Validate.notEmpty(itemName, "foreach 元素设置错误 table=" + cfOperation.getName());
+            Validate.notEmpty(collName, "foreach 元素设置错误 id=" + cfOperation.getId());
+            Validate.notEmpty(itemName, "foreach 元素设置错误 id=" + cfOperation.getId());
             cfOperation.addPrimitiveForeachParam(itemName, collName);
         }
     }
@@ -903,6 +905,7 @@ public class CfTableRepository {
         }
     }
 
+    // FIXME use tag name
     static OperationMethod testMethod(Element e) {
         @SuppressWarnings({"unchecked", "retype"})
         List<Element> sub = e.elements();
@@ -917,7 +920,7 @@ public class CfTableRepository {
         int n = content.indexOf(' ');
         if (n > 0) {
             String key = content.substring(0, n);
-            return OperationMethod.of(key.toLowerCase());
+            return OperationMethod.valueOf(key.toLowerCase());
         }
         return OperationMethod.select;
     }
