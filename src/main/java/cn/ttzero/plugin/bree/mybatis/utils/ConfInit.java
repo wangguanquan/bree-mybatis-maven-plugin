@@ -23,7 +23,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import cn.ttzero.plugin.bree.mybatis.BreeMojo;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**

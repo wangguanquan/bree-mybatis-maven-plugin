@@ -21,7 +21,7 @@ import java.util.Set;
 
 import cn.ttzero.plugin.bree.mybatis.model.java.*;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import com.google.common.collect.Lists;

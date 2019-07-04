@@ -16,7 +16,7 @@
 
 package cn.ttzero.plugin.bree.mybatis.enums;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created by guanquan.wang at 2019-05-24 21:50

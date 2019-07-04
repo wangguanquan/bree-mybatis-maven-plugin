@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 import cn.ttzero.plugin.bree.mybatis.model.db.Database;
 import com.google.common.collect.Maps;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import cn.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import cn.ttzero.plugin.bree.mybatis.model.config.CfColumn;

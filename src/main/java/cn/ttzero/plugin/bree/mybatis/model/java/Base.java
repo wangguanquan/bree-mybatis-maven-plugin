@@ -18,7 +18,7 @@ package cn.ttzero.plugin.bree.mybatis.model.java;
 
 import cn.ttzero.plugin.bree.mybatis.model.repository.JavaProperty;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import java.util.List;
 

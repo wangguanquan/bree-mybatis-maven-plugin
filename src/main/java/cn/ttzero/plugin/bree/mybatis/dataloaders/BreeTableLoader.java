@@ -24,7 +24,7 @@ import java.util.List;
 import cn.ttzero.plugin.bree.mybatis.model.Gen;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import cn.ttzero.plugin.bree.mybatis.common.FileNameSelector;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 

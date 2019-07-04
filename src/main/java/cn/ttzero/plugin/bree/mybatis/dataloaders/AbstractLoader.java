@@ -22,7 +22,7 @@ import cn.ttzero.plugin.bree.mybatis.model.Gen;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import fmpp.Engine;
 import fmpp.tdd.DataLoader;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.sql.Connection;

@@ -18,7 +18,7 @@ package cn.ttzero.plugin.bree.mybatis.utils;
 
 import java.util.Scanner;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Desc 控制台输入

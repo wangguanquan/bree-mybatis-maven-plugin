@@ -28,7 +28,7 @@ import cn.ttzero.plugin.bree.mybatis.model.db.Database;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.JdbcType;
 
 import cn.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;

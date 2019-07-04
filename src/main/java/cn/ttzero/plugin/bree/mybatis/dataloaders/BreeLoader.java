@@ -37,8 +37,8 @@ import cn.ttzero.plugin.bree.mybatis.model.repository.*;
 import cn.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import cn.ttzero.plugin.bree.mybatis.utils.StringUtil;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 
