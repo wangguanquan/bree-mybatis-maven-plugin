@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cn.ttzero.plugin.bree.mybatis.common.FileNameSelector;
 import cn.ttzero.plugin.bree.mybatis.exception.BreeException;
 import cn.ttzero.plugin.bree.mybatis.model.Gen;
 import cn.ttzero.plugin.bree.mybatis.model.config.*;
@@ -93,7 +92,7 @@ public class BreeLoader extends AbstractLoader {
     public void load(Gen gen, Connection connection, File tablesFile) throws Exception {
         // 解析所有table.xml(为生成sqlMap.xml做准备)
         Map<String, CfTable> cfTableMap = Maps.newHashMap();
-        File[] files = tablesFile.listFiles(new FileNameSelector("xml"));
+        File[] files = tablesFile.listFiles((f, name) -> name.endsWith(".xml"));
         if (files == null) {
             LOG.error("缺少table.xml");
             return;

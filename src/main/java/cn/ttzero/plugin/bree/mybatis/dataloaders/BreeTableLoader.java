@@ -23,7 +23,6 @@ import java.util.List;
 
 import cn.ttzero.plugin.bree.mybatis.model.Gen;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
-import cn.ttzero.plugin.bree.mybatis.common.FileNameSelector;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -63,7 +62,7 @@ public class BreeTableLoader extends AbstractLoader {
         List<String> neadInitTables = Lists.newArrayList();
 
         List<String> existsTables = Lists.newArrayList();
-        File[] files = tablesFile.listFiles(new FileNameSelector("xml"));
+        File[] files = tablesFile.listFiles((d, name) -> name.endsWith(".xml"));
         if (files != null) {
             for (File file : files) {
                 existsTables.add(file2DbName(file));
