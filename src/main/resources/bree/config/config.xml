@@ -24,7 +24,7 @@
   <!-- datasource config  可以配置多个                              -->
   <!-- ========================================================== -->
 
-  <database name="sdm" class="org.gjt.mm.mysql.Driver" type="mysql">
+  <database name="sdm" class="com.mysql.cj.jdbc.Driver" type="mysql">
     <property name="url" value="jdbc:mysql://localhost:3306/job"/>
     <property name="user" value="root"/>
     <property name="password" value="root"/>
