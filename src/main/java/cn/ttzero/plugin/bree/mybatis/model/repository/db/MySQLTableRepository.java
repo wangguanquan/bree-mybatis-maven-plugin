@@ -21,18 +21,15 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 import cn.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import cn.ttzero.plugin.bree.mybatis.model.db.Database;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.JdbcType;
 
 import cn.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
-import cn.ttzero.plugin.bree.mybatis.model.config.CfColumn;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.PrimaryKeys;
 import cn.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
@@ -63,13 +60,13 @@ public class MySQLTableRepository {
             }
         }
 
-        List<CfColumn> cfColumns = cfTable == null ? null : cfTable.getColumns();
+        List<Column> cfColumns = cfTable == null ? null : cfTable.getColumns();
         DatabaseMetaData databaseMetaData = connection.getMetaData();
 
 
         // 生成table
         Table table = new Table();
-        table.setSqlName(logicName);
+        table.setName(logicName);
         for (String pre : database.getPrefixs()) {
             if (!StringUtils.endsWith(pre, "_")) {
                 pre = pre + "_";
@@ -119,11 +116,12 @@ public class MySQLTableRepository {
 
         while (resultSet.next()) {
             for (Column column : table.getColumnList()) {
-                if (StringUtils.equals(column.getSqlName(), Str(resultSet, "COLUMN_NAME"))) {
+                if (StringUtils.equals(column.getColumn(), Str(resultSet, "COLUMN_NAME"))) {
                     primaryKeys = primaryKeys == null ? new PrimaryKeys() : primaryKeys;
                     primaryKeys.addColumn(column);
+                    column.setPrimaryKey(true);
                     String pkName = resultSet.getString("PK_NAME");
-                    pkName = StringUtils.isBlank(pkName) ? column.getSqlName() : pkName;
+                    pkName = StringUtils.isBlank(pkName) ? column.getColumn() : pkName;
                     primaryKeys.setPkName(CamelCaseUtils.toCapitalizeCamelCase(pkName));
                 }
             }
@@ -143,19 +141,19 @@ public class MySQLTableRepository {
      */
     private void fillColumns(Connection connection, String tableName,
                              DatabaseMetaData databaseMetaData, Table table,
-                             List<CfColumn> cfColumns) throws SQLException {
+                             List<Column> cfColumns) throws SQLException {
         // 指定表字段
         ResultSet resultSet = databaseMetaData.getColumns(connection.getCatalog(), null, tableName, null);
 
         // 组装字段
         while (resultSet.next()) {
             Column column = new Column();
-            column.setSqlName(Str(resultSet, "COLUMN_NAME"));
-            column.setSqlType(JdbcType.forCode(resultSet.getInt("DATA_TYPE")).name());
+            column.setColumn(Str(resultSet, "COLUMN_NAME"));
+            column.setJdbcType(JdbcType.forCode(resultSet.getInt("DATA_TYPE")).name());
             column.setDefaultValue(Str(resultSet, "COLUMN_DEF"));
-            column.setJavaName(CamelCaseUtils.toCamelCase(column.getSqlName()));
+            column.setProperty(CamelCaseUtils.toCamelCase(column.getColumn()));
             column.setJavaType(getJavaType(column, cfColumns));
-            column.setRemarks(Str(resultSet, "REMARKS", column.getSqlName()));
+            column.setRemark(Str(resultSet, "REMARKS", column.getColumn()));
             table.addColumn(column);
         }
     }
@@ -167,15 +165,15 @@ public class MySQLTableRepository {
      * @param cfColumns the cf columns
      * @return the java type
      */
-    private String getJavaType(Column column, List<CfColumn> cfColumns) {
+    private String getJavaType(Column column, List<Column> cfColumns) {
         if (cfColumns != null && cfColumns.size() > 0) {
-            for (CfColumn cfColumn : cfColumns) {
-                if (StringUtils.endsWithIgnoreCase(column.getSqlName(), cfColumn.getName())) {
+            for (Column cfColumn : cfColumns) {
+                if (StringUtils.endsWithIgnoreCase(column.getColumn(), cfColumn.getColumn())) {
                     return cfColumn.getJavaType();
                 }
             }
         }
-        String javaType = TypeMapEnum.getByJdbcType(column.getSqlType()).getJavaType();
+        String javaType = TypeMapEnum.getByJdbcType(column.getJdbcType()).getJavaType();
         String custJavaType = ConfigUtil.config.getTypeMap().get(javaType);
         return StringUtils.isBlank(custJavaType) ? javaType : custJavaType;
     }

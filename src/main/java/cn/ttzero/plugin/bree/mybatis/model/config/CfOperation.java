@@ -48,11 +48,11 @@ public class CfOperation {
      */
     private String remark;
     /**
-     * The Resulttype.
+     * The result type.
      */
     private String resultType;
     /**
-     * The Resultmap.
+     * The result map.
      */
     private String resultMap;
     /**
@@ -109,7 +109,7 @@ public class CfOperation {
     /**
      * The operation method. see {@link OperationMethod}
      */
-    private OperationMethod om;
+    private OperationMethod operation;
 
     /**
      * Returns operation id.
@@ -387,11 +387,11 @@ public class CfOperation {
         this.customizeCount = customizeCount;
     }
 
-    public OperationMethod getOm() {
-        return om;
+    public OperationMethod getOperation() {
+        return operation;
     }
 
-    public void setOm(OperationMethod om) {
-        this.om = om;
+    public void setOperation(OperationMethod operation) {
+        this.operation = operation;
     }
 }

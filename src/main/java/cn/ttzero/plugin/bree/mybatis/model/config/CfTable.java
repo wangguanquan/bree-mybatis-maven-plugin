@@ -16,9 +16,8 @@
 
 package cn.ttzero.plugin.bree.mybatis.model.config;
 
-import cn.ttzero.plugin.bree.mybatis.model.java.domapper.Sql;
-import cn.ttzero.plugin.bree.mybatis.exception.BreeException;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.Column;
+import cn.ttzero.plugin.bree.mybatis.model.java.domapper.Sql;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class CfTable {
     /**
      * The Columns.
      */
-    private List<CfColumn> columns = Lists.newArrayList();
+    private List<Column> columns = Lists.newArrayList();
     /**
      * The Result maps.
      */
@@ -145,7 +144,7 @@ public class CfTable {
      *
      * @return the columns
      */
-    public List<CfColumn> getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 
@@ -172,7 +171,7 @@ public class CfTable {
      *
      * @param column the column
      */
-    public void addColumn(CfColumn column) {
+    public void addColumn(Column column) {
         this.columns.add(column);
     }
 

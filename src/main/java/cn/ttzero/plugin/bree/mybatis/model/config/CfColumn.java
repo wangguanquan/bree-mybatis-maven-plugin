@@ -16,132 +16,168 @@
 
 package cn.ttzero.plugin.bree.mybatis.model.config;
 
-/**
- * Created by guanquan.wang at 2019-05-24 14:16
- */
-public class CfColumn {
-    /**
-     * The Name.
-     */
-    private String name;
-    /**
-     * The JavaType.
-     */
-    private String javaType;
-
-    /**
-     * The Sql type.
-     */
-    private String sqlType;
-
-    /**
-     * The Remark.
-     */
-    private String remark;
-    /**
-     * The Related column.
-     */
-    private String relatedColumn;
-    /**
-     * The key
-     */
-    private String key;
-
-    /**
-     * Gets name.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets name.
-     *
-     * @param name the name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Gets javaType.
-     *
-     * @return the javaType
-     */
-    public String getJavaType() {
-        return javaType;
-    }
-
-    /**
-     * Sets javaType.
-     *
-     * @param javaType the javaType
-     */
-    public void setJavaType(String javaType) {
-        this.javaType = javaType;
-    }
-
-    /**
-     * Gets related column.
-     *
-     * @return the related column
-     */
-    public String getRelatedColumn() {
-        return relatedColumn;
-    }
-
-    /**
-     * Sets related column.
-     *
-     * @param relatedColumn the related column
-     */
-    public void setRelatedColumn(String relatedColumn) {
-        this.relatedColumn = relatedColumn;
-    }
-
-    /**
-     * Gets sql type.
-     *
-     * @return the sql type
-     */
-    public String getSqlType() {
-        return sqlType;
-    }
-
-    /**
-     * Sets sql type.
-     *
-     * @param sqlType the sql type
-     */
-    public void setSqlType(String sqlType) {
-        this.sqlType = sqlType;
-    }
-
-    /**
-     * Gets remark.
-     *
-     * @return the remark
-     */
-    public String getRemark() {
-        return remark;
-    }
-
-    /**
-     * Sets remark.
-     *
-     * @param remark the remark
-     */
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-}
+///**
+// * Created by guanquan.wang at 2019-05-24 14:16
+// */
+//public class CfColumn {
+//    /**
+//     * The column name.
+//     */
+//    private String column;
+//
+//    /**
+//     * The java field
+//     */
+//    private String property;
+//
+//    /**
+//     * The JavaType.
+//     */
+//    private String javaType;
+//
+//    /**
+//     * The Sql type.
+//     */
+//    private String jdbcType;
+//
+//    /**
+//     * The Remark.
+//     */
+//    private String remark;
+//
+//    /**
+//     * The Related column.
+//     */
+//    private String relatedColumn;
+//
+//    /**
+//     * The flag mark the column is primary key
+//     */
+//    private boolean primaryKey;
+//
+//    /**
+//     * Returns the column.
+//     *
+//     * @return the column name
+//     */
+//    public String getColumn() {
+//        return column;
+//    }
+//
+//    /**
+//     * Setting column name.
+//     *
+//     * @param column the column name
+//     */
+//    public void setColumn(String column) {
+//        this.column = column;
+//    }
+//
+//    /**
+//     * Returns javaType.
+//     *
+//     * @return the javaType
+//     */
+//    public String getJavaType() {
+//        return javaType;
+//    }
+//
+//    /**
+//     * Setting javaType.
+//     *
+//     * @param javaType the javaType
+//     */
+//    public void setJavaType(String javaType) {
+//        this.javaType = javaType;
+//    }
+//
+//    /**
+//     * Returns related column.
+//     *
+//     * @return the related column
+//     */
+//    public String getRelatedColumn() {
+//        return relatedColumn;
+//    }
+//
+//    /**
+//     * Setting related column.
+//     *
+//     * @param relatedColumn the related column
+//     */
+//    public void setRelatedColumn(String relatedColumn) {
+//        this.relatedColumn = relatedColumn;
+//    }
+//
+//    /**
+//     * Returns column type.
+//     *
+//     * @return the column type
+//     */
+//    public String getJdbcType() {
+//        return jdbcType;
+//    }
+//
+//    /**
+//     * Setting column type.
+//     *
+//     * @param jdbcType the column type
+//     */
+//    public void setJdbcType(String jdbcType) {
+//        this.jdbcType = jdbcType;
+//    }
+//
+//    /**
+//     * Returns remark.
+//     *
+//     * @return the remark
+//     */
+//    public String getRemark() {
+//        return remark;
+//    }
+//
+//    /**
+//     * Setting remark.
+//     *
+//     * @param remark the remark
+//     */
+//    public void setRemark(String remark) {
+//        this.remark = remark;
+//    }
+//
+//    /**
+//     * Returns the field property
+//     *
+//     * @return the field property
+//     */
+//    public String getProperty() {
+//        return property;
+//    }
+//
+//    /**
+//     * Setting the field property
+//     *
+//     * @param property the field property
+//     */
+//    public void setProperty(String property) {
+//        this.property = property;
+//    }
+//
+//    /**
+//     * Returns current column is primary key
+//     *
+//     * @return true if primary key
+//     */
+//    public boolean isPrimaryKey() {
+//        return primaryKey;
+//    }
+//
+//    /**
+//     * Setting current column is primary key
+//     *
+//     * @param primaryKey is primary key
+//     */
+//    public void setPrimaryKey(boolean primaryKey) {
+//        this.primaryKey = primaryKey;
+//    }
+//}

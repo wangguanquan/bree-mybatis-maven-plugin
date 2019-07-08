@@ -29,11 +29,27 @@ import java.util.regex.Pattern;
 
 import cn.ttzero.plugin.bree.mybatis.exception.BreeException;
 import cn.ttzero.plugin.bree.mybatis.model.Gen;
-import cn.ttzero.plugin.bree.mybatis.model.config.*;
+import cn.ttzero.plugin.bree.mybatis.model.config.CfAssociation;
+import cn.ttzero.plugin.bree.mybatis.model.config.CfCollection;
+import cn.ttzero.plugin.bree.mybatis.model.config.CfOperation;
+import cn.ttzero.plugin.bree.mybatis.model.config.CfResultMap;
+import cn.ttzero.plugin.bree.mybatis.model.config.CfTable;
+import cn.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.Table;
-import cn.ttzero.plugin.bree.mybatis.model.java.*;
-import cn.ttzero.plugin.bree.mybatis.model.repository.*;
-import cn.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
+import cn.ttzero.plugin.bree.mybatis.model.java.Base;
+import cn.ttzero.plugin.bree.mybatis.model.java.DAO;
+import cn.ttzero.plugin.bree.mybatis.model.java.DO;
+import cn.ttzero.plugin.bree.mybatis.model.java.DOMapper;
+import cn.ttzero.plugin.bree.mybatis.model.java.Field;
+import cn.ttzero.plugin.bree.mybatis.model.java.ResultMap;
+import cn.ttzero.plugin.bree.mybatis.model.java.Vo;
+import cn.ttzero.plugin.bree.mybatis.model.java.XmlMapper;
+import cn.ttzero.plugin.bree.mybatis.model.repository.CfTableRepository;
+import cn.ttzero.plugin.bree.mybatis.model.repository.DataObjectConfig;
+import cn.ttzero.plugin.bree.mybatis.model.repository.JavaConfig;
+import cn.ttzero.plugin.bree.mybatis.model.repository.JavaProperty;
+import cn.ttzero.plugin.bree.mybatis.model.repository.TableRepository;
+import cn.ttzero.plugin.bree.mybatis.model.repository.VoConfig;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import cn.ttzero.plugin.bree.mybatis.utils.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +60,6 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 import cn.ttzero.plugin.bree.mybatis.enums.MultiplicityEnum;
 import cn.ttzero.plugin.bree.mybatis.enums.ParamTypeEnum;
 import cn.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
-import cn.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import cn.ttzero.plugin.bree.mybatis.model.java.domapper.DOMapperMethod;
 import cn.ttzero.plugin.bree.mybatis.model.java.domapper.DOMapperMethodParam;
 import com.google.common.collect.Lists;
@@ -228,14 +243,14 @@ public class BreeLoader extends AbstractLoader {
         if (suffix == null) suffix = "";
         for (CfResultMap cfResultMap : resultMapList) {
             ResultMap resultMap = new ResultMap();
-            resultMap.setTableName(table.getSqlName());
-            resultMap.setName(cfResultMap.getName());
+            resultMap.setTableName(table.getName());
+            resultMap.setId(cfResultMap.getId());
             resultMap.setType(cfResultMap.getType());
             resultMap.setClassName(prefix + cfResultMap.getType() + suffix);
             resultMap.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
             resultMap.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
             resultMap.setDesc(cfResultMap.getRemark());
-            doCfColumn(gen, tbName, resultMap, cfResultMap.getColumns(), null);
+            doColumn(gen, tbName, resultMap, cfResultMap.getColumns(), null);
 
             List<CfCollection> cfCollectionList = cfResultMap.getCollections();
             List<CfAssociation> cfAssociationList = cfResultMap.getAssociations();
@@ -269,7 +284,7 @@ public class BreeLoader extends AbstractLoader {
                 // inner xml
                 resultMap.setInnerXML(writeToByteArray(factory.createDocument(rootElement)));
             }
-            resultMaps.put(cfResultMap.getName(), resultMap);
+            resultMaps.put(cfResultMap.getId(), resultMap);
             xmlMapper.addResultMap(resultMap);
             gen.addResultMap(resultMap);
         }
@@ -307,13 +322,13 @@ public class BreeLoader extends AbstractLoader {
 
         ResultMap resultMap = new ResultMap();
         resultMap.setTableName("");
-        resultMap.setName(coll.getProperty());
+        resultMap.setId(coll.getProperty());
         resultMap.setType(coll.getOfType());
         resultMap.setClassName(prefix + coll.getOfType() + suffix);
         resultMap.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
         resultMap.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
         resultMap.setDesc(coll.getRemark());
-        doCfColumn(gen, tbName, resultMap, coll.getColumns(), subEle);
+        doColumn(gen, tbName, resultMap, coll.getColumns(), subEle);
         gen.addResultMap(resultMap);
 
         List<CfAssociation> cfAssociationList = coll.getAssociations();
@@ -345,13 +360,13 @@ public class BreeLoader extends AbstractLoader {
 
         ResultMap resultMap = new ResultMap();
         resultMap.setTableName("");
-        resultMap.setName(assoc.getProperty());
+        resultMap.setId(assoc.getProperty());
         resultMap.setType(assoc.getJavaType());
         resultMap.setClassName(prefix + assoc.getJavaType() + suffix);
         resultMap.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
         resultMap.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
         resultMap.setDesc(assoc.getRemark());
-        doCfColumn(gen, tbName, resultMap, assoc.getColumns(), subEle);
+        doColumn(gen, tbName, resultMap, assoc.getColumns(), subEle);
         gen.addResultMap(resultMap);
 
         List<CfAssociation> cfAssociationList = assoc.getAssociations();
@@ -397,37 +412,37 @@ public class BreeLoader extends AbstractLoader {
      * @param resultMap
      * @param cfColumns
      */
-    private void doCfColumn(Gen gen, String tbName, ResultMap resultMap, List<CfColumn> cfColumns, Element e) {
-        for (CfColumn cfColumn : cfColumns) {
-            Validate.notEmpty(cfColumn.getName(), tbName
+    private void doColumn(Gen gen, String tbName, ResultMap resultMap, List<Column> cfColumns, Element e) {
+        for (Column column : cfColumns) {
+            Validate.notEmpty(column.getColumn(), tbName
                 + ".xml 配置有误 BreeLoader.preResultMap Gen=" + gen);
             // 生成XML <resultMap> 标签使用
-            Column column = new Column();
-            column.setJavaName(CamelCaseUtils.toCamelCase(cfColumn.getName()));
-            column.setJavaType(cfColumn.getJavaType());
-            column.setSqlName(cfColumn.getName());
-            column.setSqlType(cfColumn.getSqlType());
-            column.setRemarks(cfColumn.getRemark());
+//            Column column = new Column();
+//            column.setJavaName(CamelCaseUtils.toCamelCase(cfColumn.getName()));
+//            column.setJavaType(cfColumn.getJavaType());
+//            column.setSqlName(cfColumn.getName());
+//            column.setSqlType(cfColumn.getSqlType());
+//            column.setRemarks(cfColumn.getRemark());
             resultMap.addColumn(column);
 
             // 生成ResultMap.java文件使用
             Field field = new Field();
             field.setJavaType(getClassAndImport(resultMap, column.getJavaType()));
-            field.setName(column.getJavaName());
-            field.setDesc(column.getRemarks());
+            field.setName(column.getProperty());
+            field.setDesc(column.getRemark());
 
             resultMap.addField(field);
 
             if (e != null) {
                 Element ele;
-                if ("ID".equals(cfColumn.getName()) || StringUtils.isNotEmpty(cfColumn.getKey())) {
+                if ("ID".equals(column.getColumn()) || column.isPrimaryKey()) {
                     ele = e.addElement("id");
                 } else {
                     ele = e.addElement("result");
                 }
-                ele.addAttribute("column", column.getSqlName());
-                ele.addAttribute("property", column.getJavaName());
-                ele.addAttribute("jdbcType", column.getSqlType());
+                ele.addAttribute("column", column.getColumn());
+                ele.addAttribute("property", column.getProperty());
+                ele.addAttribute("jdbcType", column.getJdbcType());
                 ele.addAttribute("javaType", column.getJavaType());
             }
         }
@@ -472,7 +487,7 @@ public class BreeLoader extends AbstractLoader {
         Map<String, String> columnTypeMap = Maps.newHashMap();
 //        Map<String, String> columnDescMap = Maps.newHashMap();
         for (Column column : table.getColumnList()) {
-            columnTypeMap.put(column.getJavaName(), column.getJavaType());
+            columnTypeMap.put(column.getProperty(), column.getJavaType());
 //            columnDescMap.put(column.getJavaName(), column.getRemarks());
         }
 
@@ -570,9 +585,9 @@ public class BreeLoader extends AbstractLoader {
         Map<String, String> columnTypeMap = Maps.newHashMap();
         Map<String, String> columnDescMap = Maps.newHashMap();
         for (Column column : table.getColumnList()) {
-            String fieldName = column.getJavaName();
+            String fieldName = column.getProperty();
             columnTypeMap.put(fieldName, column.getJavaType());
-            columnDescMap.put(fieldName, column.getRemarks());
+            columnDescMap.put(fieldName, column.getRemark());
         }
 
         for (CfOperation operation : cfTable.getOperations()) {
@@ -629,7 +644,7 @@ public class BreeLoader extends AbstractLoader {
 //            paging.setBaseClassPath(ConfigUtil.getCurrentDb().getGenDalCommonPackagePath() + "/" + paging);
             getClassAndImport(paging, paging.getPackageName() + ".BasePage");
         }
-        paging.setDesc(StringUtil.join(table.getSqlName(), cfTable.getRemark()));
+        paging.setDesc(StringUtil.join(table.getName(), cfTable.getRemark()));
         paging.setTableName(cfTable.getSqlname());
 
         String pagingResultType = operationResultType(doClass, paging, operation, resultMaps);
@@ -834,7 +849,7 @@ public class BreeLoader extends AbstractLoader {
      * @param cfColumns the cf columns
      * @return the do
      */
-    private DO preDo(Table table, List<CfColumn> cfColumns) {
+    private DO preDo(Table table, List<Column> cfColumns) {
         DO doClass = new DO();
         // do config
         DataObjectConfig doConfig = ConfigUtil.config.getDoConfig();
@@ -855,11 +870,11 @@ public class BreeLoader extends AbstractLoader {
         doClass.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
         doClass.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
         doClass.setDesc(table.getRemark());
-        doClass.setTableName(table.getSqlName());
+        doClass.setTableName(table.getName());
 
         // 不在DO中输出地字段
         Set<String> ignoreField = doConfig.getIgnoreFields();
-        for (CfColumn cfColumn : cfColumns) {
+        for (Column cfColumn : cfColumns) {
             if (!StringUtils.isBlank(cfColumn.getRelatedColumn())) {
                 ignoreField.add(cfColumn.getRelatedColumn());
             }
@@ -867,11 +882,11 @@ public class BreeLoader extends AbstractLoader {
 
         for (Column column : table.getColumnList()) {
             // 提出不需要在DO中出现的字段
-            if (ignoreField.contains(column.getSqlName())
-                || ignoreField.contains(column.getJavaName())) continue;
+            if (ignoreField.contains(column.getColumn())
+                || ignoreField.contains(column.getProperty())) continue;
             Field field = new Field();
-            field.setName(column.getJavaName());
-            field.setDesc(column.getRemarks());
+            field.setName(column.getProperty());
+            field.setDesc(column.getRemark());
             field.setJavaType(getClassAndImport(doClass, column.getJavaType()));
             doClass.addField(field);
         }

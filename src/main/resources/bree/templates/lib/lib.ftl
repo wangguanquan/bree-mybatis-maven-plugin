@@ -19,9 +19,9 @@
 <#function mapperResult operation>
     <#if operation.resultMap??><#return 'resultMap="${operation.resultMap}"'/></#if>
     <#if operation.resultType??><#return 'resultType="${operation.resultType}"'/></#if>
-    <#if operation.om == "insert"><#return ''/></#if>
-    <#if operation.om == "update"><#return ''/></#if>
-    <#if operation.om == "delete"><#return ''/></#if>
+    <#if operation.operation == "insert"><#return ''/></#if>
+    <#if operation.operation == "update"><#return ''/></#if>
+    <#if operation.operation == "delete"><#return ''/></#if>
     <#return 'resultMap="BaseResultMap"'/>
 </#function>
 
@@ -32,24 +32,24 @@
 
 <#-- insert  时字段处理 -->
 <#function insertVal column>
-    <#if column.sqlName == "LAST_UPDATED" || column.sqlName == "DATE_CREATED"><#return "now()"></#if>
-    <#if column.sqlName == "IS_DELETED"><#return "'N'"></#if>
-    <#return '${"#"}{${column.javaName}, jdbcType=${column.sqlType}}'/>
+    <#if column.column == "LAST_UPDATED" || column.column == "DATE_CREATED"><#return "now()"></#if>
+    <#if column.column == "IS_DELETED"><#return "'N'"></#if>
+    <#return '${"#"}{${column.property}, jdbcType=${column.jdbcType}}'/>
 </#function>
 
 <#-- Update 时字段处理 -->
 <#function updateVal column>
-    <#if column.sqlName == "LAST_UPDATED" || column.sqlName == "DATE_CREATED"><#return "now()"></#if>
-    <#return '${"#"}{${column.javaName}, jdbcType=${column.sqlType}}'/>
+    <#if column.column == "LAST_UPDATED" || column.column == "DATE_CREATED"><#return "now()"></#if>
+    <#return '${"#"}{${column.property}, jdbcType=${column.jdbcType}}'/>
 </#function>
 
 <#-- update 中需要设置的字段 -->
 <#function updateIncludeColumn column primaryKeys>
-    <#if column.sqlName == "CREATOR" || column.sqlName == "DATE_CREATED">
+    <#if column.column == "CREATOR" || column.column == "DATE_CREATED">
         <#return false>
     </#if>
     <#list primaryKeys as pkColumn>
-        <#if pkColumn.sqlName == column.sqlName><#return false></#if>
+        <#if pkColumn.column == column.column><#return false></#if>
     </#list>
     <#return true>
 </#function>

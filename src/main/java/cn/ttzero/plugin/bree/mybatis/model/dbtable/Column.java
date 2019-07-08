@@ -19,70 +19,85 @@ package cn.ttzero.plugin.bree.mybatis.model.dbtable;
 /**
  * Created by guanquan.wang at 2019-05-24 21:50
  */
-public class Column implements Comparable {
+public class Column implements Comparable<Column> {
     /**
-     * The Sql type.
+     * The column name.
      */
-    private String sqlType;
+    private String column;
+
+    /**
+     * The java field
+     */
+    private String property;
+
+    /**
+     * The jdbc type.
+     */
+    private String jdbcType;
+
     /**
      * The Java type.
      */
     private String javaType;
+
     /**
-     * The Sql name.
+     * The Remark.
      */
-    private String sqlName;
+    private String remark;
+
     /**
-     * The Java name.
+     * The Related column.
      */
-    private String javaName;
-    /**
-     * The Remarks.
-     */
-    private String remarks;
+    private String relatedColumn;
+
     /**
      * The Default value.
      */
     private String defaultValue;
 
     /**
-     * Gets remarks.
-     *
-     * @return the remarks
+     * The flag mark the column is primary key
      */
-    public String getRemarks() {
-        return remarks;
+    private boolean primaryKey;
+
+    /**
+     * Returns remark.
+     *
+     * @return the remark
+     */
+    public String getRemark() {
+        return remark;
     }
 
     /**
-     * Sets remarks.
+     * Setting remark.
      *
-     * @param remarks the remarks
+     * @param remark the remark
      */
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     /**
-     * Gets sql type.
+     * Returns jdbc type.
      *
      * @return the sql type
      */
-    public String getSqlType() {
-        return sqlType;
+    public String getJdbcType() {
+        return jdbcType;
     }
 
     /**
-     * Sets sql type.
+     * Setting jdbc type.
      *
-     * @param sqlType the sql type
+     * @param jdbcType the jdbc type
      */
-    public void setSqlType(String sqlType) {
-        this.sqlType = sqlType;
+    public void setJdbcType(String jdbcType) {
+        this.jdbcType = jdbcType;
     }
 
     /**
-     * Gets java type.
+     * Returns java type.
      *
      * @return the java type
      */
@@ -91,7 +106,7 @@ public class Column implements Comparable {
     }
 
     /**
-     * Sets java type.
+     * Setting java type.
      *
      * @param javaType the java type
      */
@@ -100,43 +115,62 @@ public class Column implements Comparable {
     }
 
     /**
-     * Gets sql name.
+     * Returns the column.
      *
-     * @return the sql name
+     * @return the column name
      */
-    public String getSqlName() {
-        return sqlName;
+    public String getColumn() {
+        return column;
     }
 
     /**
-     * Sets sql name.
+     * Setting column name.
      *
-     * @param sqlName the sql name
+     * @param column the column name
      */
-    public void setSqlName(String sqlName) {
-        this.sqlName = sqlName;
+    public void setColumn(String column) {
+        this.column = column;
     }
 
     /**
-     * Gets java name.
+     * Returns the field property
      *
-     * @return the java name
+     * @return the field property
      */
-    public String getJavaName() {
-        return javaName;
+    public String getProperty() {
+        return property;
     }
 
     /**
-     * Sets java name.
+     * Setting the field property
      *
-     * @param javaName the java name
+     * @param property the field property
      */
-    public void setJavaName(String javaName) {
-        this.javaName = javaName;
+    public void setProperty(String property) {
+        this.property = property;
+    }
+
+
+    /**
+     * Returns related column.
+     *
+     * @return the related column
+     */
+    public String getRelatedColumn() {
+        return relatedColumn;
     }
 
     /**
-     * Gets default value.
+     * Setting related column.
+     *
+     * @param relatedColumn the related column
+     */
+    public void setRelatedColumn(String relatedColumn) {
+        this.relatedColumn = relatedColumn;
+    }
+
+    /**
+     * Returns default value.
      *
      * @return the default value
      */
@@ -145,7 +179,7 @@ public class Column implements Comparable {
     }
 
     /**
-     * Sets default value.
+     * Setting default value.
      *
      * @param defaultValue the default value
      */
@@ -154,33 +188,49 @@ public class Column implements Comparable {
     }
 
     /**
+     * Returns current column is primary key
+     *
+     * @return true if primary key
+     */
+    public boolean isPrimaryKey() {
+        return primaryKey;
+    }
+
+    /**
+     * Setting current column is primary key
+     *
+     * @param primaryKey is primary key
+     */
+    public void setPrimaryKey(boolean primaryKey) {
+        this.primaryKey = primaryKey;
+    }
+
+    /**
      * Compare to int.
      *
-     * @param o the o
+     * @param other the other Column
      * @return the int
      */
-    public int compareTo(Object o) {
-        if (this == o) {
+    @Override
+    public int compareTo(Column other) {
+        if (this == other) {
             return 0;
         }
-        String ojavaName = ((Column) o).getJavaName();
-        if (this.javaName.length() == ojavaName.length()) {
-            return this.javaName.compareTo(((Column) o).getJavaName());
+        // Null last
+        if (other == null) return  1;
+        if (column.length() == other.column.length()) {
+            return column.compareTo(other.column);
         }
-        if (this.javaName.length() > ojavaName.length()) {
-            return 1;
-        } else {
-            return -1;
-        }
+        return column.length() - other.column.length();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        return obj instanceof Column && ((Column) obj).column.equalsIgnoreCase(column);
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return column.hashCode();
     }
 }

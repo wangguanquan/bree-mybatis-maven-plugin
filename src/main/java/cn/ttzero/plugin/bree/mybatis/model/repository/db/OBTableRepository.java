@@ -16,7 +16,9 @@
 
 package cn.ttzero.plugin.bree.mybatis.model.repository.db;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,7 +29,6 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 
 import cn.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
-import cn.ttzero.plugin.bree.mybatis.model.config.CfColumn;
 import cn.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.PrimaryKeys;
@@ -68,10 +69,10 @@ public class OBTableRepository {
             }
         }
         //自定义字段类型
-        List<CfColumn> cfColumns = cfTable == null ? null : cfTable.getColumns();
+        List<Column> cfColumns = cfTable == null ? null : cfTable.getColumns();
         //生成table
         Table table = new Table();
-        table.setSqlName(logicName);
+        table.setName(logicName);
         for (String pre : database.getPrefixs()) {
             if (!StringUtils.endsWith(pre, "_")) {
                 pre = pre + "_";
@@ -105,7 +106,7 @@ public class OBTableRepository {
      * @throws SQLException the sql exception
      */
     private void fillColumns(Connection connection, String tableName, Table table,
-                             List<CfColumn> cfColumns) throws SQLException {
+                             List<Column> cfColumns) throws SQLException {
         //指定表字段
         ResultSet resultSet = connection.createStatement().executeQuery(
                 "SHOW CREATE TABLE " + tableName);
@@ -183,7 +184,7 @@ public class OBTableRepository {
      * @param createSqlLines the create sql lines
      * @return the string
      */
-    private String preColumns(Table table, Map<String, Column> columnMap, List<CfColumn> cfColumns, String primaryKeyLine, String[] createSqlLines) {
+    private String preColumns(Table table, Map<String, Column> columnMap, List<Column> cfColumns, String primaryKeyLine, String[] createSqlLines) {
         for (int i = 1; i < createSqlLines.length - 1; i++) {
             String createSqlLine = StringUtils.trim(createSqlLines[i]);
             if (StringUtils.startsWith(createSqlLine, "PRIMARY KEY")) {//主键
@@ -195,18 +196,18 @@ public class OBTableRepository {
             }
             Column column = new Column();
             String[] columnArray = StringUtils.split(createSqlLine);
-            column.setSqlName(columnArray[0]);
-            column.setSqlType(TypeMapEnum.getByJdbcType(columnArray[1]).getJdbcType());
-            column.setJavaName(CamelCaseUtils.toCamelCase(column.getSqlName()));
+            column.setColumn(columnArray[0]);
+            column.setJdbcType(TypeMapEnum.getByJdbcType(columnArray[1]).getJdbcType());
+            column.setProperty(CamelCaseUtils.toCamelCase(columnArray[0]));
             column.setJavaType(getJavaType(column, cfColumns));
             if (StringUtils.startsWith(columnArray[columnArray.length - 1], "COMMENT=")) {
-                column.setRemarks(columnArray[columnArray.length - 1].split("=", 2)[1]);
+                column.setRemark(columnArray[columnArray.length - 1].split("=", 2)[1]);
             }
-            if (StringUtils.isBlank(column.getRemarks())) {
-                column.setRemarks(column.getSqlName());
+            if (StringUtils.isBlank(column.getRemark())) {
+                column.setRemark(column.getColumn());
             }
             table.addColumn(column);
-            columnMap.put(column.getSqlName(), column);
+            columnMap.put(column.getColumn(), column);
         }
         return primaryKeyLine;
     }
@@ -218,15 +219,15 @@ public class OBTableRepository {
      * @param cfColumns the cf columns
      * @return the java type
      */
-    private String getJavaType(Column column, List<CfColumn> cfColumns) {
+    private String getJavaType(Column column, List<Column> cfColumns) {
         if (cfColumns != null && cfColumns.size() > 0) {
-            for (CfColumn cfColumn : cfColumns) {
-                if (StringUtils.endsWithIgnoreCase(column.getSqlName(), cfColumn.getName())) {
+            for (Column cfColumn : cfColumns) {
+                if (StringUtils.endsWithIgnoreCase(column.getColumn(), cfColumn.getColumn())) {
                     return cfColumn.getJavaType();
                 }
             }
         }
-        String javaType = TypeMapEnum.getByJdbcType(column.getSqlType()).getJavaType();
+        String javaType = TypeMapEnum.getByJdbcType(column.getJdbcType()).getJavaType();
         String custJavaType = ConfigUtil.config.getTypeMap().get(javaType);
         return StringUtils.isBlank(custJavaType) ? javaType : custJavaType;
     }
