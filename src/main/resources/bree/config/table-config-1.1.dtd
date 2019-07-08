@@ -30,7 +30,7 @@
   -->
   <!ELEMENT result EMPTY>
   <!ATTLIST result
-    property CDATA #REQUIRED
+    property CDATA #IMPLIED
     javaType CDATA #IMPLIED
     column CDATA #IMPLIED
     jdbcType CDATA #IMPLIED
@@ -45,7 +45,7 @@
    -->
   <!ELEMENT resultMap (id*,result*,association*,collection*)>
   <!ATTLIST resultMap
-    name CDATA #REQUIRED
+    id CDATA #REQUIRED
     type CDATA #REQUIRED
     remark CDATA #IMPLIED
     >
