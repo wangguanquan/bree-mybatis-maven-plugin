@@ -19,10 +19,12 @@ package cn.ttzero.plugin.bree.mybatis.model.repository;
 import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import cn.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import cn.ttzero.plugin.bree.mybatis.exception.BreeException;
@@ -129,9 +131,9 @@ public class CfTableRepository {
     private static final Pattern UNION_PATTERN_STR = Pattern.compile("[u|U][n|N][i|I][o|O][n|N]\\s+");
 
     /**
-     * The sheared sql tag
+     * Storage all node
      */
-    private Map<String, Element> sqlCache = Maps.newHashMap();
+    private Map<String, Element> nodeCache = Maps.newHashMap();
 
     /**
      * Gain cf table cf table.
@@ -155,14 +157,45 @@ public class CfTableRepository {
         cfTable.setRemark(getAttr(table, "remark"));
         cfTable.setSequence(getAttr(table, "sequence"));
 
+        @SuppressWarnings({"unchecked", "retype"})
+        List<Element> nodes = table.elements();
+
+        StringBuilder buf = new StringBuilder(cfTable.getName()).append('_');
+        int begin = buf.length();
+        for (Element e : nodes) {
+            buf.delete(begin, buf.length()).append(getAttr(e, "id"));
+            String key = buf.toString();
+            if (nodeCache.containsKey(key)) {
+                LOG.error("The Node [" + getAttr(e, "id") + "] duplicated in " + tableFile.getName());
+            }
+            nodeCache.put(key, e);
+        }
+
+        LOG.info("cache size: " + nodeCache.size());
+
+        // Group node by tag name
+        Map<String, List<Element>> group =  nodes.stream().collect(Collectors.groupingBy(Element::getName));
+
         // fill sql tag
-        fillSql(cfTable, table);
+        if (group.containsKey("sql")) {
+            fillSql(cfTable, group.get("sql"));
+        }
 
         fillColumns(cfTable, table);
 
-        fillResultMap(cfTable, table);
+        if (group.containsKey("resultMap")) {
+            fillResultMap(cfTable, group.get("resultMap"));
+        }
 
-        parseOperation(cfTable, table);
+        List<Element> allOperation = new ArrayList<>();
+        OperationMethod[] methods = OperationMethod.values();
+        for (OperationMethod method : methods) {
+            if (group.containsKey(method.name())) {
+                allOperation.addAll(group.get(method.name()));
+            }
+        }
+
+        parseOperation(cfTable, allOperation);
 
         return cfTable;
     }
@@ -171,16 +204,15 @@ public class CfTableRepository {
      * Fill result map.
      *
      * @param cfTable the cf table
-     * @param table   the table
+     * @param elements   all resultMap node
      */
-    @SuppressWarnings({"unchecked", "retype"})
-    private void fillResultMap(CfTable cfTable, Element table) {
-        List<Element> elements = table.elements("resultMap");
+    private void fillResultMap(CfTable cfTable, List<Element> elements) {
         for (Element e : elements) {
             CfResultMap cfResultMap = new CfResultMap();
             cfResultMap.setId(getAttr(e, "id"));
             cfResultMap.setType(getAttr(e, "type"));
             cfResultMap.setRemark(getAttr(e, "remark"));
+            @SuppressWarnings({"unchecked", "retype"})
             List<Element> ers = e.elements();
             for (Element er : ers) {
                 String name = er.getName();
@@ -325,6 +357,7 @@ public class CfTableRepository {
                 cfColumn.setRemark(getAttr(er, "remark"));
                 cfColumn.setRelatedColumn(getAttr(er, "relatedColumn"));
             }
+            // TODO Result entity filed type
             cfColumn.setTypeHandler(getAttr(er, "typeHandler"));
             cfColumn.setJavaType(getAttr(er, "javaType"));
             cfColumn.setJdbcType(getAttr(er, "jdbcType"));
@@ -336,37 +369,53 @@ public class CfTableRepository {
     }
 
     /**
-     * Parse operation.
+     * Parse operation. The operation tag contains 'select', 'insert', 'update' and 'delete'
      *
      * @param cfTable the cf table
-     * @param table   the table
+     * @param elements   all operation node
      */
-    private void parseOperation(CfTable cfTable, Element table) {
-        List<Element> elements = findAllOperations(table);
+    private void parseOperation(CfTable cfTable, List<Element> elements) {
+        StringBuilder buf = new StringBuilder();
         for (Element e : elements) {
             CfOperation cfOperation = new CfOperation();
-            cfOperation.setRemark(getAttr(e, "remark"));
-            cfOperation.setId(getAttr(e, "id"));
-            cfOperation.setMultiplicity(MultiplicityEnum.getByCode(getAttr(e, "multiplicity")));
-            cfOperation.setVo(getAttr(e, "vo"));
             cfOperation.setOperation(OperationMethod.valueOf(e.getName().toLowerCase()));
+            buf.delete(0, buf.length());
+            // Loop properties
+            @SuppressWarnings({"unchecked", "retype"})
+            Iterator<Attribute> iter = e.attributeIterator();
+            for (; iter.hasNext(); ) {
+                Attribute attr = iter.next();
+                switch (attr.getName()) {
+                    case "id": cfOperation.setId(attr.getValue()); break;
+                    case "remark": cfOperation.setRemark(attr.getValue()); break;
+                    case "vo": cfOperation.setVo(attr.getValue()); break;
+                    case "resultMap": cfOperation.setResultMap(attr.getValue()); break;
+                    case "resultType": cfOperation.setResultType(attr.getValue()); break;
+                    case "noCount": cfOperation.setNoCount(attr.getValue()); break;
+                    case "multiplicity": cfOperation.setMultiplicity(MultiplicityEnum.getByCode(attr.getValue())); break;
+                    case "paramType": cfOperation.setParamType(ParamTypeEnum.getByCode(attr.getValue())); break;
+                    case "timeout":
+                        if (StringUtil.isNotEmpty(attr.getValue())) {
+                            cfOperation.setTimeout(Long.valueOf(attr.getValue()));
+                        }
+                        break;
+                        default:
+                            buf.append(" ").append(attr.getName()).append("=\"")
+                                .append(attr.getValue()).append("\"");
+                }
+            }
+
             if (cfOperation.getMultiplicity() == MultiplicityEnum.paging) {
                 Validate.notEmpty(cfOperation.getVo(), "需要设置paging,用来生成分页类");
             }
-            cfOperation.setParamType(ParamTypeEnum.getByCode(getAttr(e, "paramType")));
-            cfOperation.setResultMap(getAttr(e, "resultMap"));
-            cfOperation.setResultType(getAttr(e, "resultType"));
-            String timeout = getAttr(e, "timeout");
-            if (StringUtil.isNotEmpty(timeout)) {
-                cfOperation.setTimeout(Long.valueOf(timeout));
+
+            if (buf.length() > 0) {
+                cfOperation.setOthers(buf.toString());
             }
-            cfOperation.setNoCount(getAttr(e, "noCount"));
 
-            //sql内容
-            //setCfOperationCdata
-            setCfOperationCdata(cfTable, e, cfOperation, table);
+            setCfOperationCdata(cfTable, e, cfOperation);
 
-            fillOperationParams(e, cfOperation, cfTable.getSqlname());
+            fillOperationParams(e, cfOperation, cfTable.getName());
 
             cfTable.addOperation(cfOperation);
         }
@@ -376,18 +425,12 @@ public class CfTableRepository {
      * Search sql tags
      *
      * @param cfTable the cf table
-     * @param table the xml mapper
+     * @param elements the xml mapper
      */
-    private void fillSql(CfTable cfTable, Element table) {
-        @SuppressWarnings({"unchecked", "retype"})
-        List<Element> elements = table.elements("sql");
+    private void fillSql(CfTable cfTable, List<Element> elements) {
         for (Element e : elements) {
             String id = getAttr(e, "id");
-            String key = cfTable.getSqlname() + "_" + id;
-            if (sqlCache.containsKey(key)) {
-                throw new BreeException("Sql id重复：" + id);
-            }
-            sqlCache.put(key, e);
+
             Attribute remark = e.attribute("remark");
             if (remark != null) {
                 e.remove(remark);
@@ -405,7 +448,7 @@ public class CfTableRepository {
      * @param e           the e
      * @param cfOperation the cf operation
      */
-    private void setCfOperationCdata(CfTable cfTable, Element e, CfOperation cfOperation, Element table) {
+    private void setCfOperationCdata(CfTable cfTable, Element e, CfOperation cfOperation) {
         String cdata = getContent(e);
 
         // SQlDESC
@@ -434,7 +477,7 @@ public class CfTableRepository {
         // TODO 普通vo
         // pageCount添加
         if (!cfOperation.isNoCount()) {
-            setCfOperationPageCdata(table, cdata, cfOperation);
+            setCfOperationPageCdata(cdata, cfOperation);
         }
     }
 
@@ -483,7 +526,7 @@ public class CfTableRepository {
                         String columnParam = CamelCaseUtils.toCamelCase(columns[j]);
                         cdata = StringUtils.replace(cdata, "?", "#{" + columnParam + "}", 1);
                     } catch (ArrayIndexOutOfBoundsException e) {
-                        throw new BreeException("参数设置错误#{}中,未正确使用 table=" + cfTable.getSqlname());
+                        throw new BreeException("参数设置错误#{}中,未正确使用 table=" + cfTable.getName());
                     }
 
                 }
@@ -514,17 +557,18 @@ public class CfTableRepository {
      * @param cdata       the cdata
      * @param cfOperation the cf operation
      */
-    void setCfOperationPageCdata(Element e, String cdata, CfOperation cfOperation) {
+    void setCfOperationPageCdata(String cdata, CfOperation cfOperation) {
         // 分页配置
         if (cfOperation.getMultiplicity() != MultiplicityEnum.paging) {
             return;
         }
 
         // 判断是否已有count语句
-        @SuppressWarnings({"unchecked", "retype"})
-        List<Element> list = e.selectNodes("//select[@id='" + cfOperation.getId() + "Count']");
+//        @SuppressWarnings({"unchecked", "retype"})
+//        List<Element> list = e.selectNodes("//select[@id='" + cfOperation.getId() + "Count']");
+        if (nodeCache.containsKey(cfOperation.getId() + "Count")) {
         // 如果已有count语句则跳过
-        if (list != null && !list.isEmpty()) {
+//        if (list != null && !list.isEmpty()) {
             cfOperation.setCustomizeCount(true);
             return;
         }
@@ -903,7 +947,7 @@ public class CfTableRepository {
                         +"]包含include节点但是未指定refid值。");
                 }
                 String key = tableName + "_" + refid;
-                Element ref = sqlCache.get(key);
+                Element ref = nodeCache.get(key);
                 if (ref == null) {
                     throw new BreeException("operation["+getAttr(e, "name")
                         +"]包含include节点但是refid[" + refid + "]并未出现在此xml中。");
@@ -949,35 +993,35 @@ public class CfTableRepository {
 //        return OperationMethod.select;
 //    }
 
-    /**
-     * List all operation elements in mapping, contains 'select', 'insert', 'update' and 'delete'
-     *
-     * @param root the root element
-     * @return all operation elements
-     */
-    @SuppressWarnings({"unchecked", "retype"})
-    private List<Element> findAllOperations(Element root) {
-        List<Element> elements = new ArrayList<>();
-        List<Element> selects = root.elements("select");
-        if (selects != null && !selects.isEmpty()) {
-            elements.addAll(selects);
-        }
-
-        List<Element> inserts = root.elements("insert");
-        if (inserts != null && !inserts.isEmpty()) {
-            elements.addAll(inserts);
-        }
-
-        List<Element> updates = root.elements("update");
-        if (updates != null && !updates.isEmpty()) {
-            elements.addAll(updates);
-        }
-
-        List<Element> deletes = root.elements("delete");
-        if (deletes != null && !deletes.isEmpty()) {
-            elements.addAll(deletes);
-        }
-
-        return elements;
-    }
+//    /**
+//     * List all operation elements in mapping, contains 'select', 'insert', 'update' and 'delete'
+//     *
+//     * @param root the root element
+//     * @return all operation elements
+//     */
+//    @SuppressWarnings({"unchecked", "retype"})
+//    private List<Element> findAllOperations(Element root) {
+//        List<Element> elements = new ArrayList<>();
+//        List<Element> selects = root.elements("select");
+//        if (selects != null && !selects.isEmpty()) {
+//            elements.addAll(selects);
+//        }
+//
+//        List<Element> inserts = root.elements("insert");
+//        if (inserts != null && !inserts.isEmpty()) {
+//            elements.addAll(inserts);
+//        }
+//
+//        List<Element> updates = root.elements("update");
+//        if (updates != null && !updates.isEmpty()) {
+//            elements.addAll(updates);
+//        }
+//
+//        List<Element> deletes = root.elements("delete");
+//        if (deletes != null && !deletes.isEmpty()) {
+//            elements.addAll(deletes);
+//        }
+//
+//        return elements;
+//    }
 }
