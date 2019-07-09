@@ -7,13 +7,13 @@
 <mapper namespace="${xmlMapper.doMapper.packageName}.${xmlMapper.doMapper.className}">
     <!-- 自动生成, 请勿修改。修改 ${xmlMapper.table.name}.xml -->
 
-<#--生成BaseResultMap-->
+<#-- 生成BaseResultMap -->
     <resultMap id="BaseResultMap"  type="${xmlMapper.doClass.packageName}.${xmlMapper.doClass.className}">
         <#list xmlMapper.table.columnList as column>
         <#if column.primaryKey ><id column="${column.column}" property="${column.property}"<#if column.jdbcType??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if><#if column.typeHandler??> typeHandler="${column.typeHandler}"</#if> /><#else><result column="${column.column}" property="${column.property}"<#if column.jdbcType??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if><#if column.typeHandler??> typeHandler="${column.typeHandler}"</#if> /></#if>
         </#list>
     </resultMap>
-<#--生成自定义ResultMap-->
+<#-- 生成自定义ResultMap -->
 <#list xmlMapper.resultMaps as resultMap>
 
     <#if resultMap.desc??><!-- ${resultMap.desc!} --></#if>
@@ -34,29 +34,29 @@
     </sql>
 
     <#list xmlMapper.cfTable.sqlList as sqlTag>
-    <#if sqlTag.remark??><!--${sqlTag.remark!}--></#if>
-        ${sqlTag.content}
+    <#if sqlTag.remark??><!-- ${sqlTag.remark!} --></#if>
+    ${sqlTag.content}
     </#list>
 
 <#-- sql部分  -->
     <#list xmlMapper.cfTable.operations as operation>
 
-    <#if operation.multiplicity.code=="paging"><#--分页-->
-    <#if operation.cdataPageCount??><#--判断是否既有求和语句-->
-    <!--${operation.remark!operation.id} PageCount-->
-    <${operation.operation!} id="${operation.id}Count"  resultType="int"${lib.timeout(operation)}>
+    <#if operation.multiplicity.code=="paging"><#-- 分页 -->
+    <#if operation.cdataPageCount??><#-- 判断是否既有求和语句 -->
+    <!-- ${operation.remark!operation.id} PageCount -->
+    <${operation.operation!} id="${operation.id}Count" resultType="int"${lib.timeout(operation)}${operation.others!}>
         ${operation.cdataPageCount!}
     </${operation.operation!}>
     </#if>
 
-    <!--${operation.remark!operation.id} PageResult-->
-    <${operation.operation!} id="${operation.id}Result"  ${lib.mapperResult(operation)}${lib.timeout(operation)}>
+    <!-- ${operation.remark!operation.id} PageResult -->
+    <${operation.operation!} id="${operation.id}Result"${lib.mapperResult(operation)}${lib.timeout(operation)}${operation.others!}>
     ${operation.cdata!}
         limit ${"#"}{pageSize} offset ${"#"}{offset}
     </${operation.operation!}>
-    <#else><#--非分页-->
-    <!--${operation.remark!operation.id}-->
-    <${operation.operation!} id="${operation.id}" ${lib.mapperResult(operation)}${lib.timeout(operation)}>
+    <#else><#-- 非分页 -->
+    <!-- ${operation.remark!operation.id} -->
+    <${operation.operation!} id="${operation.id}"${lib.mapperResult(operation)}${lib.timeout(operation)}${operation.others!}>
         ${operation.cdata!}
     </${operation.operation!}>
     </#if>
