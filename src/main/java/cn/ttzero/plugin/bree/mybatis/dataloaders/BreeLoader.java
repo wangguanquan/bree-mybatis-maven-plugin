@@ -479,7 +479,7 @@ public class BreeLoader extends AbstractLoader {
         dao.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property);
         dao.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property);
         dao.setDesc(cfTable.getRemark());
-        dao.setTableName(cfTable.getSqlname());
+        dao.setTableName(cfTable.getName());
 
         // append java config
         addJavaConfig(dao, javaConfig);
@@ -577,7 +577,7 @@ public class BreeLoader extends AbstractLoader {
         doMapper.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property);
         doMapper.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property);
         doMapper.setDesc(cfTable.getRemark());
-        doMapper.setTableName(cfTable.getSqlname());
+        doMapper.setTableName(cfTable.getName());
 
         // add java config
         addJavaConfig(doMapper, javaConfig);
@@ -645,7 +645,7 @@ public class BreeLoader extends AbstractLoader {
             getClassAndImport(paging, paging.getPackageName() + ".BasePage");
         }
         paging.setDesc(StringUtil.join(table.getName(), cfTable.getRemark()));
-        paging.setTableName(cfTable.getSqlname());
+        paging.setTableName(cfTable.getName());
 
         String pagingResultType = operationResultType(doClass, paging, operation, resultMaps);
 

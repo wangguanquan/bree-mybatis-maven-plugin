@@ -3,7 +3,7 @@
 <#list bree.tables as table>
     <@pp.changeOutputFile name = "/${bree.tablesPath}/${table.name}.xml" />
 <!DOCTYPE table SYSTEM "../config/table-config-1.1.dtd">
-<table sqlName="${table.name}" physicalName="${table.physicalName}"<#if table.remark??> remark="${table.remark!}"</#if>>
+<table name="${table.name}" physicalName="${table.physicalName}"<#if table.remark??> remark="${table.remark!}"</#if>>
     <!--  特殊字符说明  &lt;&gt;   <> -->
     <!-- BaseResultMap 和 Base_Column_List 已全量生成include引用即可-->
 

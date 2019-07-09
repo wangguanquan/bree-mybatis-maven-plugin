@@ -150,7 +150,7 @@ public class CfTableRepository {
 
         Element table = document.getRootElement();
 
-        cfTable.setSqlname(getAttr(table, "sqlName"));
+        cfTable.setName(getAttr(table, "name"));
         cfTable.setPhysicalName(getAttr(table, "physicalName"));
         cfTable.setRemark(getAttr(table, "remark"));
         cfTable.setSequence(getAttr(table, "sequence"));

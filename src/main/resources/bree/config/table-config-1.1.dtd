@@ -9,7 +9,7 @@
   -->
   <!ELEMENT table (resultMap* | sql* | insert* | update* | delete* | select*)+>
   <!ATTLIST table
-    sqlName CDATA #IMPLIED
+    name CDATA #IMPLIED
     sequence CDATA #IMPLIED
     physicalName CDATA #IMPLIED
     remark CDATA #IMPLIED
