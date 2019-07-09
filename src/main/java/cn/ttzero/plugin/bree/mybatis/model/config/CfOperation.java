@@ -42,7 +42,7 @@ public class CfOperation {
     /**
      * The Multiplicity.
      */
-    private MultiplicityEnum multiplicity;
+    private MultiplicityEnum multiplicity = MultiplicityEnum.one;
     /**
      * The Remark.
      */
@@ -80,16 +80,10 @@ public class CfOperation {
      */
     private boolean noCount;
 
-    // TODO some new properties
-    // resultSetType (FORWARD_ONLY | SCROLL_INSENSITIVE | SCROLL_SENSITIVE | DEFAULT) #IMPLIED
-    // statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
-    // fetchSize CDATA #IMPLIED
-    // flushCache (true|false) #IMPLIED
-    // useCache (true|false) #IMPLIED
-    // statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
-    // keyProperty CDATA #IMPLIED
-    // useGeneratedKeys (true|false) #IMPLIED
-    // keyColumn CDATA #IMPLIED
+    /**
+     * Other properties
+     */
+    private String others;
 
     /**
      * The Primitive params.
@@ -393,5 +387,23 @@ public class CfOperation {
 
     public void setOperation(OperationMethod operation) {
         this.operation = operation;
+    }
+
+    /**
+     * Returns other properties, join on space
+     *
+     * @return the joined result
+     */
+    public String getOthers() {
+        return others;
+    }
+
+    /**
+     * Setting the joined properties string
+     *
+     * @param others the joined string
+     */
+    public void setOthers(String others) {
+        this.others = others;
     }
 }
