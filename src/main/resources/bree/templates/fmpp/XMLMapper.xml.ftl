@@ -10,7 +10,7 @@
 <#--生成BaseResultMap-->
     <resultMap id="BaseResultMap"  type="${xmlMapper.doClass.packageName}.${xmlMapper.doClass.className}">
         <#list xmlMapper.table.columnList as column>
-        <#if column.primaryKey ><id column="${column.column}" property="${column.property}"<#if column.jdbcType??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if> /><#else><result column="${column.column}" property="${column.property}"<#if column.jdbcType??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if> /></#if>
+        <#if column.primaryKey ><id column="${column.column}" property="${column.property}"<#if column.jdbcType??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if><#if column.typeHandler??> typeHandler="${column.typeHandler}"</#if> /><#else><result column="${column.column}" property="${column.property}"<#if column.jdbcType??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if><#if column.typeHandler??> typeHandler="${column.typeHandler}"</#if> /></#if>
         </#list>
     </resultMap>
 <#--生成自定义ResultMap-->
@@ -20,7 +20,7 @@
     <resultMap id="${resultMap.id}" type="${resultMap.packageName}.${resultMap.className}">
 <#-- Column -->
     <#list resultMap.columnList as column>
-        <#if column.primaryKey ><id column="${column.column}" property="${column.property}"<#if (column.jdbcType)??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if> /><#else><result column="${column.column}" property="${column.property}"<#if column.jdbcType??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if> /></#if>
+        <#if column.primaryKey ><id column="${column.column}" property="${column.property}"<#if (column.jdbcType)??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if><#if column.typeHandler??> typeHandler="${column.typeHandler}"</#if> /><#else><result column="${column.column}" property="${column.property}"<#if column.jdbcType??> jdbcType="${column.jdbcType}"</#if><#if column.javaType??> javaType="${column.javaType}"</#if><#if column.typeHandler??> typeHandler="${column.typeHandler}"</#if> /></#if>
     </#list>
     <#if resultMap.innerXML??>
     ${resultMap.innerXML!}

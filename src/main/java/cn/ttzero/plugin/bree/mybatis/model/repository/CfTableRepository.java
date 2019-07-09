@@ -325,6 +325,7 @@ public class CfTableRepository {
                 cfColumn.setRemark(getAttr(er, "remark"));
                 cfColumn.setRelatedColumn(getAttr(er, "relatedColumn"));
             }
+            cfColumn.setTypeHandler(getAttr(er, "typeHandler"));
             cfColumn.setJavaType(getAttr(er, "javaType"));
             cfColumn.setJdbcType(getAttr(er, "jdbcType"));
             return cfColumn;
