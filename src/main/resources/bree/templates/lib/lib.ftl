@@ -7,7 +7,7 @@
 </#function>
 
 <#-- operation 2 sql -->
-<#-- Don't use this function, replace it with operation.om -->
+<#-- Don't use this function, replace it with operation.operation -->
 <#function operation2Sql param>
     <#if param?starts_with("insert")><#return "insert"/></#if>
     <#if param?starts_with("update")><#return "update"/></#if>
@@ -17,12 +17,12 @@
 
 <#-- mapper-xml result -->
 <#function mapperResult operation>
-    <#if operation.resultMap??><#return 'resultMap="${operation.resultMap}"'/></#if>
-    <#if operation.resultType??><#return 'resultType="${operation.resultType}"'/></#if>
+    <#if operation.resultMap??><#return ' resultMap="${operation.resultMap}"'/></#if>
+    <#if operation.resultType??><#return ' resultType="${operation.resultType}"'/></#if>
     <#if operation.operation == "insert"><#return ''/></#if>
     <#if operation.operation == "update"><#return ''/></#if>
     <#if operation.operation == "delete"><#return ''/></#if>
-    <#return 'resultMap="BaseResultMap"'/>
+    <#return ' resultMap="BaseResultMap"'/>
 </#function>
 
 <#function timeout operation>
