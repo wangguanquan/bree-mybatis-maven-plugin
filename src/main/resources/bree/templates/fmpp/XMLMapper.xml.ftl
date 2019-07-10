@@ -32,8 +32,8 @@
     <sql id="Base_Column_List">
         <#list xmlMapper.table.columnList as column><#if column_index gt 0>,</#if>${column.column}</#list>
     </sql>
-
     <#list xmlMapper.cfTable.sqlList as sqlTag>
+
     <#if sqlTag.remark??><!-- ${sqlTag.remark!} --></#if>
     ${sqlTag.content}
     </#list>
