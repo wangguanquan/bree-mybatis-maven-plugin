@@ -477,7 +477,7 @@ public class CfTableRepository {
         // TODO 普通vo
         // pageCount添加
         if (!cfOperation.isNoCount()) {
-            setCfOperationPageCdata(cdata, cfOperation);
+            setCfOperationPageCdata(cdata, cfOperation, cfTable.getName());
         }
     }
 
@@ -556,8 +556,9 @@ public class CfTableRepository {
      *
      * @param cdata       the cdata
      * @param cfOperation the cf operation
+     * @param tableName   the table name
      */
-    void setCfOperationPageCdata(String cdata, CfOperation cfOperation) {
+    private void setCfOperationPageCdata(String cdata, CfOperation cfOperation, String tableName) {
         // 分页配置
         if (cfOperation.getMultiplicity() != MultiplicityEnum.paging) {
             return;
@@ -566,7 +567,7 @@ public class CfTableRepository {
         // 判断是否已有count语句
 //        @SuppressWarnings({"unchecked", "retype"})
 //        List<Element> list = e.selectNodes("//select[@id='" + cfOperation.getId() + "Count']");
-        if (nodeCache.containsKey(cfOperation.getId() + "Count")) {
+        if (nodeCache.containsKey(tableName + '_' + cfOperation.getId() + "Count")) {
         // 如果已有count语句则跳过
 //        if (list != null && !list.isEmpty()) {
             cfOperation.setCustomizeCount(true);
@@ -946,7 +947,7 @@ public class CfTableRepository {
                     throw new BreeException("operation["+getAttr(e, "name")
                         +"]包含include节点但是未指定refid值。");
                 }
-                String key = tableName + "_" + refid;
+                String key = tableName + '_' + refid;
                 Element ref = nodeCache.get(key);
                 if (ref == null) {
                     throw new BreeException("operation["+getAttr(e, "name")
