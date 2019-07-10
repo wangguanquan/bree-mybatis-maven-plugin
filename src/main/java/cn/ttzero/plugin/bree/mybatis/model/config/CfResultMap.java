@@ -16,6 +16,7 @@
 
 package cn.ttzero.plugin.bree.mybatis.model.config;
 
+import cn.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -25,9 +26,9 @@ import java.util.List;
  */
 public class CfResultMap {
     /**
-     * The Name.
+     * The id of result map.
      */
-    private String name;
+    private String id;
     /**
      * The Type. A fully qualified Java class name, or a type alias (see the
      * table above for the list of built-in type aliases).
@@ -41,7 +42,7 @@ public class CfResultMap {
     /**
      * The Columns.
      */
-    private List<CfColumn> columns = Lists.newArrayList();
+    private List<Column> columns = Lists.newArrayList();
     /**
      * The Collection.
      */
@@ -52,25 +53,25 @@ public class CfResultMap {
     private List<CfAssociation> associations = Lists.newArrayList();
 
     /**
-     * Gets name.
+     * Returns the result id.
      *
-     * @return the name
+     * @return the resultMap's id
      */
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
     /**
-     * Sets name.
+     * Setting the id of result map.
      *
-     * @param name the name
+     * @param id the id of result map
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
-     * Gets type.
+     * Returns type.
      *
      * @return the type
      */
@@ -79,7 +80,7 @@ public class CfResultMap {
     }
 
     /**
-     * Sets type.
+     * Setting type.
      *
      * @param type the type
      */
@@ -88,11 +89,11 @@ public class CfResultMap {
     }
 
     /**
-     * Gets columns.
+     * Returns columns.
      *
      * @return the columns
      */
-    public List<CfColumn> getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 
@@ -101,12 +102,12 @@ public class CfResultMap {
      *
      * @param column the column
      */
-    public void addColumn(CfColumn column) {
+    public void addColumn(Column column) {
         this.columns.add(column);
     }
 
     /**
-     * Gets remark.
+     * Returns remark.
      *
      * @return the remark
      */
@@ -115,7 +116,7 @@ public class CfResultMap {
     }
 
     /**
-     * Sets remark.
+     * Setting remark.
      *
      * @param remark the remark
      */
@@ -124,7 +125,7 @@ public class CfResultMap {
     }
 
     /**
-     * Gets collections.
+     * Returns collections.
      *
      * @return the collections
      */

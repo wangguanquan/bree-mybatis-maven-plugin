@@ -16,7 +16,7 @@
 
 package cn.ttzero.plugin.bree.mybatis.model.java.domapper;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 

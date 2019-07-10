@@ -21,8 +21,8 @@ import cn.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import cn.ttzero.plugin.bree.mybatis.model.repository.db.MySQLTableRepository;
 import cn.ttzero.plugin.bree.mybatis.model.repository.db.OBTableRepository;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.sql.Connection;
 import java.sql.SQLException;

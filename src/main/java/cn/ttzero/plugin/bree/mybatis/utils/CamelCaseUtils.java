@@ -36,7 +36,7 @@ public class CamelCaseUtils {
      * @param s the s
      * @return the string
      */
-    public static String tolineName(String s,char sp) {
+    public static String toLineName(String s,char sp) {
         if (s == null) {
             return null;
         }
@@ -52,7 +52,7 @@ public class CamelCaseUtils {
                 nextUpperCase = Character.isUpperCase(s.charAt(i + 1));
             }
 
-            if ((i >= 0) && Character.isUpperCase(c)) {
+            if (Character.isUpperCase(c)) {
                 if (!upperCase || !nextUpperCase) {
                     if (i > 0)
                         sb.append(sp);
@@ -75,7 +75,7 @@ public class CamelCaseUtils {
      * @return the string
      */
     public static String toUnderlineName(String s) {
-        return tolineName(s, SEPARATOR);
+        return toLineName(s, SEPARATOR);
     }
 
     /**
@@ -85,7 +85,7 @@ public class CamelCaseUtils {
      * @return the string
      */
     public static String toInlineName(String s) {
-        return tolineName(s,IN_LINE);
+        return toLineName(s,IN_LINE);
     }
     /**
      * To camel case string.
@@ -132,15 +132,15 @@ public class CamelCaseUtils {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
-            public static void main(String[] args) {
-                System.out.println(CamelCaseUtils.toInlineName("ISOCertifiedStaff"));
-                System.out.println(CamelCaseUtils.toUnderlineName("ISOCertifiedStaff"));
-                System.out.println(CamelCaseUtils.toUnderlineName("CertifiedStaff"));
-                System.out.println(CamelCaseUtils.toUnderlineName("UserID"));
-                System.out.println(CamelCaseUtils.toCamelCase("iso_certified_staff"));
-                System.out.println(CamelCaseUtils.toCamelCase("certified_staff"));
-                System.out.println(CamelCaseUtils.toCamelCase("user_id"));
-                System.out.println(CamelCaseUtils.toCapitalizeCamelCase("user_id"));
-            }
+    public static void main(String[] args) {
+        System.out.println(CamelCaseUtils.toInlineName("ISOCertifiedStaff"));
+        System.out.println(CamelCaseUtils.toUnderlineName("ISOCertifiedStaff"));
+        System.out.println(CamelCaseUtils.toUnderlineName("CertifiedStaff"));
+        System.out.println(CamelCaseUtils.toUnderlineName("UserID"));
+        System.out.println(CamelCaseUtils.toCamelCase("iso_certified_staff"));
+        System.out.println(CamelCaseUtils.toCamelCase("certified_staff"));
+        System.out.println(CamelCaseUtils.toCamelCase("user_id"));
+        System.out.println(CamelCaseUtils.toCapitalizeCamelCase("user_id"));
+    }
 
 }

@@ -24,7 +24,7 @@
   <!-- datasource config  可以配置多个                              -->
   <!-- ========================================================== -->
 
-  <database name="sdm" class="org.gjt.mm.mysql.Driver" type="mysql">
+  <database name="sdm" class="com.mysql.cj.jdbc.Driver" type="mysql">
     <property name="url" value="jdbc:mysql://localhost:3306/job"/>
     <property name="user" value="root"/>
     <property name="password" value="root"/>
@@ -136,56 +136,13 @@
 
   <!-- Dao配置-->
   <!-- 最终生成XXXDao.java接口-->
-  <dao ignore="true">
-    <!-- 包名 默认mapper-->
-    <namespace />
-    <!-- 前缀 默认无-->
-    <prefix />
-    <!-- 后缀 默认Mapper-->
-    <suffix />
-    <!-- 配置DOMapper类的继承 默认无-->
-    <!-- java只支持类单继承，此节点只能存在一个-->
-    <extend />
-    <!-- 配置DOMapper类的实现 默认无-->
-    <implements />
-    <!-- 配置DOMapper类的注解 默认无-->
-    <annotations />
-  </dao>
+  <dao ignore="true" />
 
   <!-- 生成service配置-->
-  <service ignore="true">
-    <!-- 包名 默认service-->
-    <namespace />
-    <!-- 前缀 默认无-->
-    <prefix />
-    <!-- 后缀 默认Service-->
-    <suffix />
-    <!-- 配置Service类的继承 默认无-->
-    <extend />
-    <!-- 配置Service类的实现 默认无-->
-    <!-- java只支持类单继承，此节点只能存在一个-->
-    <implements />
-    <!-- 配置Service类的注解 默认@Service-->
-    <annotations />
-  </service>
+  <service ignore="true" />
 
   <!-- 生成controller配置-->
-  <controller ignore="true">
-    <!-- 包名 默认controller-->
-    <namespace />
-    <!-- 前缀 默认无-->
-    <prefix />
-    <!-- 后缀 默认Controller-->
-    <suffix />
-    <!-- 配置Controller类的继承 默认无-->
-    <extend />
-    <!-- 配置Controller类的实现 默认无-->
-    <!-- java只支持类单继承，此节点只能存在一个-->
-    <implements />
-    <!-- 配置Controller类的注解 默认无-->
-    <annotations />
-  </controller>
-
+  <controller ignore="true" />
 
   <!-- 新生成文件自动add到git -->
   <add-to-git-if-new>true</add-to-git-if-new>

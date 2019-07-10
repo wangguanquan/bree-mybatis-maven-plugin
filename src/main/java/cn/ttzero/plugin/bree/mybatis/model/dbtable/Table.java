@@ -25,9 +25,9 @@ import java.util.List;
  */
 public class Table {
     /**
-     * The Sql name.
+     * The table name.
      */
-    private String sqlName;
+    private String name;
 
     /**
      * The Java name.
@@ -77,21 +77,21 @@ public class Table {
     }
 
     /**
-     * Returns sql name.
+     * Returns table name.
      *
-     * @return the sql name
+     * @return the table name
      */
-    public String getSqlName() {
-        return sqlName;
+    public String getName() {
+        return name;
     }
 
     /**
-     * Setting sql name.
+     * Setting table name.
      *
-     * @param sqlName the sql name
+     * @param name the table name
      */
-    public void setSqlName(String sqlName) {
-        this.sqlName = sqlName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

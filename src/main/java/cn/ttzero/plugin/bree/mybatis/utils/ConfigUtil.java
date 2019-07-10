@@ -30,7 +30,7 @@ import cn.ttzero.plugin.bree.mybatis.model.repository.JavaConfig;
 import cn.ttzero.plugin.bree.mybatis.model.repository.JavaProperty;
 import cn.ttzero.plugin.bree.mybatis.exception.BreeException;
 import cn.ttzero.plugin.bree.mybatis.model.repository.VoConfig;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;

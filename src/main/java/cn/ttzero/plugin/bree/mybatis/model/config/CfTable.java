@@ -16,9 +16,8 @@
 
 package cn.ttzero.plugin.bree.mybatis.model.config;
 
-import cn.ttzero.plugin.bree.mybatis.model.java.domapper.Sql;
-import cn.ttzero.plugin.bree.mybatis.exception.BreeException;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.Column;
+import cn.ttzero.plugin.bree.mybatis.model.java.domapper.Sql;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -28,9 +27,9 @@ import java.util.List;
  */
 public class CfTable {
     /**
-     * The Sqlname.
+     * The table name.
      */
-    private String sqlname;
+    private String name;
     /**
      * The Sequence.
      */
@@ -47,7 +46,7 @@ public class CfTable {
     /**
      * The Columns.
      */
-    private List<CfColumn> columns = Lists.newArrayList();
+    private List<Column> columns = Lists.newArrayList();
     /**
      * The Result maps.
      */
@@ -69,16 +68,16 @@ public class CfTable {
     private List<Sql> sqlList = Lists.newArrayList();
 
     /**
-     * Gets sqlname.
+     * Returns table name.
      *
-     * @return the sqlname
+     * @return the table name
      */
-    public String getSqlname() {
-        return sqlname;
+    public String getName() {
+        return name;
     }
 
     /**
-     * Gets sequence.
+     * Returns sequence.
      *
      * @return the sequence
      */
@@ -87,7 +86,7 @@ public class CfTable {
     }
 
     /**
-     * Gets physical name.
+     * Returns physical name.
      *
      * @return the physical name
      */
@@ -96,7 +95,7 @@ public class CfTable {
     }
 
     /**
-     * Gets remarks.
+     * Returns remarks.
      *
      * @return the remarks
      */
@@ -105,16 +104,16 @@ public class CfTable {
     }
 
     /**
-     * Sets sqlname.
+     * Setting table name.
      *
-     * @param sqlname the sqlname
+     * @param name the table name
      */
-    public void setSqlname(String sqlname) {
-        this.sqlname = sqlname;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
-     * Sets sequence.
+     * Setting sequence.
      *
      * @param sequence the sequence
      */
@@ -123,7 +122,7 @@ public class CfTable {
     }
 
     /**
-     * Sets physical name.
+     * Setting physical name.
      *
      * @param physicalName the physical name
      */
@@ -132,7 +131,7 @@ public class CfTable {
     }
 
     /**
-     * Sets remark.
+     * Setting remark.
      *
      * @param remark the remark
      */
@@ -141,16 +140,16 @@ public class CfTable {
     }
 
     /**
-     * Gets columns.
+     * Returns columns.
      *
      * @return the columns
      */
-    public List<CfColumn> getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 
     /**
-     * Gets result maps.
+     * Returns result maps.
      *
      * @return the result maps
      */
@@ -159,7 +158,7 @@ public class CfTable {
     }
 
     /**
-     * Gets operations.
+     * Returns operations.
      *
      * @return the operations
      */
@@ -172,7 +171,7 @@ public class CfTable {
      *
      * @param column the column
      */
-    public void addColumn(CfColumn column) {
+    public void addColumn(Column column) {
         this.columns.add(column);
     }
 
@@ -195,7 +194,7 @@ public class CfTable {
     }
 
     /**
-     * Gets db columns.
+     * Returns db columns.
      *
      * @return the db columns
      */
@@ -204,7 +203,7 @@ public class CfTable {
     }
 
     /**
-     * Sets db columns.
+     * Setting db columns.
      *
      * @param dbColumns the db columns
      */

@@ -20,19 +20,8 @@ package cn.ttzero.plugin.bree.mybatis.model.config;
  * Create by guanquan.wang at 2019-06-03 21:45
  */
 public enum OperationMethod {
-    select,
     insert,
     update,
-    delete
-    ;
-
-    public static OperationMethod of(String name) {
-        OperationMethod[] values = values();
-        for (OperationMethod e : values) {
-            if (e.name().equals(name)) {
-                return e;
-            }
-        }
-        return select;
-    }
+    delete,
+    select
 }

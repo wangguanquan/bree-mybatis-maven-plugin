@@ -19,7 +19,7 @@ package cn.ttzero.plugin.bree.mybatis.datasources;
 import java.sql.Connection;
 
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 

@@ -28,9 +28,9 @@ import java.util.Map;
 public class CfOperation {
 
     /**
-     * The Name.
+     * The id.
      */
-    private String name;
+    private String id;
     /**
      * Paging param name
      */
@@ -42,17 +42,17 @@ public class CfOperation {
     /**
      * The Multiplicity.
      */
-    private MultiplicityEnum multiplicity;
+    private MultiplicityEnum multiplicity = MultiplicityEnum.one;
     /**
      * The Remark.
      */
     private String remark;
     /**
-     * The Resulttype.
+     * The result type.
      */
     private String resultType;
     /**
-     * The Resultmap.
+     * The result map.
      */
     private String resultMap;
     /**
@@ -81,6 +81,11 @@ public class CfOperation {
     private boolean noCount;
 
     /**
+     * Other properties
+     */
+    private String others;
+
+    /**
      * The Primitive params.
      */
     private Map<String, String> primitiveParams = Maps.newHashMap();
@@ -98,28 +103,28 @@ public class CfOperation {
     /**
      * The operation method. see {@link OperationMethod}
      */
-    private OperationMethod om;
+    private OperationMethod operation;
 
     /**
-     * Gets name.
+     * Returns operation id.
      *
-     * @return the name
+     * @return the operation id
      */
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
     /**
-     * Sets name.
+     * Setting the operation id.
      *
-     * @param name the name
+     * @param id the operation id
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
-     * Gets paging.
+     * Returns paging.
      *
      * @return the paging
      */
@@ -128,7 +133,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets paging.
+     * Setting paging.
      *
      * @param vo the vo
      */
@@ -137,7 +142,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets param type.
+     * Returns param type.
      *
      * @return the param type
      */
@@ -146,7 +151,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets param type.
+     * Setting param type.
      *
      * @param paramType the param type
      */
@@ -155,7 +160,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets multiplicity.
+     * Returns multiplicity.
      *
      * @return the multiplicity
      */
@@ -164,7 +169,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets multiplicity.
+     * Setting multiplicity.
      *
      * @param multiplicity the multiplicity
      */
@@ -173,7 +178,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets remark.
+     * Returns remark.
      *
      * @return the remark
      */
@@ -182,7 +187,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets remark.
+     * Setting remark.
      *
      * @param remark the remark
      */
@@ -191,7 +196,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets resultType.
+     * Returns resultType.
      *
      * @return the resultType
      */
@@ -200,7 +205,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets resultType.
+     * Setting resultType.
      *
      * @param resultType the resultType
      */
@@ -209,7 +214,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets resultMap.
+     * Returns resultMap.
      *
      * @return the resultMap
      */
@@ -218,7 +223,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets resultMap.
+     * Setting resultMap.
      *
      * @param resultMap the resultMap
      */
@@ -227,7 +232,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets timeout.
+     * Returns timeout.
      *
      * @return the timeout
      */
@@ -236,7 +241,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets timeout.
+     * Setting timeout.
      *
      * @param timeout the timeout
      */
@@ -245,7 +250,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets cdata.
+     * Returns cdata.
      *
      * @return the cdata
      */
@@ -254,7 +259,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets cdata.
+     * Setting cdata.
      *
      * @param cdata the cdata
      */
@@ -263,7 +268,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets primitive params.
+     * Returns primitive params.
      *
      * @return the primitive params
      */
@@ -292,7 +297,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets primitive foreach params.
+     * Returns primitive foreach params.
      *
      * @return the primitive foreach params
      */
@@ -315,7 +320,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets sql desc.
+     * Returns sql desc.
      *
      * @return the sql desc
      */
@@ -324,7 +329,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets sql desc.
+     * Setting sql desc.
      *
      * @param sqlDesc the sql desc
      */
@@ -333,7 +338,7 @@ public class CfOperation {
     }
 
     /**
-     * Gets cdata page count.
+     * Returns cdata page count.
      *
      * @return the cdata page count
      */
@@ -342,7 +347,7 @@ public class CfOperation {
     }
 
     /**
-     * Sets cdata page count.
+     * Setting cdata page count.
      *
      * @param cdataPageCount the cdata page count
      */
@@ -376,11 +381,29 @@ public class CfOperation {
         this.customizeCount = customizeCount;
     }
 
-    public OperationMethod getOm() {
-        return om;
+    public OperationMethod getOperation() {
+        return operation;
     }
 
-    public void setOm(OperationMethod om) {
-        this.om = om;
+    public void setOperation(OperationMethod operation) {
+        this.operation = operation;
+    }
+
+    /**
+     * Returns other properties, join on space
+     *
+     * @return the joined result
+     */
+    public String getOthers() {
+        return others;
+    }
+
+    /**
+     * Setting the joined properties string
+     *
+     * @param others the joined string
+     */
+    public void setOthers(String others) {
+        this.others = others;
     }
 }

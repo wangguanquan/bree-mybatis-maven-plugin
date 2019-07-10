@@ -23,6 +23,6 @@ import org.junit.Test;
  */
 public class OperationMethodTest {
     @Test public void test() {
-        System.out.println(OperationMethod.of("ab"));
+        System.out.println(OperationMethod.valueOf("ab"));
     }
 }

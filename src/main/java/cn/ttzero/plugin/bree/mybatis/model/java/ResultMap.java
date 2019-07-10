@@ -26,9 +26,9 @@ import java.util.List;
  */
 public class ResultMap extends DO {
     /**
-     * The Name.
+     * The id of result map.
      */
-    private String name;
+    private String id;
     /**
      * The Type.
      */
@@ -43,21 +43,21 @@ public class ResultMap extends DO {
     private String innerXML;
 
     /**
-     * Gets name.
+     * Returns the result id.
      *
-     * @return the name
+     * @return the resultMap's id
      */
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
     /**
-     * Sets name.
+     * Setting the id of result map.
      *
-     * @param name the name
+     * @param id the id of result map
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
