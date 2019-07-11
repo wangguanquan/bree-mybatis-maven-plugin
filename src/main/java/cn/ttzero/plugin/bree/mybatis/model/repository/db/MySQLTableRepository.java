@@ -26,7 +26,7 @@ import cn.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import cn.ttzero.plugin.bree.mybatis.model.db.Database;
 import cn.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import cn.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
-import org.apache.commons.lang3.StringUtils;
+import cn.ttzero.plugin.bree.mybatis.utils.StringUtil;
 import org.apache.ibatis.type.JdbcType;
 
 import cn.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
@@ -51,11 +51,11 @@ public class MySQLTableRepository {
     public Table gainTable(Connection connection, String tableName, CfTable cfTable)
             throws SQLException {
         String physicalName = cfTable == null ? tableName : cfTable.getPhysicalName();
-        String logicName = tableName;
+        String logicName = tableName.toUpperCase();
         Database database = ConfigUtil.getCurrentDb();
         for (String splitTableSuffix : database.getSplitSuffixs()) {
-            if (StringUtils.endsWithIgnoreCase(tableName, splitTableSuffix)) {
-                logicName = StringUtils.replace(logicName, splitTableSuffix, "");
+            if (tableName.endsWith(splitTableSuffix.toUpperCase())) {
+                logicName = logicName.substring(0, logicName.length() - splitTableSuffix.length());
                 break;
             }
         }
@@ -68,17 +68,17 @@ public class MySQLTableRepository {
         Table table = new Table();
         table.setName(logicName);
         for (String pre : database.getPrefixs()) {
-            if (!StringUtils.endsWith(pre, "_")) {
+            if (!pre.endsWith("_")) {
                 pre = pre + "_";
             }
 
-            if (StringUtils.startsWith(logicName, StringUtils.upperCase(pre))) {
-                table.setJavaName(CamelCaseUtils.toCapitalizeCamelCase(StringUtils.substring(
-                        logicName, pre.length())));
+            pre = pre.toUpperCase();
+            if (logicName.startsWith(pre)) {
+                table.setJavaName(CamelCaseUtils.toCapitalizeCamelCase(logicName.substring(pre.length())));
                 break;/* 取第一个匹配的 */
             }
         }
-        if (StringUtils.isBlank(table.getJavaName())) {
+        if (StringUtil.isEmpty(table.getJavaName())) {
             table.setJavaName(CamelCaseUtils.toCapitalizeCamelCase(logicName));
         }
         table.setPhysicalName(physicalName);
@@ -116,12 +116,12 @@ public class MySQLTableRepository {
 
         while (resultSet.next()) {
             for (Column column : table.getColumnList()) {
-                if (StringUtils.equals(column.getColumn(), str(resultSet, "COLUMN_NAME"))) {
+                if (column.getColumn().equals(resultSet.getString("COLUMN_NAME"))) {
                     primaryKeys = primaryKeys == null ? new PrimaryKeys() : primaryKeys;
                     primaryKeys.addColumn(column);
                     column.setPrimaryKey(true);
                     String pkName = resultSet.getString("PK_NAME");
-                    pkName = StringUtils.isBlank(pkName) ? column.getColumn() : pkName;
+                    pkName = StringUtil.isEmpty(pkName) ? column.getColumn() : pkName;
                     primaryKeys.setPkName(CamelCaseUtils.toCapitalizeCamelCase(pkName));
                 }
             }
@@ -148,9 +148,9 @@ public class MySQLTableRepository {
         // 组装字段
         while (resultSet.next()) {
             Column column = new Column();
-            column.setColumn(str(resultSet, "COLUMN_NAME"));
+            column.setColumn(resultSet.getString("COLUMN_NAME").toUpperCase());
             column.setJdbcType(JdbcType.forCode(resultSet.getInt("DATA_TYPE")).name());
-            column.setDefaultValue(str(resultSet, "COLUMN_DEF"));
+            column.setDefaultValue(resultSet.getString("COLUMN_DEF"));
             column.setProperty(CamelCaseUtils.toCamelCase(column.getColumn()));
             column.setJavaType(getJavaType(column, cfColumns));
             column.setRemark(str(resultSet, "REMARKS", column.getColumn()));
@@ -166,29 +166,18 @@ public class MySQLTableRepository {
      * @return the java type
      */
     private String getJavaType(Column column, List<Column> cfColumns) {
-        if (cfColumns != null && cfColumns.size() > 0) {
-            for (Column cfColumn : cfColumns) {
-                if (StringUtils.endsWithIgnoreCase(column.getColumn(), cfColumn.getColumn())) {
-                    return cfColumn.getJavaType();
-                }
-            }
-        }
+//        if (cfColumns != null && cfColumns.size() > 0) {
+//            for (Column cfColumn : cfColumns) {
+//                if (StringUtils.endsWithIgnoreCase(column.getColumn(), cfColumn.getColumn())) {
+//                    return cfColumn.getJavaType();
+//                }
+//            }
+//        }
         String javaType = TypeMapEnum.getByJdbcType(column.getJdbcType()).getJavaType();
-        String custJavaType = ConfigUtil.config.getTypeMap().get(javaType);
-        return StringUtils.isBlank(custJavaType) ? javaType : custJavaType;
+        String customizeJavaType = ConfigUtil.config.getTypeMap().get(javaType);
+        return StringUtil.isEmpty(customizeJavaType) ? javaType : customizeJavaType;
     }
 
-    /**
-     * Str string.
-     *
-     * @param resultSet the result set
-     * @param column the column def
-     * @return the string
-     * @throws SQLException the sql exception
-     */
-    private String str(ResultSet resultSet, String column) throws SQLException {
-        return StringUtils.upperCase(resultSet.getString(column));
-    }
 
     /**
      * Str string.
@@ -200,7 +189,7 @@ public class MySQLTableRepository {
      * @throws SQLException the sql exception
      */
     private String str(ResultSet resultSet, String column, String defaultVal) throws SQLException {
-        String val = str(resultSet, column);
-        return StringUtils.isBlank(val) ? defaultVal : val;
+        String val = resultSet.getString(column);
+        return StringUtil.isEmpty(val) ? defaultVal : val;
     }
 }
