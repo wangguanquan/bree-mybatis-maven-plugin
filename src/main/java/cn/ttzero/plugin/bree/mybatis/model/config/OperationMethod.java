@@ -20,8 +20,8 @@ package cn.ttzero.plugin.bree.mybatis.model.config;
  * Create by guanquan.wang at 2019-06-03 21:45
  */
 public enum OperationMethod {
-    select,
     insert,
     update,
-    delete
+    delete,
+    select
 }

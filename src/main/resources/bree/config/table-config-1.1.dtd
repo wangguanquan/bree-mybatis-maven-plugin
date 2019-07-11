@@ -2,14 +2,14 @@
   <!--
   table 下包含多个 column resultMap sql insert update delete select 相应说明见定义
   namespace    命名空间
-  sqlName      sql名
+  name         the table name
   remark      说明
   sequence     oracle使用
   physicalName 物理表名,分库分表使用
   -->
   <!ELEMENT table (resultMap* | sql* | insert* | update* | delete* | select*)+>
   <!ATTLIST table
-    sqlName CDATA #IMPLIED
+    name CDATA #IMPLIED
     sequence CDATA #IMPLIED
     physicalName CDATA #IMPLIED
     remark CDATA #IMPLIED

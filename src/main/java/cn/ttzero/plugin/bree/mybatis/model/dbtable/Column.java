@@ -61,6 +61,11 @@ public class Column implements Comparable<Column> {
     private boolean primaryKey;
 
     /**
+     * The mybatis result type handler
+     */
+    private String typeHandler;
+
+    /**
      * Returns remark.
      *
      * @return the remark
@@ -203,6 +208,24 @@ public class Column implements Comparable<Column> {
      */
     public void setPrimaryKey(boolean primaryKey) {
         this.primaryKey = primaryKey;
+    }
+
+    /**
+     * Returns the type handler
+     *
+     * @return the type handler referer
+     */
+    public String getTypeHandler() {
+        return typeHandler;
+    }
+
+    /**
+     * Setting the result type handler
+     *
+     * @param typeHandler result type handler
+     */
+    public void setTypeHandler(String typeHandler) {
+        this.typeHandler = typeHandler;
     }
 
     /**

@@ -28,14 +28,14 @@ public class ${vo.className}<#if vo.extend??> extends ${vo.extend.className}</#i
     <#list vo.fieldList as field>
 
     /**
-     * Set ${field.name} ${field.desc!}.
+     * Setting the ${field.name} ${field.desc!}.
      */
     public void set${field.name?cap_first}(${field.javaType} ${field.name}) {
         this.${field.name} = ${field.name};
     }
 
     /**
-     * Get ${field.name} ${field.desc!}.
+     * Returns the ${field.name} ${field.desc!}.
      *
      * @return the ${field.javaType}
      */
