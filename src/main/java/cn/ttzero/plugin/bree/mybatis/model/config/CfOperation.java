@@ -38,7 +38,7 @@ public class CfOperation {
     /**
      * The Param type.
      */
-    private ParamTypeEnum paramType;
+    private ParamTypeEnum paramType = ParamTypeEnum.primitive;
     /**
      * The Multiplicity.
      */

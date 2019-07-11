@@ -549,7 +549,7 @@ public class CfTableRepository {
         return cdata;
     }
 
-    private static final String REPLACE_TMP = " ( ⊙ o ⊙ ) ";
+    private static final String REPLACE_TMP = "@^@";
 
     /**
      * Sets cf operation page cdata.
