@@ -116,7 +116,7 @@ public class MySQLTableRepository {
 
         while (resultSet.next()) {
             for (Column column : table.getColumnList()) {
-                if (StringUtils.equals(column.getColumn(), Str(resultSet, "COLUMN_NAME"))) {
+                if (StringUtils.equals(column.getColumn(), str(resultSet, "COLUMN_NAME"))) {
                     primaryKeys = primaryKeys == null ? new PrimaryKeys() : primaryKeys;
                     primaryKeys.addColumn(column);
                     column.setPrimaryKey(true);
@@ -148,12 +148,12 @@ public class MySQLTableRepository {
         // 组装字段
         while (resultSet.next()) {
             Column column = new Column();
-            column.setColumn(Str(resultSet, "COLUMN_NAME"));
+            column.setColumn(str(resultSet, "COLUMN_NAME"));
             column.setJdbcType(JdbcType.forCode(resultSet.getInt("DATA_TYPE")).name());
-            column.setDefaultValue(Str(resultSet, "COLUMN_DEF"));
+            column.setDefaultValue(str(resultSet, "COLUMN_DEF"));
             column.setProperty(CamelCaseUtils.toCamelCase(column.getColumn()));
             column.setJavaType(getJavaType(column, cfColumns));
-            column.setRemark(Str(resultSet, "REMARKS", column.getColumn()));
+            column.setRemark(str(resultSet, "REMARKS", column.getColumn()));
             table.addColumn(column);
         }
     }
@@ -186,7 +186,7 @@ public class MySQLTableRepository {
      * @return the string
      * @throws SQLException the sql exception
      */
-    private String Str(ResultSet resultSet, String column) throws SQLException {
+    private String str(ResultSet resultSet, String column) throws SQLException {
         return StringUtils.upperCase(resultSet.getString(column));
     }
 
@@ -199,8 +199,8 @@ public class MySQLTableRepository {
      * @return the string
      * @throws SQLException the sql exception
      */
-    private String Str(ResultSet resultSet, String column, String defaultVal) throws SQLException {
-        String val = Str(resultSet, column);
+    private String str(ResultSet resultSet, String column, String defaultVal) throws SQLException {
+        String val = str(resultSet, column);
         return StringUtils.isBlank(val) ? defaultVal : val;
     }
 }
