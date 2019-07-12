@@ -232,13 +232,13 @@ public class BreeLoader extends AbstractLoader {
     private void preResultMap(Gen gen, String tbName, CfTable cfTable, Table table,
                               XmlMapper xmlMapper, Map<String, ResultMap> resultMaps) {
         List<CfResultMap> resultMapList = cfTable.getResultMaps();
-        VoConfig voConfig = ConfigUtil.config.getVoConfig();
+        DataObjectConfig doConfig = ConfigUtil.config.getDoConfig();
         String namespace;
-        if (StringUtil.isEmpty(namespace = voConfig.getNamespace())) {
-            namespace = "vo";
+        if (StringUtil.isEmpty(namespace = doConfig.getNamespace())) {
+            namespace = "do";
         }
-        String prefix = voConfig.getPrefix()
-            , suffix = voConfig.getSuffix();
+        String prefix = doConfig.getPrefix()
+            , suffix = doConfig.getSuffix();
         if (prefix == null) prefix = "";
         if (suffix == null) suffix = "";
         for (CfResultMap cfResultMap : resultMapList) {
@@ -246,9 +246,20 @@ public class BreeLoader extends AbstractLoader {
             resultMap.setTableName(table.getName());
             resultMap.setId(cfResultMap.getId());
             resultMap.setType(cfResultMap.getType());
-            resultMap.setClassName(prefix + cfResultMap.getType() + suffix);
-            resultMap.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
-            resultMap.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+
+            String type = cfResultMap.getType();
+            int index = type.lastIndexOf('.');
+            if (index < 0) {
+                resultMap.setClassName(prefix + cfResultMap.getType() + suffix);
+                resultMap.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
+                resultMap.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+            } else {
+                resultMap.setClassName(type.substring(index + 1));
+                String packageName = type.substring(0, index);
+                resultMap.setClassPath(packageName.replace('.', '/'));
+                resultMap.setPackageName(packageName);
+            }
+
             resultMap.setDesc(cfResultMap.getRemark());
             doColumn(gen, tbName, resultMap, cfResultMap.getColumns(), null);
 
@@ -527,8 +538,16 @@ public class BreeLoader extends AbstractLoader {
             if (prefix == null) prefix = "";
             if (suffix == null) suffix = "Vo";
 
-            paging.setClassName(prefix + StringUtil.upperFirst(operation.getVo()) + suffix);
-            paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+            String vo = operation.getVo();
+            int index = vo.lastIndexOf('.');
+            if (index < 0) {
+                paging.setClassName(prefix + StringUtil.upperFirst(operation.getVo()) + suffix);
+                paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+            } else {
+                paging.setClassName(vo.substring(index + 1));
+                paging.setPackageName(vo.substring(0, index));
+            }
+
             resultType = getClassAndImport(dao, paging.getPackageName() + "." + paging.getClassName());
             DoMapperMethodParam param = new DoMapperMethodParam(resultType,
                 StringUtil.lowerFirst(operation.getVo()));
@@ -636,9 +655,20 @@ public class BreeLoader extends AbstractLoader {
         pagingResultMethod.setPagingFlag("true");
 
         Vo paging = new Vo();
-        paging.setClassName(prefix + StringUtil.upperFirst(operation.getVo()) + suffix);
-        paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
-        paging.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
+
+        String vo = operation.getVo();
+        int index = vo.lastIndexOf('.');
+        if (index < 0) {
+            paging.setClassName(prefix + vo + suffix);
+            paging.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
+            paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+        } else {
+            paging.setClassName(vo.substring(index + 1));
+            String packageName = vo.substring(0, index);
+            paging.setClassPath(packageName.replace('.', '/'));
+            paging.setPackageName(packageName);
+        }
+
         if (voConfig.isUseBasePageVo()) {
 //            paging.setBasePackageName(ConfigUtil.getCurrentDb().getGenDalCommonPackage() + "." + paging);
 //            paging.setBaseClassPath(ConfigUtil.getCurrentDb().getGenDalCommonPackagePath() + "/" + paging);
