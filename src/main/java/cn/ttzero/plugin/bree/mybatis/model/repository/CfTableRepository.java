@@ -405,8 +405,9 @@ public class CfTableRepository {
                 }
             }
 
-            if (cfOperation.getMultiplicity() == MultiplicityEnum.paging) {
-                Validate.notEmpty(cfOperation.getVo(), "需要设置paging,用来生成分页类");
+            if (cfOperation.getMultiplicity() == MultiplicityEnum.paging
+                && StringUtil.isEmpty(cfOperation.getVo())) {
+                cfOperation.setVo(cfOperation.getId());
             }
 
             if (buf.length() > 0) {
