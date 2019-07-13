@@ -24,9 +24,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.ttzero.plugin.bree.mybatis.model.dbtable.Database;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import com.google.common.collect.Maps;
 
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
@@ -35,6 +34,7 @@ import org.ttzero.plugin.bree.mybatis.model.dbtable.PrimaryKeys;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
+import org.ttzero.plugin.bree.mybatis.utils.StringUtil;
 
 /**
  * Created by guanquan.wang at 2019-05-24 09:02
@@ -58,42 +58,16 @@ public class OBTableRepository implements ITableRepository {
     @Override
     public Table gainTable(Connection connection, String tableName, CfTable cfTable)
             throws SQLException {
-        //支持分表,逻辑表
-        String physicalName = cfTable == null ? tableName : cfTable.getPhysicalName();
-        //物理表
-        String logicName = tableName;
-        Database database = ConfigUtil.getCurrentDb();
-        for (String splitTableSuffix : database.getSplitSuffixs()) {
-            if (StringUtils.endsWithIgnoreCase(tableName, splitTableSuffix)) {
-                logicName = StringUtils.replace(logicName, splitTableSuffix, "");
-                break;
-            }
-        }
-        //自定义字段类型
-        List<Column> cfColumns = cfTable == null ? null : cfTable.getColumns();
-        //生成table
-        Table table = new Table();
-        table.setName(logicName);
-        for (String pre : database.getPrefixs()) {
-            if (!StringUtils.endsWith(pre, "_")) {
-                pre = pre + "_";
-            }
 
-            if (StringUtils.startsWith(logicName, StringUtils.upperCase(pre))) {
-                table.setJavaName(CamelCaseUtils.toCapitalizeCamelCase(StringUtils.substring(
-                        logicName, pre.length())));
-                break;/* 取第一个匹配的 */
-            }
-        }
-        if (StringUtils.isBlank(table.getJavaName())) {
-            table.setJavaName(CamelCaseUtils.toCapitalizeCamelCase(logicName));
-        }
-        table.setPhysicalName(physicalName);
-        table.setRemark(logicName);
+        Table table = generalParse(cfTable, tableName);
+
+        List<Column> cfColumns = cfTable == null ? null : cfTable.getColumns();
         // 填充字段
-        fillColumns(connection, physicalName, table, cfColumns);
+        fillColumns(connection, table.getPhysicalName(), table, cfColumns);
+
         // 自动生成初始操作
         table.setCreateDefaultOperation(ConfigUtil.config.isCreateDefaultOperation());
+
         return table;
     }
 
@@ -108,33 +82,30 @@ public class OBTableRepository implements ITableRepository {
      */
     private void fillColumns(Connection connection, String tableName, Table table,
                              List<Column> cfColumns) throws SQLException {
-        //指定表字段
+        // 指定表字段
         ResultSet resultSet = connection.createStatement().executeQuery(
                 "SHOW CREATE TABLE " + tableName);
-        //组装字段
+        // 组装字段
         while (resultSet.next()) {
-            //得到建表语句
+            // 得到建表语句
             String createTableSql = getCreateTableSql(resultSet);
 
-            //主键行
-            String primaryKeyLine = null;
+            // 解析建表语句
+            String[] createSqlLines = createTableSql.split("\n");
 
-            //解析建表语句
-            String[] createSqlLines = StringUtils.split(createTableSql, "\n");
-
-            //准备字段
+            // 准备字段
             Map<String, Column> columnMap = Maps.newHashMap();
-            primaryKeyLine = preColumns(table, columnMap, cfColumns, primaryKeyLine, createSqlLines);
+            String primaryKeyLine = preColumns(table, columnMap, cfColumns, createSqlLines);
 
-            //最后一行解析表注释
+            // 最后一行解析表注释
             String lastLine = createSqlLines[createSqlLines.length - 1];
             for (String comments : StringUtils.split(lastLine)) {
-                if (StringUtils.startsWith(comments, "COMMENT=")) {
+                if (comments.startsWith("COMMENT=")) {
                     table.setRemark(comments.split("=", 2)[1]);
                 }
             }
 
-            //设置主键
+            // 设置主键
             if (primaryKeyLine != null) {
                 Matcher m = PRIMARY_KEY_PATTERN.matcher(primaryKeyLine);
                 while (m.find()) {
@@ -164,14 +135,14 @@ public class OBTableRepository implements ITableRepository {
      * @throws SQLException the sql exception
      */
     private String getCreateTableSql(ResultSet resultSet) throws SQLException {
-        String createTableSql = StringUtils.upperCase(resultSet.getString(2));
-        createTableSql = StringUtils.replace(createTableSql, "`", "");
+        String createTableSql = resultSet.getString(2).toUpperCase();
+        createTableSql = createTableSql.replace("`", "");
         createTableSql = createTableSql.replaceAll("\\s{1,}=\\s{1,}", "=");
         createTableSql = createTableSql.replaceAll("\\(\\d*\\)", "");
         createTableSql = createTableSql.replaceAll("COMMENT\\s{1,}'", "COMMON='");
-        createTableSql = createTableSql.replaceAll(", ", " ");
-        createTableSql = createTableSql.replaceAll(",", "");
-        createTableSql = createTableSql.replaceAll("'", "");
+        createTableSql = createTableSql.replace(", ", " ");
+        createTableSql = createTableSql.replace(",", "");
+        createTableSql = createTableSql.replace("'", "");
         return createTableSql;
     }
 
@@ -181,18 +152,20 @@ public class OBTableRepository implements ITableRepository {
      * @param table          the table
      * @param columnMap      the column map
      * @param cfColumns      the cf columns
-     * @param primaryKeyLine the primary key line
      * @param createSqlLines the create sql lines
      * @return the string
      */
-    private String preColumns(Table table, Map<String, Column> columnMap, List<Column> cfColumns, String primaryKeyLine, String[] createSqlLines) {
+    private String preColumns(Table table, Map<String, Column> columnMap, List<Column> cfColumns, String[] createSqlLines) {
+        String primaryKeyLine = null;
         for (int i = 1; i < createSqlLines.length - 1; i++) {
-            String createSqlLine = StringUtils.trim(createSqlLines[i]);
-            if (StringUtils.startsWith(createSqlLine, "PRIMARY KEY")) {//主键
+            String createSqlLine = createSqlLines[i].trim();
+            if (StringUtil.isEmpty(createSqlLine)) continue;
+
+            if (createSqlLine.startsWith("PRIMARY KEY")) {
                 primaryKeyLine = createSqlLine;
                 continue;
             }
-            if (StringUtils.startsWith(createSqlLine, "KEY ") || StringUtils.isBlank(createSqlLine)) {//索引,外键啥的,不处理
+            if (createSqlLine.startsWith("KEY ")) {
                 continue;
             }
             Column column = new Column();
@@ -201,12 +174,13 @@ public class OBTableRepository implements ITableRepository {
             column.setJdbcType(TypeMapEnum.getByJdbcType(columnArray[1]).getJdbcType());
             column.setProperty(CamelCaseUtils.toCamelCase(columnArray[0]));
             column.setJavaType(getJavaType(column, cfColumns));
-            if (StringUtils.startsWith(columnArray[columnArray.length - 1], "COMMENT=")) {
+            if (columnArray[columnArray.length - 1].startsWith("COMMENT=")) {
                 column.setRemark(columnArray[columnArray.length - 1].split("=", 2)[1]);
             }
-            if (StringUtils.isBlank(column.getRemark())) {
+            if (StringUtil.isEmpty(column.getRemark())) {
                 column.setRemark(column.getColumn());
             }
+            column.setReserved(isReserved(column.getColumn()));
             table.addColumn(column);
             columnMap.put(column.getColumn(), column);
         }
@@ -231,5 +205,16 @@ public class OBTableRepository implements ITableRepository {
         String javaType = TypeMapEnum.getByJdbcType(column.getJdbcType()).getJavaType();
         String custJavaType = ConfigUtil.config.getTypeMap().get(javaType);
         return StringUtils.isBlank(custJavaType) ? javaType : custJavaType;
+    }
+
+    /**
+     * Test the column is reserved word
+     *
+     * @param column the column name
+     * @return true if the name is reserved
+     */
+    @Override
+    public boolean isReserved(String column) {
+        return false;
     }
 }

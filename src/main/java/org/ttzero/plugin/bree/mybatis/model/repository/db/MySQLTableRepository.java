@@ -20,10 +20,11 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
-import org.ttzero.plugin.bree.mybatis.model.dbtable.Database;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import org.ttzero.plugin.bree.mybatis.utils.StringUtil;
@@ -39,6 +40,21 @@ import org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
  */
 public class MySQLTableRepository implements ITableRepository {
 
+    private Set<String> reserved;
+
+    public MySQLTableRepository() {
+        // https://dev.mysql.com/doc/refman/8.0/en/keywords.html
+        reserved = new HashSet<>();
+        reserved.add("NAME");
+        reserved.add("DESC");
+        reserved.add("TYPE");
+        reserved.add("CREATE");
+        reserved.add("TABLE");
+        reserved.add("TEXT");
+        reserved.add("ALTER");
+        reserved.add("DATA");
+    }
+
     /**
      * Gain table table.
      *
@@ -51,48 +67,20 @@ public class MySQLTableRepository implements ITableRepository {
     @Override
     public Table gainTable(Connection connection, String tableName, CfTable cfTable)
             throws SQLException {
-        String physicalName = cfTable == null ? tableName : cfTable.getPhysicalName();
-        String logicName = tableName.toUpperCase();
-        Database database = ConfigUtil.getCurrentDb();
-        for (String splitTableSuffix : database.getSplitSuffixs()) {
-            if (tableName.endsWith(splitTableSuffix.toUpperCase())) {
-                logicName = logicName.substring(0, logicName.length() - splitTableSuffix.length());
-                break;
-            }
-        }
+
+        Table table = generalParse(cfTable, tableName);
 
         List<Column> cfColumns = cfTable == null ? null : cfTable.getColumns();
+
         DatabaseMetaData databaseMetaData = connection.getMetaData();
 
+        // Parse columns
+        fillColumns(connection, table.getPhysicalName(), databaseMetaData, table, cfColumns);
 
-        // 生成table
-        Table table = new Table();
-        table.setName(logicName);
-        for (String pre : database.getPrefixs()) {
-            if (!pre.endsWith("_")) {
-                pre = pre + "_";
-            }
+        // Parse primary key
+        fillPrimaryKeys(connection, table.getPhysicalName(), databaseMetaData, table);
 
-            pre = pre.toUpperCase();
-            if (logicName.startsWith(pre)) {
-                table.setJavaName(CamelCaseUtils.toCapitalizeCamelCase(logicName.substring(pre.length())));
-                break;/* 取第一个匹配的 */
-            }
-        }
-        if (StringUtil.isEmpty(table.getJavaName())) {
-            table.setJavaName(CamelCaseUtils.toCapitalizeCamelCase(logicName));
-        }
-        table.setPhysicalName(physicalName);
-        table.setRemark(logicName);
-
-
-        // 填充字段
-        fillColumns(connection, physicalName, databaseMetaData, table, cfColumns);
-
-        // 主键
-        fillPrimaryKeys(connection, physicalName, databaseMetaData, table);
-
-        // 自动生成初始操作
+        // Create default operation
         table.setCreateDefaultOperation(ConfigUtil.config.isCreateDefaultOperation());
 
         return table;
@@ -155,7 +143,8 @@ public class MySQLTableRepository implements ITableRepository {
             column.setDefaultValue(resultSet.getString("COLUMN_DEF"));
             column.setProperty(CamelCaseUtils.toCamelCase(column.getColumn()));
             column.setJavaType(getJavaType(column, cfColumns));
-            column.setRemark(str(resultSet, "REMARKS", column.getColumn()));
+            column.setRemark(getOrElse(resultSet, "REMARKS", column.getColumn()));
+            column.setReserved(isReserved(column.getColumn()));
             table.addColumn(column);
         }
     }
@@ -180,18 +169,14 @@ public class MySQLTableRepository implements ITableRepository {
         return StringUtil.isEmpty(customizeJavaType) ? javaType : customizeJavaType;
     }
 
-
     /**
-     * Str string.
+     * Test the column is reserved word
      *
-     * @param resultSet the result set
-     * @param column the column
-     * @param defaultVal the default val
-     * @return the string
-     * @throws SQLException the sql exception
+     * @param column the column name
+     * @return true if the name is reserved
      */
-    private String str(ResultSet resultSet, String column, String defaultVal) throws SQLException {
-        String val = resultSet.getString(column);
-        return StringUtil.isEmpty(val) ? defaultVal : val;
+    @Override
+    public boolean isReserved(String column) {
+        return reserved != null && reserved.contains(column);
     }
 }

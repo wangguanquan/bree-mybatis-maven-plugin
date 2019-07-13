@@ -17,9 +17,14 @@
 package org.ttzero.plugin.bree.mybatis.model.repository.db;
 
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
+import org.ttzero.plugin.bree.mybatis.model.dbtable.Database;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
+import org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
+import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
+import org.ttzero.plugin.bree.mybatis.utils.StringUtil;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -36,4 +41,67 @@ public interface ITableRepository {
      * @throws SQLException the sql exception
      */
     Table gainTable(Connection connection, String tableName, CfTable cfTable) throws SQLException;
+
+    /**
+     * Test the column is reserved word
+     *
+     * @param column the column name
+     * @return true if the name is reserved
+     */
+    boolean isReserved(String column);
+
+    /**
+     * Parse general information from {@link CfTable}
+     *
+     * @param cfTable the table defined
+     * @param tableName the table name
+     * @return {@link Table}
+     */
+    default Table generalParse(CfTable cfTable, String tableName) {
+        String logicName = tableName.toUpperCase();
+        Database database = ConfigUtil.getCurrentDb();
+        for (String splitTableSuffix : database.getSplitSuffixs()) {
+            if (tableName.endsWith(splitTableSuffix.toUpperCase())) {
+                logicName = logicName.substring(0, logicName.length() - splitTableSuffix.length());
+                break;
+            }
+        }
+
+        Table table = new Table();
+        table.setName(logicName);
+        for (String pre : database.getPrefixs()) {
+            if (!pre.endsWith("_")) {
+                pre = pre + "_";
+            }
+
+            pre = pre.toUpperCase();
+            if (logicName.startsWith(pre)) {
+                table.setJavaName(CamelCaseUtils.toCapitalizeCamelCase(logicName.substring(pre.length())));
+                break;
+            }
+        }
+        if (StringUtil.isEmpty(table.getJavaName())) {
+            table.setJavaName(CamelCaseUtils.toCapitalizeCamelCase(logicName));
+        }
+
+        String physicalName = cfTable == null ? tableName : cfTable.getPhysicalName();
+        table.setPhysicalName(physicalName);
+        table.setRemark(logicName);
+
+        return table;
+    }
+
+    /**
+     * Getting value from {@link ResultSet} and set a default value if it empty
+     *
+     * @param resultSet the {@link ResultSet}
+     * @param key the column name
+     * @param defaultValue the default value
+     * @return value of result set
+     * @throws SQLException if sql exception occur
+     */
+    default String getOrElse(ResultSet resultSet, String key, String defaultValue) throws SQLException {
+        String value = resultSet.getString(key);
+        return StringUtil.isEmpty(key) ? defaultValue : value;
+    }
 }
