@@ -57,7 +57,7 @@ public class BreeTableLoader extends AbstractLoader {
         if ("*".equals(ConfigUtil.cmd.trim())) {
             return;
         }
-        String[] cmdTables = ConfigUtil.cmd.split(",");
+        String[] cmdTables = ConfigUtil.cmd.toUpperCase().split(",");
 
         Set<String> existsTables = Sets.newHashSet();
         File[] files = tablesFile.listFiles(file -> file.getName().endsWith(".xml"));
