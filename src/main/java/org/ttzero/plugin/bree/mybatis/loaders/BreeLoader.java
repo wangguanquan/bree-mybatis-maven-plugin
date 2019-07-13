@@ -539,21 +539,6 @@ public class BreeLoader extends AbstractLoader {
             if (suffix == null) suffix = "Vo";
 
             String vo = operation.getVo();
-            if (StringUtil.isEmpty(vo)) {
-                // TODO the default vo name ...
-                // Maybe set the default name same as do name is better
-                vo = operation.getId();
-            } else {
-                int index = vo.lastIndexOf('.');
-                if (index < 0) {
-                    paging.setClassName(prefix + StringUtil.upperFirst(operation.getVo()) + suffix);
-                    paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
-                } else {
-                    paging.setClassName(vo.substring(index + 1));
-                    paging.setPackageName(vo.substring(0, index));
-                }
-            }
-            String vo = operation.getVo();
             int index = vo.lastIndexOf('.');
             if (index < 0) {
                 paging.setClassName(prefix + StringUtil.upperFirst(operation.getVo()) + suffix);
