@@ -19,16 +19,15 @@ package org.ttzero.plugin.bree.mybatis.loaders;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Set;
 
+import com.google.common.collect.Sets;
 import org.ttzero.plugin.bree.mybatis.model.Gen;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 
 import org.ttzero.plugin.bree.mybatis.model.repository.TableRepository;
-import com.google.common.collect.Lists;
 
 /**
  * 初始化表用
@@ -54,15 +53,14 @@ public class BreeTableLoader extends AbstractLoader {
     @Override
     public void load(Gen gen, Connection connection, File tablesFile) throws SQLException {
 
-        if (StringUtils.equals(StringUtils.trim(ConfigUtil.cmd), "*")) {
+        // TODO list all tables
+        if ("*".equals(ConfigUtil.cmd.trim())) {
             return;
         }
-        List<String> cmdTables = Lists.newArrayList(StringUtils.split(StringUtils.upperCase(ConfigUtil.cmd)));
+        String[] cmdTables = ConfigUtil.cmd.split(",");
 
-        List<String> neadInitTables = Lists.newArrayList();
-
-        List<String> existsTables = Lists.newArrayList();
-        File[] files = tablesFile.listFiles((d, name) -> name.endsWith(".xml"));
+        Set<String> existsTables = Sets.newHashSet();
+        File[] files = tablesFile.listFiles(file -> file.getName().endsWith(".xml"));
         if (files != null) {
             for (File file : files) {
                 existsTables.add(file2DbName(file));
@@ -71,18 +69,10 @@ public class BreeTableLoader extends AbstractLoader {
 
         for (String cmdTable : cmdTables) {
             if (!existsTables.contains(cmdTable)) {
-                neadInitTables.add(cmdTable);
+                LOG.info("初始化表:" + cmdTable);
+                gen.addTable(tableRepository.gainTable(connection, cmdTable, null));
             }
         }
 
-        if (neadInitTables.isEmpty()) {
-            return;
-        }
-
-        LOG.info("开始初始化表");
-        for (String neadInitTable : neadInitTables) {
-            LOG.info("初始化表:" + neadInitTable);
-            gen.addTable(tableRepository.gainTable(connection, neadInitTable, null));
-        }
     }
 }
