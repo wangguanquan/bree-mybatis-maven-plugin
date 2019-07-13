@@ -25,7 +25,7 @@
   <!-- ========================================================== -->
 
   <database name="sdm" class="com.mysql.cj.jdbc.Driver" type="mysql">
-    <property name="url" value="jdbc:mysql://localhost:3306/job?serverTimezone=Asia/Shanghai&#38;useSSL=true"/>
+    <property name="url" value="jdbc:mysql://localhost/job?serverTimezone=Asia/Shanghai&#38;useSSL=true"/>
     <property name="user" value="root"/>
     <property name="password" value="root"/>
     <!-- 省略前置 支持多个 -->
@@ -120,7 +120,7 @@
     <!-- 后缀 默认Vo-->
     <suffix />
     <!-- 分页基础vo，不配置false时bree提供一个默认BasePage-->
-    <useBasePageVo value="false" />
+    <useBasePageVo value="true" />
     <!-- 配置vo类的继承 默认无-->
     <!-- 让分页vo继承定义PageVo 此处PageVo放在vo包下，所以省掉import-->
     <extend  class="PageVo" if ="paging" />

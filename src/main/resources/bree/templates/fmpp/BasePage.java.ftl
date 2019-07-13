@@ -12,108 +12,46 @@
 package ${vo.packageName};
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
- * 用于分页的工具类
+ * Base entry use for paging
  */
 public class BasePage<T> {
 
-    private List<T> datas           = new ArrayList<>();         // 对象记录结果集
-    private int     total           = 0;    // 总记录数
-    private int     limit           = 20;   // 默认每页显示记录数
-    private int     pageNos         = 1;    // 总页数
-    private int     currPageNo      = 1;    // 当前页
+    private List<T> data;                    // 对象记录结果集
+    private int     total           = 0;     // 总记录数
+    private int     limit           = 20;    // 默认每页显示记录数
+    private int     totalPage       = 1;     // 总页数
+    private int     pageNo      = 1;     // 当前页
 
-    private boolean isFirstPage     = false; // 是否为第一页
-    private boolean isLastPage      = false; // 是否为最后一页
-    private boolean hasPreviousPage = false; // 是否有前一页
-    private boolean hasNextPage     = false; // 是否有下一页
-
-    private int     navigatePages   = 8;    // 导航页码数
-    private int[]   navigatePageNos;        // 所有导航页号
 
     private void init() {
-        this.pageNos = (this.total - 1) / this.limit + 1;
+        this.totalPage = (this.total - 1) / this.limit + 1;
 
         // 根据输入可能错误的当前号码进行自动纠正
-        if (currPageNo < 1) {
-            this.currPageNo = 1;
-        } else if (currPageNo > this.pageNos) {
-            this.currPageNo = this.pageNos;
-        } else {
-            this.currPageNo = currPageNo;
-        }
-
-        // 基本参数设定之后进行导航页面的计算
-        calcNavigatePageNumbers();
-
-        // 以及页面边界的判定
-        judgePageBoudary();
-    }
-
-    /**
-     * 计算导航页
-     */
-    private void calcNavigatePageNumbers() {
-        // 当总页数小于或等于导航页码数时
-        if (pageNos <= navigatePages) {
-            navigatePageNos = new int[pageNos];
-            for (int i = 0; i < pageNos; i++) {
-                navigatePageNos[i] = i + 1;
-            }
-        } else { // 当总页数大于导航页码数时
-            navigatePageNos = new int[navigatePages];
-            int startNum = currPageNo - navigatePages / 2;
-            int endNum = currPageNo + navigatePages / 2;
-
-            if (startNum < 1) {
-                startNum = 1;
-                // 最前navigatePages页
-                for (int i = 0; i < navigatePages; i++) {
-                    navigatePageNos[i] = startNum++;
-                }
-            } else if (endNum > pageNos) {
-                endNum = pageNos;
-                // 最后navigatePages页
-                for (int i = navigatePages - 1; i >= 0; i--) {
-                    navigatePageNos[i] = endNum--;
-                }
-            } else {
-                // 所有中间页
-                for (int i = 0; i < navigatePages; i++) {
-                    navigatePageNos[i] = startNum++;
-                }
-            }
+        if (pageNo < 1) {
+            this.pageNo = 1;
+        } else if (pageNo > this.totalPage) {
+            this.pageNo = this.totalPage;
         }
     }
 
     /**
-     * 判定页面边界
+     * Returns a page data
+     * 
+     * @return list of {@link T}
      */
-    private void judgePageBoudary() {
-        isFirstPage = currPageNo == 1;
-        isLastPage = currPageNo == pageNos && currPageNo != 1;
-        hasPreviousPage = currPageNo > 1;
-        hasNextPage = currPageNo < pageNos;
+    public List<T> getData() {
+        return data;
     }
 
     /**
-     * 得到数据
+     * Setting a page data
      * 
-     * @return
+     * @param data a page list data
      */
-    public List<T> getDatas() {
-        return datas;
-    }
-
-    /**
-     * 设置数据
-     * 
-     * @param datas
-     */
-    public void setDatas(List<T> datas) {
-        this.datas = datas;
+    public void setDatas(List<T> data) {
+        this.data = data;
     }
 
     /**
@@ -163,21 +101,12 @@ public class BasePage<T> {
     }
 
     /**
-     * 设置导航线上几页
-     * 
-     * @param navigatePages
-     */
-    public void setNavigatePages(int navigatePages) {
-        this.navigatePages = navigatePages;
-    }
-
-    /**
      * 得到页面总数
      *
      * @return {int}
      */
     public int getPageNos() {
-        return pageNos;
+        return totalPage;
     }
 
     /**
@@ -186,43 +115,18 @@ public class BasePage<T> {
      * @return {int}
      */
     public int getCurrPageNo() {
-        return currPageNo;
-    }
-
-    /**
-     * 得到所有导航页号
-     *
-     * @return {int[]}
-     */
-    public int[] getNavigatePageNos() {
-        return navigatePageNos;
-    }
-
-    public boolean isFirstPage() {
-        return isFirstPage;
-    }
-
-    public boolean isLastPage() {
-        return isLastPage;
-    }
-
-    public boolean hasPreviousPage() {
-        return hasPreviousPage;
-    }
-
-    public boolean hasNextPage() {
-        return hasNextPage;
+        return pageNo;
     }
 
     /**
      * 设置当前行
-     * @param currPageNo
+     * @param pageNo
      */
-    public void setCurrPageNo(int currPageNo) {
-        if (currPageNo == 0) {
-            this.currPageNo = 1;
+    public void setCurrPageNo(int pageNo) {
+        if (pageNo == 0) {
+            this.pageNo = 1;
         } else {
-            this.currPageNo = currPageNo;
+            this.pageNo = pageNo;
         }
     }
 
@@ -230,29 +134,16 @@ public class BasePage<T> {
     * 得到开始行
     */
     public int getOffset() {
-        return (currPageNo - 1) * limit;
+        return (pageNo - 1) * limit;
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder("[");
-        sb.append("total=").append(total)
-            .append(",pageNos=").append(pageNos)
-            .append(",currPageNo=").append(currPageNo)
-            .append(",limit=").append(limit)
-            .append(",isFirstPage=").append(isFirstPage)
-            .append(",isLastPage=").append(isLastPage)
-            .append(",hasPreviousPage=").append(hasPreviousPage)
-            .append(",hasNextPage=").append(hasNextPage)
-            .append(",navigatePageNos=");
-        int len = navigatePageNos.length;
-        if (len > 0)
-            sb.append(navigatePageNos[0]);
-        for (int i = 1; i < len; i++) {
-            sb.append(" ").append(navigatePageNos[i]);
-        }
-        sb.append(",datas.size=" + datas.size());
-        sb.append("]");
-        return sb.toString();
+        return "[total=" + total +
+            ",totalPage=" + totalPage +
+            ",pageNo=" + pageNo +
+            ",limit=" + limit +
+            ",data.size=" + (data != null ? data.size() : 0) +
+            "]";
     }
 }
 </#list>
