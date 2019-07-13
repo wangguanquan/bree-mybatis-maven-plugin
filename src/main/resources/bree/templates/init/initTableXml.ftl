@@ -11,7 +11,7 @@
     <insert id="insert" paramType="object" remark="插入表:${table.name}">
         INSERT INTO ${table.name}(
         <#list table.columnList as column>
-            <#if column.column != "ID"><#if column_index gt 1>, </#if>${column.column}</#if>
+            <#if column.column != "ID"><#if column_index gt 1>, </#if><#if column.reserved>`${column.column}`<#else>${column.column}</#if></#if>
         </#list>
         ) VALUES (
         <#list table.columnList as column>
@@ -27,7 +27,7 @@
         <#assign c_idx = 0>
         <#list table.columnList as column>
             <#if lib.updateIncludeColumn(column,table.primaryKeys.columnList)><#assign c_idx = c_idx+1>
-            <#if c_idx gt 1>, </#if>${column.column}${lib.space(column.column)} = ${lib.updateVal(column)}
+            <#if c_idx gt 1>, </#if><#if column.reserved>`${column.column}`<#else>${column.column}</#if>${lib.space(column.column)} = ${lib.updateVal(column)}
             </#if>
         </#list>
         WHERE

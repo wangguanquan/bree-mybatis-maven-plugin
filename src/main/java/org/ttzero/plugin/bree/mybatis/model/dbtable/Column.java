@@ -66,6 +66,11 @@ public class Column implements Comparable<Column> {
     private String typeHandler;
 
     /**
+     * Mark the column name is a reserved word
+     */
+    private boolean reserved;
+
+    /**
      * Returns remark.
      *
      * @return the remark
@@ -226,6 +231,24 @@ public class Column implements Comparable<Column> {
      */
     public void setTypeHandler(String typeHandler) {
         this.typeHandler = typeHandler;
+    }
+
+    /**
+     * Returns the column name is reserved
+     *
+     * @return the reserved value
+     */
+    public boolean isReserved() {
+        return reserved;
+    }
+
+    /**
+     * Setting the column name is reserved
+     *
+     * @param reserved the reserved value
+     */
+    public void setReserved(boolean reserved) {
+        this.reserved = reserved;
     }
 
     /**
