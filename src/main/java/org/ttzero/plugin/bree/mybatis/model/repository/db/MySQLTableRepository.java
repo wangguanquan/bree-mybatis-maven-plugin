@@ -37,7 +37,7 @@ import org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
 /**
  * Created by guanquan.wang at 2019-05-24 09:02
  */
-public class MySQLTableRepository {
+public class MySQLTableRepository implements ITableRepository {
 
     /**
      * Gain table table.
@@ -48,6 +48,7 @@ public class MySQLTableRepository {
      * @return the table
      * @throws SQLException the sql exception
      */
+    @Override
     public Table gainTable(Connection connection, String tableName, CfTable cfTable)
             throws SQLException {
         String physicalName = cfTable == null ? tableName : cfTable.getPhysicalName();

@@ -39,7 +39,7 @@ import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 /**
  * Created by guanquan.wang at 2019-05-24 09:02
  */
-public class OBTableRepository {
+public class OBTableRepository implements ITableRepository {
 
     /**
      * The constant PRIMARY_KEY_PATTERN.
@@ -55,6 +55,7 @@ public class OBTableRepository {
      * @return the table
      * @throws SQLException the sql exception
      */
+    @Override
     public Table gainTable(Connection connection, String tableName, CfTable cfTable)
             throws SQLException {
         //支持分表,逻辑表

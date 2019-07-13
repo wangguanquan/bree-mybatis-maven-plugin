@@ -18,11 +18,10 @@ package org.ttzero.plugin.bree.mybatis.model.repository;
 
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
+import org.ttzero.plugin.bree.mybatis.model.repository.db.ITableRepository;
 import org.ttzero.plugin.bree.mybatis.model.repository.db.MySQLTableRepository;
 import org.ttzero.plugin.bree.mybatis.model.repository.db.OBTableRepository;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -41,16 +40,19 @@ public class TableRepository {
      */
     public Table gainTable(Connection connection, String tableName, CfTable cfTable)
             throws SQLException {
-        if (StringUtils.equalsIgnoreCase(ConfigUtil.getCurrentDb().getType(), "mysql")) {
-            MySQLTableRepository tableRepository = new MySQLTableRepository();
-            return tableRepository.gainTable(connection,tableName,cfTable);
-        }
-        if (StringUtils.equalsIgnoreCase(ConfigUtil.getCurrentDb().getType(), "ob")) {
-            OBTableRepository tableRepository = new OBTableRepository();
-            return tableRepository.gainTable(connection,tableName,cfTable);
+        String type = ConfigUtil.getCurrentDb().getType().toLowerCase();
+        ITableRepository tableRepository = null;
+        switch (type) {
+            case "mysql":
+                tableRepository = new MySQLTableRepository();
+                break;
+            case "ob":
+                tableRepository = new OBTableRepository();
+                break;
+                default:
+                    System.out.println("===== 目前仅支持 mysql ob 请正确选择 =====");
         }
 
-        Validate.notNull(null,"===== config.xml 目前仅支持 mysql ob 请正确选择 =====");
-        return null;
+        return tableRepository != null ? tableRepository.gainTable(connection,tableName,cfTable) : null;
     }
 }
