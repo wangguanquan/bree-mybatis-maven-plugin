@@ -21,7 +21,6 @@ import org.ttzero.plugin.bree.mybatis.model.Gen;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import fmpp.Engine;
 import fmpp.tdd.DataLoader;
-import org.apache.commons.lang3.StringUtils;
 import org.ttzero.plugin.bree.mybatis.others.DBConnectionFactory;
 
 import java.io.File;
@@ -96,7 +95,6 @@ public abstract class AbstractLoader implements DataLoader {
      * @return the string
      */
     protected String file2DbName(File tableFile) {
-        return StringUtils.upperCase(StringUtils.substring(tableFile.getName(), 0, tableFile
-                .getName().indexOf(".")));
+        return tableFile.getName().substring(0, tableFile.getName().length() - 4).toUpperCase();
     }
 }
