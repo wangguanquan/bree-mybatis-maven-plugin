@@ -46,7 +46,7 @@
   <!-- 如果配置项包含<>请转为&lt;和&gt;                               -->
   <!-- ========================================================== -->
 
-  <!-- DO配置-->
+  <!-- Do配置-->
   <!-- 数据库表对应实体 data object-->
   <data-object>
     <!-- 包名 默认do-->
@@ -55,15 +55,15 @@
     <prefix />
     <!-- 后缀 默认无-->
     <suffix />
-    <!-- 配置DO类的继承 默认无-->
+    <!-- 配置Do类的继承 默认无-->
     <!-- java只支持类单继承，此节点只能存在一个-->
-    <extend class="BaseModel&lt;${DO.className}&gt;"
+    <extend class="BaseModel&lt;${Do.className}&gt;"
             import="net.vipmro.athena.boot.starter.model.BaseModel" />
-    <!-- 配置DO类的实现 默认无-->
+    <!-- 配置Do类的实现 默认无-->
     <implements />
-    <!-- 配置DO类的注解 默认无-->
+    <!-- 配置Do类的注解 默认无-->
     <annotations>
-      <annotation class='TableName("${DO.tableName}")'
+      <annotation class='TableName("${Do.tableName}")'
                   import="com.baomidou.mybatisplus.annotations.TableName"/>
     </annotations>
     <!-- 因为实体有继承，这里配置忽略父类的字段，不然会根本表定义生成全字段 -->
@@ -83,7 +83,7 @@
   <!-- 例: resources/cn/ttzero/sdm/mapper-->
   <xml-mapper output="resources/mapper" />
 
-  <!-- DOMapper配置-->
+  <!-- DoMapper配置-->
   <!-- 最终生成XXXMapper.java接口-->
   <do-mapper>
     <!-- 包名 默认mapper-->
@@ -92,19 +92,19 @@
     <prefix />
     <!-- 后缀 默认Mapper-->
     <suffix />
-    <!-- 配置DOMapper类的继承 默认无-->
+    <!-- 配置DoMapper类的继承 默认无-->
     <!-- java只支持类单继承，此节点只能存在一个-->
-    <!-- DO, VO, Mapper -->
+    <!-- Do, Vo, Mapper -->
     <!-- xx.className 类名-->
     <!-- xx.tableName 表名-->
     <!-- xx.classPath -->
     <!-- xx.packageName -->
     <!-- xx.desc 描述-->
-    <extend class="BaseMapper&lt;${DO.className}&gt;"
+    <extend class="BaseMapper&lt;${Do.className}&gt;"
             import="com.baomidou.mybatisplus.mapper.BaseMapper" />
-    <!-- 配置DOMapper类的实现 默认无-->
+    <!-- 配置DoMapper类的实现 默认无-->
     <implements />
-    <!-- 配置DOMapper类的注解 默认无-->
+    <!-- 配置DoMapper类的注解 默认无-->
     <annotations>
       <annotation class="Mapper"
                   import="org.apache.ibatis.annotations.Mapper" />
