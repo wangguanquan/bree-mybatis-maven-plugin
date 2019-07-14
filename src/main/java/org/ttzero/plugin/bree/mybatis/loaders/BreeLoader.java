@@ -34,6 +34,7 @@ import org.ttzero.plugin.bree.mybatis.model.config.CfCollection;
 import org.ttzero.plugin.bree.mybatis.model.config.CfOperation;
 import org.ttzero.plugin.bree.mybatis.model.config.CfResultMap;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
+import org.ttzero.plugin.bree.mybatis.model.config.OperationMethod;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.model.java.Base;
@@ -122,7 +123,7 @@ public class BreeLoader extends AbstractLoader {
         Map<String, Table> tableMap = Maps.newHashMap();
 
         for (String tbName : needGenTableNames) {
-            tableMap.put(StringUtils.upperCase(tbName),
+            tableMap.put(tbName,
                 tableRepository.gainTable(connection, tbName, cfTableMap.get(tbName)));
         }
 
@@ -132,7 +133,7 @@ public class BreeLoader extends AbstractLoader {
             Table table = tableMap.get(tbName);
             // 准备DO
             Do doClass = preDo(table, cfTable.getColumns());
-            gen.addDO(doClass);
+            gen.addDo(doClass);
 
             // 准备Mapper.xml
             XmlMapper xmlMapper = new XmlMapper();
@@ -151,7 +152,7 @@ public class BreeLoader extends AbstractLoader {
 
             // 准备Mapper接口
             DoMapper doMapper = preDOMapper(gen, cfTable, table, doClass, resultMaps);
-            gen.addDOMapper(doMapper);
+            gen.addDoMapper(doMapper);
 
             // TODO
 
@@ -198,15 +199,15 @@ public class BreeLoader extends AbstractLoader {
      */
     private List<String> preNeedGenTableNames(String cmd, Map<String, CfTable> cfTableMap) {
         List<String> needGenTableNames = Lists.newArrayList();
-        if (StringUtils.equals(StringUtils.trim(cmd), "*")) {
+        if ("*".equals(cmd.trim())) {
             needGenTableNames = Lists.newArrayList(cfTableMap.keySet());
         } else {
-            for (String tableName : Lists
-                .newArrayList(StringUtils.split(StringUtils.upperCase(cmd)))) {
+            for (String tableName : StringUtils.split(cmd.toUpperCase())) {
+                tableName = tableName.toUpperCase();
                 boolean flag = true;
                 for (String splitTableSuffix : ConfigUtil.getCurrentDb().getSplitSuffixs()) {
-                    if (StringUtils.endsWithIgnoreCase(tableName, splitTableSuffix)) {
-                        needGenTableNames.add(StringUtils.replace(tableName, splitTableSuffix, ""));
+                    if (tableName.endsWith(splitTableSuffix)) {
+                        needGenTableNames.add(tableName.substring(0, tableName.length() - splitTableSuffix.length()));
                         flag = false;
                         break;
                     }
@@ -839,11 +840,10 @@ public class BreeLoader extends AbstractLoader {
     private String operationResultType(Do doClass, Base base, CfOperation operation,
                                        Map<String, ResultMap> resultMaps) {
 
-        // FIXME use operation type check returns
-        if (StringUtils.startsWithIgnoreCase(operation.getId(), "insert")
-            || StringUtils.startsWithIgnoreCase(operation.getId(), "update")
-            || StringUtils.startsWithIgnoreCase(operation.getId(), "delete")) {
-            return "Long";
+        if (operation.getOperation() == OperationMethod.insert
+            || operation.getOperation() == OperationMethod.update
+            || operation.getOperation() == OperationMethod.delete) {
+            return "int";
         }
         //返回类不为null
         String resultType;

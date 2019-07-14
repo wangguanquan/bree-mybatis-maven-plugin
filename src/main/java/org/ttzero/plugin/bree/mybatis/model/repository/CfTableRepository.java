@@ -51,7 +51,8 @@ import org.ttzero.plugin.bree.mybatis.enums.MultiplicityEnum;
 import org.ttzero.plugin.bree.mybatis.enums.ParamTypeEnum;
 import org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
 import com.google.common.collect.Lists;
-import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
+
+import static org.ttzero.plugin.bree.mybatis.utils.ConfigUtil.getAttr;
 
 /**
  * Created by guanquan.wang at 2019-05-24 11:51
@@ -149,10 +150,10 @@ public class CfTableRepository {
 
         Element table = document.getRootElement();
 
-        cfTable.setName(ConfigUtil.getAttr(table, "name"));
-        cfTable.setPhysicalName(ConfigUtil.getAttr(table, "physicalName"));
-        cfTable.setRemark(ConfigUtil.getAttr(table, "remark"));
-        cfTable.setSequence(ConfigUtil.getAttr(table, "sequence"));
+        cfTable.setName(getAttr(table, "name"));
+        cfTable.setPhysicalName(getAttr(table, "physicalName"));
+        cfTable.setRemark(getAttr(table, "remark"));
+        cfTable.setSequence(getAttr(table, "sequence"));
 
         @SuppressWarnings({"unchecked", "retype"})
         List<Element> nodes = table.elements();
@@ -160,10 +161,10 @@ public class CfTableRepository {
         StringBuilder buf = new StringBuilder(cfTable.getName()).append('_');
         int begin = buf.length();
         for (Element e : nodes) {
-            buf.delete(begin, buf.length()).append(ConfigUtil.getAttr(e, "id"));
+            buf.delete(begin, buf.length()).append(getAttr(e, "id"));
             String key = buf.toString();
             if (nodeCache.containsKey(key)) {
-                LOG.error("The Node [" + ConfigUtil.getAttr(e, "id") + "] duplicated in " + tableFile.getName());
+                LOG.error("The Node [" + getAttr(e, "id") + "] duplicated in " + tableFile.getName());
             }
             nodeCache.put(key, e);
         }
@@ -206,9 +207,9 @@ public class CfTableRepository {
     private void fillResultMap(CfTable cfTable, List<Element> elements) {
         for (Element e : elements) {
             CfResultMap cfResultMap = new CfResultMap();
-            cfResultMap.setId(ConfigUtil.getAttr(e, "id"));
-            cfResultMap.setType(ConfigUtil.getAttr(e, "type"));
-            cfResultMap.setRemark(ConfigUtil.getAttr(e, "remark"));
+            cfResultMap.setId(getAttr(e, "id"));
+            cfResultMap.setType(getAttr(e, "type"));
+            cfResultMap.setRemark(getAttr(e, "remark"));
             @SuppressWarnings({"unchecked", "retype"})
             List<Element> ers = e.elements();
             for (Element er : ers) {
@@ -216,21 +217,21 @@ public class CfTableRepository {
                 switch (name) {
                     case "collection":
                         CfCollection collection = new CfCollection();
-                        collection.setProperty(ConfigUtil.getAttr(er, "property"));
-                        collection.setOfType(ConfigUtil.getAttr(er, "ofType"));
-                        collection.setRemark(ConfigUtil.getAttr(er, "remark"));
-                        collection.setResultMap(ConfigUtil.getAttr(er, "resultMap"));
+                        collection.setProperty(getAttr(er, "property"));
+                        collection.setOfType(getAttr(er, "ofType"));
+                        collection.setRemark(getAttr(er, "remark"));
+                        collection.setResultMap(getAttr(er, "resultMap"));
                         deepCollection(collection, er);
                         cfResultMap.addCollection(collection);
                         break;
                     case "association":
                         CfAssociation association = new CfAssociation();
-                        association.setProperty(ConfigUtil.getAttr(er, "property"));
-                        association.setColumn(ConfigUtil.getAttr(er, "column"));
-                        association.setJavaType(ConfigUtil.getAttr(er, "javaType"));
-                        association.setRemark(ConfigUtil.getAttr(er, "remark"));
-                        association.setSelect(ConfigUtil.getAttr(er, "select"));
-                        association.setResultMap(ConfigUtil.getAttr(er, "resultMap"));
+                        association.setProperty(getAttr(er, "property"));
+                        association.setColumn(getAttr(er, "column"));
+                        association.setJavaType(getAttr(er, "javaType"));
+                        association.setRemark(getAttr(er, "remark"));
+                        association.setSelect(getAttr(er, "select"));
+                        association.setResultMap(getAttr(er, "resultMap"));
                         deepAssociation(association, er);
                         cfResultMap.addAssociation(association);
                         break;
@@ -257,21 +258,21 @@ public class CfTableRepository {
             switch (name) {
                 case "collection":
                     CfCollection coll = new CfCollection();
-                    coll.setProperty(ConfigUtil.getAttr(er, "property"));
-                    coll.setOfType(ConfigUtil.getAttr(er, "ofType"));
-                    coll.setRemark(ConfigUtil.getAttr(er, "remark"));
-                    coll.setResultMap(ConfigUtil.getAttr(er, "resultMap"));
+                    coll.setProperty(getAttr(er, "property"));
+                    coll.setOfType(getAttr(er, "ofType"));
+                    coll.setRemark(getAttr(er, "remark"));
+                    coll.setResultMap(getAttr(er, "resultMap"));
                     deepCollection(coll, er);
                     collection.addCollection(coll);
                     break;
                 case "association":
                     CfAssociation association = new CfAssociation();
-                    association.setProperty(ConfigUtil.getAttr(er, "property"));
-                    association.setColumn(ConfigUtil.getAttr(er, "column"));
-                    association.setJavaType(ConfigUtil.getAttr(er, "javaType"));
-                    association.setRemark(ConfigUtil.getAttr(er, "remark"));
-                    association.setSelect(ConfigUtil.getAttr(er, "select"));
-                    association.setResultMap(ConfigUtil.getAttr(er, "resultMap"));
+                    association.setProperty(getAttr(er, "property"));
+                    association.setColumn(getAttr(er, "column"));
+                    association.setJavaType(getAttr(er, "javaType"));
+                    association.setRemark(getAttr(er, "remark"));
+                    association.setSelect(getAttr(er, "select"));
+                    association.setResultMap(getAttr(er, "resultMap"));
                     deepAssociation(association, er);
                     collection.addAssociation(association);
                     break;
@@ -296,21 +297,21 @@ public class CfTableRepository {
             switch (name) {
                 case "collection":
                     CfCollection coll = new CfCollection();
-                    coll.setProperty(ConfigUtil.getAttr(er, "property"));
-                    coll.setOfType(ConfigUtil.getAttr(er, "ofType"));
-                    coll.setRemark(ConfigUtil.getAttr(er, "remark"));
-                    coll.setResultMap(ConfigUtil.getAttr(er, "resultMap"));
+                    coll.setProperty(getAttr(er, "property"));
+                    coll.setOfType(getAttr(er, "ofType"));
+                    coll.setRemark(getAttr(er, "remark"));
+                    coll.setResultMap(getAttr(er, "resultMap"));
                     deepCollection(coll, er);
                     association.addCollection(coll);
                     break;
                 case "association":
                     CfAssociation asso = new CfAssociation();
-                    asso.setProperty(ConfigUtil.getAttr(er, "property"));
-                    asso.setColumn(ConfigUtil.getAttr(er, "column"));
-                    asso.setJavaType(ConfigUtil.getAttr(er, "javaType"));
-                    asso.setRemark(ConfigUtil.getAttr(er, "remark"));
-                    asso.setSelect(ConfigUtil.getAttr(er, "select"));
-                    asso.setResultMap(ConfigUtil.getAttr(er, "resultMap"));
+                    asso.setProperty(getAttr(er, "property"));
+                    asso.setColumn(getAttr(er, "column"));
+                    asso.setJavaType(getAttr(er, "javaType"));
+                    asso.setRemark(getAttr(er, "remark"));
+                    asso.setSelect(getAttr(er, "select"));
+                    asso.setResultMap(getAttr(er, "resultMap"));
                     deepAssociation(asso, er);
                     association.addAssociation(asso);
                     break;
@@ -332,8 +333,8 @@ public class CfTableRepository {
         if ((isKey = "id".equals(er.getName())) || "result".equals(er.getName())) {
             Column cfColumn = new Column();
 
-            String column = ConfigUtil.getAttr(er, "column")
-                , property = ConfigUtil.getAttr(er, "property");
+            String column = getAttr(er, "column")
+                , property = getAttr(er, "property");
 
             boolean a = StringUtil.isEmpty(column), b = StringUtil.isEmpty(property);
             if (a && b) {
@@ -351,13 +352,13 @@ public class CfTableRepository {
             cfColumn.setProperty(property);
             cfColumn.setPrimaryKey(isKey);
             if (!isKey) {
-                cfColumn.setRemark(ConfigUtil.getAttr(er, "remark"));
-                cfColumn.setRelatedColumn(ConfigUtil.getAttr(er, "relatedColumn"));
+                cfColumn.setRemark(getAttr(er, "remark"));
+                cfColumn.setRelatedColumn(getAttr(er, "relatedColumn"));
             }
             // TODO Result entity filed type
-            cfColumn.setTypeHandler(ConfigUtil.getAttr(er, "typeHandler"));
-            cfColumn.setJavaType(ConfigUtil.getAttr(er, "javaType"));
-            cfColumn.setJdbcType(ConfigUtil.getAttr(er, "jdbcType"));
+            cfColumn.setTypeHandler(getAttr(er, "typeHandler"));
+            cfColumn.setJavaType(getAttr(er, "javaType"));
+            cfColumn.setJdbcType(getAttr(er, "jdbcType"));
             return cfColumn;
         } else {
             // Unknown tag
@@ -406,6 +407,17 @@ public class CfTableRepository {
                 && StringUtil.isEmpty(cfOperation.getVo())) {
                 cfOperation.setVo(cfOperation.getId());
             }
+            // TODO reset vo and resultType
+            String id = cfOperation.getId();
+            LOG.info("id: " + id);
+            // Check if paging count
+            if (id.endsWith("Count") && StringUtil.isEmpty(cfOperation.getVo())) {
+                Element element = nodeCache.get(cfTable.getName() + '_' + id.substring(0, id.length() - 5));
+                String vo = getAttr(element, "vo");
+                cfOperation.setVo(vo != null ? vo : getAttr(element, "id"));
+                cfOperation.setParamType(ParamTypeEnum.getByCode(getAttr(element, "paramType")));
+                cfOperation.setResultType("int");
+            }
 
             if (buf.length() > 0) {
                 cfOperation.setOthers(buf.toString());
@@ -427,7 +439,7 @@ public class CfTableRepository {
      */
     private void fillSql(CfTable cfTable, List<Element> elements) {
         for (Element e : elements) {
-            String id = ConfigUtil.getAttr(e, "id");
+            String id = getAttr(e, "id");
 
             Attribute remark = e.attribute("remark");
             if (remark != null) {
@@ -493,8 +505,7 @@ public class CfTableRepository {
             return cdata;
         }
 //        cfTable.getColumns();
-        // FIXME use tag name
-        if (StringUtils.startsWithIgnoreCase(cfOperation.getId(), "insert")) {
+        if (cfOperation.getOperation() == OperationMethod.insert) {
             //TODO cdata中 insert ? 参数替换 不指定类型
             String sql = cdata;
             //sql 特殊处理一下
@@ -563,11 +574,8 @@ public class CfTableRepository {
         }
 
         // 判断是否已有count语句
-//        @SuppressWarnings({"unchecked", "retype"})
-//        List<Element> list = e.selectNodes("//select[@id='" + cfOperation.getId() + "Count']");
         if (nodeCache.containsKey(tableName + '_' + cfOperation.getId() + "Count")) {
-        // 如果已有count语句则跳过
-//        if (list != null && !list.isEmpty()) {
+            // 如果已有count语句则跳过
             cfOperation.setCustomizeCount(true);
             return;
         }
@@ -855,8 +863,8 @@ public class CfTableRepository {
         @SuppressWarnings({"unchecked", "retype"})
         List<Element> items = newElement.selectNodes(XPATH_FOREACH);
         for (Element item : items) {
-            String collName = ConfigUtil.getAttr(item, "collection");
-            String itemName = ConfigUtil.getAttr(item, "item");
+            String collName = getAttr(item, "collection");
+            String itemName = getAttr(item, "item");
             Validate.notEmpty(collName, "foreach 元素设置错误 id=" + cfOperation.getId());
             Validate.notEmpty(itemName, "foreach 元素设置错误 id=" + cfOperation.getId());
             cfOperation.addPrimitiveForeachParam(itemName, collName);
@@ -900,11 +908,11 @@ public class CfTableRepository {
         List<Element> elements = table.elements("result");
         for (Element e : elements) {
             Column cfColumn = new Column();
-            cfColumn.setColumn(ConfigUtil.getAttr(e, "column"));
-            cfColumn.setProperty(ConfigUtil.getAttr(e, "property"));
-            cfColumn.setJavaType(ConfigUtil.getAttr(e, "javaType"));
-            cfColumn.setJdbcType(ConfigUtil.getAttr(e, "jdbcType"));
-            cfColumn.setRelatedColumn(ConfigUtil.getAttr(e, "relatedColumn"));
+            cfColumn.setColumn(getAttr(e, "column"));
+            cfColumn.setProperty(getAttr(e, "property"));
+            cfColumn.setJavaType(getAttr(e, "javaType"));
+            cfColumn.setJdbcType(getAttr(e, "jdbcType"));
+            cfColumn.setRelatedColumn(getAttr(e, "relatedColumn"));
             cfTable.addColumn(cfColumn);
         }
 
@@ -937,18 +945,18 @@ public class CfTableRepository {
         List<Element> includeArray = e.elements("include");
         if (!includeArray.isEmpty()) {
             for (Element ic : includeArray) {
-                String refid = ConfigUtil.getAttr(ic, "refid");
+                String refid = getAttr(ic, "refid");
                 if ("Base_Column_List".equalsIgnoreCase(refid)) {
                     continue;
                 }
                 if (StringUtil.isEmpty(refid)) {
-                    throw new BreeException("operation["+ ConfigUtil.getAttr(e, "name")
+                    throw new BreeException("operation["+ getAttr(e, "name")
                         +"]包含include节点但是未指定refid值。");
                 }
                 String key = tableName + '_' + refid;
                 Element ref = nodeCache.get(key);
                 if (ref == null) {
-                    throw new BreeException("operation["+ ConfigUtil.getAttr(e, "name")
+                    throw new BreeException("operation["+ getAttr(e, "name")
                         +"]包含include节点但是refid[" + refid + "]并未出现在此xml中。");
                 }
                 cdata = cdata.replace(ic.asXML(), ref.asXML());
