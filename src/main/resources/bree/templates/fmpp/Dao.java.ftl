@@ -32,7 +32,7 @@ public class ${dao.className} {
     public ${method.returnClass!} ${method.name}(<#list  method.params as param><#if param_index gt 0>, </#if>${param.paramType!} <#assign pagingParam = param.param/>${param.param}</#list>) {
     <#if method.pagingFlag == "true">
         <#if method.noCount == "true">
-        ${pagingParam}.setDatas(${dao.doMapper.className?uncap_first}.${method.name}Result(<#list  method.params as param><#if param_index gt 0>, </#if>${param.param}</#list>));
+        ${pagingParam}.setData(${dao.doMapper.className?uncap_first}.${method.name}Result(<#list  method.params as param><#if param_index gt 0>, </#if>${param.param}</#list>));
         // 分页但不求Count，可以提升查询速度。移动端分页不需要知道总共多少页。
         // 直到取得的数据量小于pageSize时表示结束
         ${pagingParam}.setTotal(-1);
