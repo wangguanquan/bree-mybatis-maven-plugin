@@ -16,8 +16,6 @@
 
 package org.ttzero.plugin.bree.mybatis.enums;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * Created by guanquan.wang at 2019-05-24 21:50
  */
@@ -25,43 +23,14 @@ public enum ParamTypeEnum {
     /**
      * DO作为参数.
      */
-    object("object"),
+    object,
     /**
      * 多DO作为对象
      */
-    multiple("multiple"),
+    multiple,
     /**
      * 原生态参数.
      */
-    primitive("primitive");
-
-    /**
-     * The Code.
-     */
-    private String code;
-
-    /**
-     * Instantiates a new Param type enum.
-     *
-     * @param code the code
-     */
-    ParamTypeEnum(String code) {
-        this.code = code;
-    }
-
-    /**
-     * Get by code param type enum.
-     *
-     * @param code the code
-     * @return the param type enum
-     */
-    public static ParamTypeEnum getByCode(String code) {
-        for (ParamTypeEnum paramTypeEnum : ParamTypeEnum.values()) {
-            if (StringUtils.equals(code, paramTypeEnum.code)) {
-                return paramTypeEnum;
-            }
-        }
-        return ParamTypeEnum.primitive;
-    }
+    primitive
 
 }
