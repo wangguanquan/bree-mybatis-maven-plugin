@@ -1,31 +1,31 @@
 <@pp.dropOutputFile />
-<#list bree.dos as DO>
-<@pp.changeOutputFile name = "/main/java/${DO.classPath}/${DO.className}.java" />
-package ${DO.packageName};
+<#list bree.dos as Do>
+<@pp.changeOutputFile name = "/main/java/${Do.classPath}/${Do.className}.java" />
+package ${Do.packageName};
 
-<#list DO.importLists as import>
+<#list Do.importLists as import>
 <#if import??>import ${import};</#if>
 </#list>
 
 /**
- * The table ${DO.desc}
+ * The table ${Do.desc}
  * 注意:此结构由系统生成, 禁止手工修改以免被覆盖, 请通过bree-mybatis插件生成
  * @author ${bree.author}
  */
-<#if DO.annotationArray.size() gt 0>
-<#list DO.annotationArray as annotation>
+<#if Do.annotationArray.size() gt 0>
+<#list Do.annotationArray as annotation>
 @${annotation.className}
 </#list>
 </#if>
-public class ${DO.className}<#if DO.extend??> extends ${DO.extend.className}</#if><#if DO.implementArray.size() gt 0> implements <#list DO.implementArray as impl><#if impl_index gt 0>, </#if>${impl.className}</#list></#if> {
-    <#list DO.fieldList as field>
+public class ${Do.className}<#if Do.extend??> extends ${Do.extend.className}</#if><#if Do.implementArray.size() gt 0> implements <#list Do.implementArray as impl><#if impl_index gt 0>, </#if>${impl.className}</#list></#if> {
+    <#list Do.fieldList as field>
 
     /**
      * The ${field.name} ${field.desc}.
      */
     private ${field.javaType} ${field.name};
     </#list>
-    <#list DO.fieldList as field>
+    <#list Do.fieldList as field>
 
     /**
      * Setting the ${field.name} ${field.desc}.

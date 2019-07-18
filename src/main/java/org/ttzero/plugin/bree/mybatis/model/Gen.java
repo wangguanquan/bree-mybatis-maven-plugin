@@ -212,7 +212,7 @@ public class Gen {
      *
      * @param doClass the do class
      */
-    public void addDO(Do doClass) {
+    public void addDo(Do doClass) {
         this.dos.add(doClass);
     }
 
@@ -275,7 +275,7 @@ public class Gen {
      *
      * @param doMapper the do mapper
      */
-    public void addDOMapper(DoMapper doMapper) {
+    public void addDoMapper(DoMapper doMapper) {
         this.doMappers.add(doMapper);
     }
 

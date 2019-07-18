@@ -16,8 +16,6 @@
 
 package org.ttzero.plugin.bree.mybatis.enums;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * Created by guanquan.wang at 2019-05-24 21:50
  */
@@ -25,51 +23,14 @@ public enum MultiplicityEnum {
     /**
      * One multiplicity enum.
      */
-    one("one"),
+    one,
     /**
      * Many multiplicity enum.
      */
-    many("many"),
+    many,
     /**
      * Paging multiplicity enum.
      */
-    paging("paging");
+    paging
 
-    /**
-     * The Code.
-     */
-    private String code;
-
-    /**
-     * Instantiates a new Multiplicity enum.
-     *
-     * @param code the code
-     */
-    MultiplicityEnum(String code) {
-        this.code = code;
-    }
-
-    /**
-     * Gets by code.
-     *
-     * @param code the code
-     * @return the by code
-     */
-    public static MultiplicityEnum getByCode(String code) {
-        for (MultiplicityEnum multiplicityEnum : MultiplicityEnum.values()) {
-            if (StringUtils.equals(code, multiplicityEnum.code)) {
-                return multiplicityEnum;
-            }
-        }
-        return MultiplicityEnum.one;
-    }
-
-    /**
-     * Gets code.
-     *
-     * @return the code
-     */
-    public String getCode() {
-        return code;
-    }
 }

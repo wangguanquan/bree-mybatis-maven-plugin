@@ -18,11 +18,11 @@ import java.util.List;
  */
 public class BasePage<T> {
 
-    private List<T> data;                    // 对象记录结果集
-    private int     total           = 0;     // 总记录数
-    private int     limit           = 20;    // 默认每页显示记录数
-    private int     totalPage       = 1;     // 总页数
-    private int     pageNo      = 1;     // 当前页
+    private List<T> data;              // 对象记录结果集
+    private int     total     = 0;     // 总记录数
+    private int     limit     = 20;    // 默认每页显示记录数
+    private int     totalPage = 1;     // 总页数
+    private int     pageNo    = 1;     // 当前页
 
 
     private void init() {
@@ -50,23 +50,23 @@ public class BasePage<T> {
      * 
      * @param data a page list data
      */
-    public void setDatas(List<T> data) {
+    public void setData(List<T> data) {
         this.data = data;
     }
 
     /**
-     * 得到记录总数
+     * Returns total of records
      *
-     * @return {int}
+     * @return the record count
      */
     public int getTotal() {
         return total;
     }
 
     /**
-     * 设置总记录数
+     * Setting the total number
      * 
-     * @param total
+     * @param total the record count
      */
     public void setTotal(int total) {
         this.total = total;
@@ -74,56 +74,57 @@ public class BasePage<T> {
     }
 
     /**
-     * 得到每页显示多少条记录
+     * Returns number of records to show per page
      *
-     * @return {int}
+     * @return the limit of per page
      */
     public int getLimit() {
         return limit;
     }
 
     /**
-     * 得到每页显示多少条记录
+     * Setting the limit of per page
      *
-     * @return {int}
-     */
-    public int getPageSize() {
-        return limit;
-    }
-
-    /**
-     * 设置每页多少记录
-     * 
-     * @param limit
+     * @param limit the limit
      */
     public void setLimit(int limit) {
         this.limit = limit;
     }
 
     /**
-     * 得到页面总数
+     * Returns the page total
      *
-     * @return {int}
+     * @return the page total
      */
-    public int getPageNos() {
+    public int getTotalPage() {
         return totalPage;
     }
 
     /**
-     * 得到当前页号
+     * Setting the page total
      *
-     * @return {int}
+     * @param totalPage the page total
      */
-    public int getCurrPageNo() {
+    public void setTotalPage(int totalPage) {
+        this.totalPage = totalPage;
+    }
+
+    /**
+     * Returns current page No. the first page No. is 'one'
+     *
+     * @return the page no
+     */
+    public int getPageNo() {
         return pageNo;
     }
 
     /**
-     * 设置当前行
-     * @param pageNo
+     * Setting page No.
+     *
+     * @param pageNo the page No.
      */
-    public void setCurrPageNo(int pageNo) {
-        if (pageNo == 0) {
+    public void setPageNo(int pageNo) {
+        if (pageNo <= 0) {
             this.pageNo = 1;
         } else {
             this.pageNo = pageNo;
@@ -131,12 +132,13 @@ public class BasePage<T> {
     }
 
     /**
-    * 得到开始行
-    */
+     * Return the offset of cursor to read
+     */
     public int getOffset() {
         return (pageNo - 1) * limit;
     }
 
+    @Override
     public String toString() {
         return "[total=" + total +
             ",totalPage=" + totalPage +
