@@ -765,14 +765,31 @@ public class BreeLoader extends AbstractLoader {
         }
 
         if (operation.getParamType() == ParamTypeEnum.object) {
-            String vo = null;
+            String vo, voName = null;
             if (hasVo) {
-                // TODO get vo package
-//                vo =
+                // get vo package
+                vo = operation.getVo();
+                int index = vo.lastIndexOf('.');
+                if (index < 0) {
+                    VoConfig voConfig = ConfigUtil.config.getVoConfig();
+                    String namespace;
+                    if (StringUtil.isEmpty(namespace = voConfig.getNamespace())) {
+                        namespace = "vo";
+                    }
+                    String prefix = voConfig.getPrefix()
+                        , suffix = voConfig.getSuffix();
+                    if (prefix == null) prefix = "";
+                    if (suffix == null) suffix = "Vo";
+
+                    voName = prefix + vo + suffix;
+                    vo = ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace + '.' + voName;
+                } else {
+                    voName = vo.substring(index + 1);
+                }
             } else {
-                vo = doClass.getPackageName() + "." + doClass.getClassName();
+                vo = doClass.getPackageName() + '.' + doClass.getClassName();
             }
-            method.addParam(new DoMapperMethodParam(getClassAndImport(doMapper, vo), "entity"));
+            method.addParam(new DoMapperMethodParam(getClassAndImport(doMapper, vo), voName != null ? voName : "entity"));
         } else if (operation.getParamType() == ParamTypeEnum.multiple) {
             method.addParam(new DoMapperMethodParam(getClassAndImport(doMapper,
                 "java.util.List"), "entities"));

@@ -408,14 +408,17 @@ public class CfTableRepository {
                 cfOperation.setVo(cfOperation.getId());
             }
             // TODO reset vo and resultType
-            String id = cfOperation.getId();
-            LOG.info("id: " + id);
             // Check if paging count
-            if (id.endsWith("Count") && StringUtil.isEmpty(cfOperation.getVo())) {
-                Element element = nodeCache.get(cfTable.getName() + '_' + id.substring(0, id.length() - 5));
+            if (cfOperation.isCustomizeCount() && StringUtil.isEmpty(cfOperation.getVo())) {
+                String id = cfOperation.getId();
+                // Test if it is a paging counter
+                String key = cfTable.getName() + '_' + id.substring(0, id.length() - 5);
+                Element element = nodeCache.get(key);
+                Validate.notNull(element, "Miss the paging operation [" + key + "]");
+
                 String vo = getAttr(element, "vo");
                 cfOperation.setVo(vo != null ? vo : getAttr(element, "id"));
-                cfOperation.setParamType(ParamTypeEnum.getByCode(getAttr(element, "paramType")));
+                cfOperation.setParamType(ParamTypeEnum.valueOf(getAttr(element, "paramType")));
                 cfOperation.setResultType("int");
             }
 
@@ -570,6 +573,20 @@ public class CfTableRepository {
     private void setCfOperationPageCdata(String cdata, CfOperation cfOperation, String tableName) {
         // 分页配置
         if (cfOperation.getMultiplicity() != MultiplicityEnum.paging) {
+            // Maybe it is a counter
+            if (cfOperation.getId().endsWith("Count")) {
+                // It is a customize paging counter
+                Element node = nodeCache.get(tableName + '_'
+                    + cfOperation.getId().substring(0, cfOperation.getId().length() - 5));
+                if (node != null && MultiplicityEnum.paging.name().equals(getAttr(node, "multiplicity"))) {
+                    cfOperation.setCustomizeCount(true);
+                    cfOperation.setVo(getAttr(node, "vo"));
+                    if (StringUtil.isEmpty(cfOperation.getResultType())) {
+                        cfOperation.setResultType("int");
+                    }
+                    cfOperation.setResultMap(null);
+                }
+            }
             return;
         }
 
