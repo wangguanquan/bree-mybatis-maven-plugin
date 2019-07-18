@@ -41,7 +41,7 @@
 <#-- sql部分  -->
     <#list xmlMapper.cfTable.operations as operation>
 
-    <#if operation.multiplicity.code=="paging"><#-- 分页 -->
+    <#if operation.multiplicity == "paging"><#-- 分页 -->
     <#if operation.cdataPageCount??><#-- 判断是否既有求和语句 -->
     <!-- ${operation.remark!operation.id} PageCount -->
     <${operation.operation!} id="${operation.id}Count" resultType="int"${lib.timeout(operation)}${operation.others!}>

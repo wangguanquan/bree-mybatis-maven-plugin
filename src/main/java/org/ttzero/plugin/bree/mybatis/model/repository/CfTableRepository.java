@@ -390,8 +390,8 @@ public class CfTableRepository {
                     case "resultMap": cfOperation.setResultMap(attr.getValue()); break;
                     case "resultType": cfOperation.setResultType(attr.getValue()); break;
                     case "noCount": cfOperation.setNoCount(attr.getValue()); break;
-                    case "multiplicity": cfOperation.setMultiplicity(MultiplicityEnum.getByCode(attr.getValue())); break;
-                    case "paramType": cfOperation.setParamType(ParamTypeEnum.getByCode(attr.getValue())); break;
+                    case "multiplicity": cfOperation.setMultiplicity(MultiplicityEnum.valueOf(attr.getValue())); break;
+                    case "paramType": cfOperation.setParamType(ParamTypeEnum.valueOf(attr.getValue())); break;
                     case "timeout":
                         if (StringUtil.isNotEmpty(attr.getValue())) {
                             cfOperation.setTimeout(Long.valueOf(attr.getValue()));
