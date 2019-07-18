@@ -136,7 +136,7 @@
 
   <!-- Dao配置-->
   <!-- 最终生成XXXDao.java接口-->
-  <dao ignore="true" />
+  <dao ignore="false" />
 
   <!-- 生成service配置-->
   <service ignore="true" />
