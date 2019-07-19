@@ -820,7 +820,7 @@ public class CfTableRepository {
         String content = getReplaceInclude(e, tableName);
         Element newElement = stringToXml(content);
         // #\\{(.*?)\\}
-        Matcher m = PARAM_PATTERN.matcher(content);
+        Matcher m = PARAM_PATTERN.matcher(getContent(e));
         List<String> params = Lists.newArrayList();
         while (m.find()) {
             params.add(m.group(1));
