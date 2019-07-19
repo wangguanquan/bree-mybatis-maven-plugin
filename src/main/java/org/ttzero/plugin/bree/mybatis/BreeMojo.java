@@ -109,7 +109,11 @@ public class BreeMojo extends AbstractMojo {
 
         try {
             ConfigUtil.readConfig(config);
-            String _cmd = cmdUtil.consoleInput();
+            String _cmd;
+
+            if (ConfigUtil.cmd != null) _cmd = ConfigUtil.cmd;
+            else _cmd = cmdUtil.consoleInput();
+
             if ("q".equals(_cmd)) {
                 getLog().info("Bye!");
                 return;
