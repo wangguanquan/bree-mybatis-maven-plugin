@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Random;
 
 /**
  * Created by guanquan.wang at 2019-05-24 23:35
@@ -22,6 +23,15 @@ public class BreeMojoTest {
      * The default output path
      */
     private static Path defaultTestPath = Paths.get("target/out/");
+
+    /**
+     * The root path of test resources
+     */
+    private static Path resourcePath;
+
+    static Random random = new Random();
+    static char[] charArray = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toCharArray();
+    private static char[] cache = new char[32];
 
     /**
      * Returns the path of test dest path
@@ -60,11 +70,12 @@ public class BreeMojoTest {
      * @return the test/resources root path
      */
     public static Path testResourceRoot() {
+        if (resourcePath != null) return resourcePath;
         URL url = BreeMojoTest.class.getClassLoader().getResource(".");
         if (url == null) {
             throw new RuntimeException("Load test resources error.");
         }
-        return isWindows()
+        return resourcePath = isWindows()
             ? Paths.get(url.getFile().substring(1))
             : Paths.get(url.getFile());
     }

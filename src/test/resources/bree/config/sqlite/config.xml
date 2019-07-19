@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ============================================================== -->
+<!-- Master configuration file for auto-generation of iPaycore dal. -->
+<!-- ============================================================== -->
+
+<config>
+  <!-- ========================================================== -->
+  <!-- The typemap("Type Map") maps from one java type to another -->
+  <!-- java type. If you feel the original sql data type to java  -->
+  <!-- type mapping is not satisfactory, you can use typemap to   -->
+  <!-- convert it to a more appropriate one.                      -->
+  <!-- ========================================================== -->
+  <type-map from="java.sql.Date" to="java.util.Date"/>
+  <type-map from="java.sql.Time" to="java.util.Date"/>
+  <type-map from="java.sql.Timestamp" to="java.util.Date"/>
+  <type-map from="java.math.BigDecimal" to="Long"/>
+  <type-map from="byte" to="int"/>
+  <type-map from="short" to="int"/>
+  <!-- 此参数会将未知类型转为String-->
+  <type-map from="other" to="String" />
+
+  <!-- ========================================================== -->
+  <!-- datasource config  可以配置多个                              -->
+  <!-- ========================================================== -->
+
+  <database name="test" class="org.sqlite.JDBC" type="sqlite">
+    <property name="url" value="jdbc:sqlite:target/test.db"/>
+  </database>
+
+  <!-- ========project.name pom.xml中的值========================= -->
+  <package value="org.ttzero.hades.${database.name}"/>
+
+  <!-- 是不创建默认的insert/update/deleteById/getById 默认true-->
+  <!-- 如果项目使用了第三方的插件包含这些基础功能，可以将此配置设为false-->
+  <create-default-operation value="true"/>
+
+  <!-- ========================================================== -->
+  <!-- 以下配置影响最终生成文件                                       -->
+  <!-- 如果配置项包含<>请转为&lt;和&gt;                               -->
+  <!-- ========================================================== -->
+
+  <!-- Do配置-->
+  <!-- 数据库表对应实体 data object-->
+  <data-object>
+    <!-- 包名 默认do-->
+    <namespace value="model"/>
+  </data-object>
+
+  <!-- XMLMapper配置-->
+  <!-- mapper xml存放位置 默认与resources/${package} 同级-->
+  <!-- 例: resources/cn/ttzero/sdm/mapper-->
+  <xml-mapper output="resources/mapper" />
+
+  <!-- DoMapper配置-->
+  <!-- 最终生成XXXMapper.java接口-->
+  <do-mapper>
+    <!-- 配置DoMapper类的注解 默认无-->
+    <annotations>
+      <annotation class="Mapper"
+                  import="org.apache.ibatis.annotations.Mapper" />
+    </annotations>
+  </do-mapper>
+
+  <!-- 最终生成XXXVo.java接口-->
+  <vo />
+
+  <!-- ========================================================== -->
+  <!-- 以下配置非必须可使用ignore属性忽略 -->
+  <!-- ========================================================== -->
+
+  <!-- Dao配置-->
+  <!-- 最终生成XXXDao.java接口-->
+  <dao />
+
+  <!-- 生成service配置-->
+  <service ignore="true" />
+
+  <!-- 生成controller配置-->
+  <controller ignore="true" />
+
+  <!-- 新生成文件自动add到git -->
+  <add-to-git-if-new>true</add-to-git-if-new>
+</config>
