@@ -8,7 +8,7 @@ package ${Do.packageName};
 </#list>
 
 /**
- * The table ${Do.desc}
+ * The table ${Do.desc!}
  * 注意:此结构由系统生成, 禁止手工修改以免被覆盖, 请通过bree-mybatis插件生成
  * @author ${bree.author}
  */
@@ -21,21 +21,21 @@ public class ${Do.className}<#if Do.extend??> extends ${Do.extend.className}</#i
     <#list Do.fieldList as field>
 
     /**
-     * The ${field.name} ${field.desc}.
+     * The ${field.name} ${field.desc!}.
      */
     private ${field.javaType} ${field.name};
     </#list>
     <#list Do.fieldList as field>
 
     /**
-     * Setting the ${field.name} ${field.desc}.
+     * Setting the ${field.name} ${field.desc!}.
      */
     public void set${field.name?cap_first}(${field.javaType} ${field.name}) {
         this.${field.name} = ${field.name};
     }
 
     /**
-     * Returns the ${field.name} ${field.desc}.
+     * Returns the ${field.name} ${field.desc!}.
      *
      * @return the ${field.name} value
      */
