@@ -44,13 +44,14 @@ public class TableRepository {
         ITableRepository tableRepository = null;
         switch (type) {
             case "mysql":
+            case "sqlite":
                 tableRepository = new MySQLTableRepository();
                 break;
             case "ob":
                 tableRepository = new OBTableRepository();
                 break;
                 default:
-                    System.out.println("===== 目前仅支持 mysql ob 请正确选择 =====");
+                    System.out.println("===== 目前支持 mysql/sqlite/ob 请正确选择 =====");
         }
 
         return tableRepository != null ? tableRepository.gainTable(connection,tableName,cfTable) : null;
