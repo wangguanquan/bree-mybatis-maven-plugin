@@ -22,6 +22,7 @@ import org.ttzero.plugin.bree.mybatis.model.repository.DataObjectConfig;
 import org.ttzero.plugin.bree.mybatis.model.repository.JavaConfig;
 import org.ttzero.plugin.bree.mybatis.model.repository.VoConfig;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -92,6 +93,11 @@ public class Config {
      * Create default operation
      */
     private boolean createDefaultOperation = true;
+
+    /**
+     * The config path in disk
+     */
+    private File configPath;
 
     /**
      * Add data source.
@@ -237,5 +243,23 @@ public class Config {
      */
     public void setCreateDefaultOperation(boolean createDefaultOperation) {
         this.createDefaultOperation = createDefaultOperation;
+    }
+
+    /**
+     * Returns the config path
+     *
+     * @return config path
+     */
+    public File getConfigPath() {
+        return configPath;
+    }
+
+    /**
+     * Setting the path of config
+     *
+     * @param configPath the path
+     */
+    public void setConfigPath(File configPath) {
+        this.configPath = configPath;
     }
 }

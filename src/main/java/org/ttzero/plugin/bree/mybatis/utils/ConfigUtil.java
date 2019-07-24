@@ -68,11 +68,12 @@ public class ConfigUtil {
      */
     @SuppressWarnings({"unchecked", "retype"})
     public static void readConfig(File configFile) throws IOException, DocumentException {
-        if (config == null) {
+        if (config == null || !config.getConfigPath().equals(configFile)) {
             SAXReader reader = new SAXReader();
             Document document = reader.read(Files.newInputStream(
                 Paths.get(URLDecoder.decode(configFile.toPath().toString(), StandardCharsets.UTF_8.name()))));
             config = new Config();
+            config.setConfigPath(configFile);
 
             Element root = document.getRootElement();
             // type-map
@@ -387,6 +388,7 @@ public class ConfigUtil {
      * @return the current db
      */
     public static Database getCurrentDb() {
+        System.out.println(config.getDataSourceMap());
         if (config.getDataSourceMap().size() == 1) {
             return config.getDataSourceMap().values().iterator().next();
         }
