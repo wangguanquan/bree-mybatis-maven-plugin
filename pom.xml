@@ -5,7 +5,7 @@
 
   <groupId>org.ttzero.plugin</groupId>
   <artifactId>bree-mybatis-maven-plugin</artifactId>
-  <version>1.13</version>
+  <version>0.1.13</version>
   <packaging>maven-plugin</packaging>
 
   <name>bree-mybatis</name>
@@ -126,8 +126,25 @@
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-plugin-plugin</artifactId>
+            <version>3.6.0</version>
+            <configuration>
+              <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+            </configuration>
+
+            <executions>
+              <execution>
+                <id>mojo-descriptor</id>
+                <goals>
+                  <goal>descriptor</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
-            <version>3.1</version>
+            <version>3.8.1</version>
             <configuration>
               <encoding>UTF-8</encoding>
               <source>1.8</source>
@@ -137,18 +154,12 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
+            <version>3.1.0</version>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
+            <version>3.1.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
