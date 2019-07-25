@@ -16,12 +16,66 @@ CRUD操作。
 
 ## 使用方法
 
-使用`mvn bree-mybatis:gen`命令运行插件，初次运行后需要在`config.xml`文件中配置数据源
-和其它代码生成相关配置项，然后再次执行`mvn bree-mybatis:gen`命令，命令窗口会提示你输入要生成
+#### 1. 在项目pom.xml文件添加
+
+```
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.ttzero.plugin</groupId>
+        <artifactId>bree-mybatis-maven-plugin</artifactId>
+        <version>0.1.13</version> <!-- 替换为最新版 -->
+        <dependencies>
+          <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.15</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <copyTemplate>true</copyTemplate><!-- 初次动行设为true以复制模版 -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+```
+
+*插件不主动引入jdbc，请根据具体的数据库进行配置*
+
+配置好上面的plugin后运行命令`mvn bree-mybatis:gen`或者在IDE上可视化运行
+
+- [jetbrains]
+![jetbrains](referer/jetbrains.png)
+
+- [eclipse]
+![eclipse](referer/eclipse.png)
+
+eclipse添加maven build: 鼠标右击项目 -> Run As... -> Run Configurations, 弹出窗口选择Maven build新添加一个build项
+name随意,goals填写`bree-mybatis:gen` -> Apply。保存好后下次就可以直接右击项目 -> Run As... Maven build运行插件了。
+
+成功运行后会提示如下信息
+
+```
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building bree-mybatis-example 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- bree-mybatis-maven-plugin:0.1.13:gen (default-cli) @ bree-mybatis-example ---
+[INFO] 初始化配置信息开始
+初始化完成,下一步到/Users/guanquan.wang/workspace/bree-mybatis-example/bree/config/config.xml配置数据源
+```
+
+默认情况下会在项目的根目录生成一个bree文件夹，结构如下
+|-bree
+|--config
+|--templates
+
+下一步需要在`config.xml`文件中配置数据源和其它代码生成相关配置项，然后再次执行`mvn bree-mybatis:gen`命令，命令窗口会提示你输入要生成
 的表名，输入表名回车即完成Mapper接口,vo,dto以及mapper.xml的自动生成。
 
-所有的修改请在bree/xxxTables下对应的表名xml中修改，大部分的写法与直接写mybatis mapper
-没有区别，修改后执行`mvn bree-mybatis:gen`命令
+所有的修改请在bree/xxxTables下对应的表名xml中修改，大部分的写法与直接写mybatis mapper没有区别，修改后再次执行命令即可
 
 ## 配置说明
 
@@ -53,7 +107,7 @@ CRUD操作。
 
 此配置为生成java文件的output路径，`XMLMapper`并不放在此目录，可选变数`${project.name}`和`${database.name}`
 
-示例: `<package value="cn.ttzero.${project.name}.${database.name}"/>`
+示例: `<package value="org.ttzero.${project.name}.${database.name}"/>`
 
 ### xml-mapper
 
@@ -178,5 +232,58 @@ VO是SQL参数对象，分页SQL默认继承bree-mybatis自带的`BasePageVo`，
 
 ## 示例
 
-1. 增加分页查询的count语句自定义，在分页查询的name后加Count即可自动匹配，而不会自动生成count语句。
+1. 分页查询
+
+```
+<select id="paging" vo="Rewrite" multiplicity="paging" remark="Paging query">
+    select
+    <include refid="Base_Column_List"/>
+    from sdm_rewrite
+    <include refid="whereCondition"/>
+    order by update_at desc
+</select>
+```
+
+生成的XMLMapper.xml文件结果
+
+```
+<!-- Paging query PageCount -->
+<select id="pagingCount" resultType="int">
+    SELECT
+    COUNT(*) AS total 
+    FROM
+     sdm_rewrite
+    <include refid="whereCondition"/>
+    
+</select>
+
+<!-- Paging query PageResult -->
+<select id="pagingResult" resultMap="BaseResultMap">
+select
+    <include refid="Base_Column_List"/>
+    from sdm_rewrite
+    <include refid="whereCondition"/>
+    order by update_at desc
+    limit #{pageSize} offset #{offset}
+</select>
+```
+
+Mapper.java文件
+
+```
+/**
+ * Paging query.
+ * @param rewrite rewrite
+ * @return int
+ */
+int pagingCount(RewriteVo rewrite);
+
+/**
+ * Paging query.
+ * @param rewrite rewrite
+ * @return List<Rewrite>
+ */
+List<Rewrite> pagingResult(RewriteVo rewrite);
+```
+
 2. 同一个xml文件分页语句paging属性相同时，将会进行合并处理。
