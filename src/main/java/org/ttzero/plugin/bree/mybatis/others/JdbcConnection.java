@@ -45,15 +45,16 @@ public class JdbcConnection {
 
             Class.forName(dataBase.getDriverClass());
         } catch (ClassNotFoundException e) {
-           LOG.info("驱动加载错误");
+           LOG.error("驱动加载错误");
+           throw new RuntimeException(e);
         }
         try {
 
             return DriverManager.getConnection(dataBase.getPropertyMapVal("url"),
                     dataBase.getPropertyMapVal("user"), dataBase.getPropertyMapVal("password"));
         } catch (SQLException e) {
-            LOG.error("获取连接失败", e);
+            LOG.error("获取连接失败");
+            throw new RuntimeException(e);
         }
-        return null;
     }
 }

@@ -19,7 +19,6 @@ package org.ttzero.plugin.bree.mybatis.others;
 import java.sql.Connection;
 
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 
@@ -38,17 +37,8 @@ public class DBConnectionFactory {
      * @return the connection
      */
     public static Connection getConnection() {
-        Connection connection = null;
-        try {
-            LOG.info("==== init connection");
-            connection = JdbcConnection.getConnection(ConfigUtil.getCurrentDb());
-            Validate.notNull(connection, "====connection error mysql");
-
-        } catch (Exception e) {
-            LOG.error("", e);
-        }
-        return connection;
-
+        LOG.info("==== init connection");
+        return JdbcConnection.getConnection(ConfigUtil.getCurrentDb());
     }
 
 }
