@@ -21,6 +21,7 @@ import fmpp.setting.Settings;
 import fmpp.tdd.EvalException;
 import fmpp.tdd.Interpreter;
 import fmpp.util.MiscUtil;
+import org.ttzero.plugin.bree.mybatis.utils.ReservedUtil;
 
 /**
  * bree-mybatis 代码生成器
@@ -118,6 +119,9 @@ public class BreeMojo extends AbstractMojo {
                 getLog().info("Bye!");
                 return;
             }
+
+            // Load reserved
+            ConfigUtil.reserved = ReservedUtil.load(templateDirectory.toPath().getParent().resolve("reserved"));
             ConfigUtil.breePath = config.getParentFile().getParent();
             executeInit();
             executeGen();

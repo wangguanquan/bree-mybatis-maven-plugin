@@ -29,6 +29,7 @@ import org.ttzero.plugin.bree.mybatis.model.repository.DataObjectConfig;
 import org.ttzero.plugin.bree.mybatis.model.repository.JavaConfig;
 import org.ttzero.plugin.bree.mybatis.model.repository.JavaProperty;
 import org.ttzero.plugin.bree.mybatis.BreeException;
+import org.ttzero.plugin.bree.mybatis.model.repository.Reserved;
 import org.ttzero.plugin.bree.mybatis.model.repository.VoConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -59,6 +60,11 @@ public class ConfigUtil {
     public static String cmd = null;
 
     public static String breePath;
+
+    /**
+     * Reserved config
+     */
+    public static Reserved reserved;
 
     /**
      * Read config config.

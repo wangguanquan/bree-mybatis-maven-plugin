@@ -16,6 +16,7 @@
 
 package org.ttzero.plugin.bree.mybatis.model.repository;
 
+import org.ttzero.plugin.bree.mybatis.enums.DatabaseTypeEnum;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.model.repository.db.ITableRepository;
@@ -45,7 +46,7 @@ public class TableRepository {
         switch (type) {
             case "mysql":
             case "sqlite":
-                tableRepository = new MySQLTableRepository();
+                tableRepository = new MySQLTableRepository(DatabaseTypeEnum.valueOf(type));
                 break;
             case "ob":
                 tableRepository = new OBTableRepository();

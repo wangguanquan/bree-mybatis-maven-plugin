@@ -20,10 +20,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import org.ttzero.plugin.bree.mybatis.enums.DatabaseTypeEnum;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
@@ -40,19 +39,10 @@ import org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
  */
 public class MySQLTableRepository implements ITableRepository {
 
-    private Set<String> reserved;
+    private DatabaseTypeEnum type;
 
-    public MySQLTableRepository() {
-        // https://dev.mysql.com/doc/refman/8.0/en/keywords.html
-        reserved = new HashSet<>();
-        reserved.add("NAME");
-        reserved.add("DESC");
-        reserved.add("TYPE");
-        reserved.add("CREATE");
-        reserved.add("TABLE");
-        reserved.add("TEXT");
-        reserved.add("ALTER");
-        reserved.add("DATA");
+    public MySQLTableRepository(DatabaseTypeEnum type) {
+        this.type = type;
     }
 
     /**
@@ -177,6 +167,6 @@ public class MySQLTableRepository implements ITableRepository {
      */
     @Override
     public boolean isReserved(String column) {
-        return reserved != null && reserved.contains(column);
+        return ConfigUtil.reserved != null && ConfigUtil.reserved.isReserved(type, column);
     }
 }
