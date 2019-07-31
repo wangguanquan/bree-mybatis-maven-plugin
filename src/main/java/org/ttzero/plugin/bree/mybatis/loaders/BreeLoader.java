@@ -19,6 +19,7 @@ package org.ttzero.plugin.bree.mybatis.loaders;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.List;
@@ -316,7 +317,7 @@ public class BreeLoader extends AbstractLoader {
         }
         byte[] bytes = baos.toByteArray();
         // 去掉<?xml version="1.0" encoding="UTF-8"?>标记信息
-        return new String(bytes, 49, bytes.length - 58)
+        return new String(bytes, 49, bytes.length - 58, StandardCharsets.UTF_8)
             .replace("  ", "    ").replace("<", "    <");
     }
 

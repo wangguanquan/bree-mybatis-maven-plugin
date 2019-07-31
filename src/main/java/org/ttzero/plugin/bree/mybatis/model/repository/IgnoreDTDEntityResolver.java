@@ -20,6 +20,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by guanquan.wang at 2019-05-24 11:55
@@ -29,6 +30,6 @@ public class IgnoreDTDEntityResolver implements EntityResolver {
     @Override
     public InputSource resolveEntity(String publicId, String systemId) {
         return new InputSource(new ByteArrayInputStream(
-                "<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
+                "<?xml version='1.0' encoding='UTF-8'?>".getBytes(StandardCharsets.UTF_8)));
     }
 }
