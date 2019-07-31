@@ -63,6 +63,22 @@ public class PatternTest {
         System.out.println(buffer);
     }
 
+    @Test public void testReplaceAll() {
+        String c = "/|\\\\",  p = "resources";
+        String p1 = "/" + p;
+        String r = p1.replaceAll(c, "");
+
+        assert p.equals(r);
+
+        String p2 = p + "/";
+        r = p2.replaceAll(c, "");
+        assert p.equals(r);
+
+        String p3 = "/" + p + "/";
+        r = p3.replaceAll(c, "");
+        assert p.equals(r);
+    }
+
     private String value(String key) {
         String value;
         switch (key) {
