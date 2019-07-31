@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Created by guanquan.wang at 2019-05-24 23:53
  */
-public class DoMapperMethod implements Cloneable, Serializable {
+public class DoMapperMethod implements Serializable {
     /**
      * The Return class.
      */
