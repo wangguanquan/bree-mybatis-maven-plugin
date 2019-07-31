@@ -19,6 +19,7 @@ package org.ttzero.plugin.bree.mybatis.model.repository.db;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -83,46 +84,48 @@ public class OBTableRepository implements ITableRepository {
      */
     private void fillColumns(Connection connection, String tableName, Table table,
                              List<Column> cfColumns) throws SQLException {
-        // 指定表字段
-        ResultSet resultSet = connection.createStatement().executeQuery(
-                "SHOW CREATE TABLE " + tableName);
-        // 组装字段
-        while (resultSet.next()) {
-            // 得到建表语句
-            String createTableSql = getCreateTableSql(resultSet);
+        try (Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SHOW CREATE TABLE " + tableName)) {
 
-            // 解析建表语句
-            String[] createSqlLines = createTableSql.split("\n");
+            // 指定表字段
+            // 组装字段
+            while (resultSet.next()) {
+                // 得到建表语句
+                String createTableSql = getCreateTableSql(resultSet);
 
-            // 准备字段
-            Map<String, Column> columnMap = Maps.newHashMap();
-            String primaryKeyLine = preColumns(table, columnMap, cfColumns, createSqlLines);
+                // 解析建表语句
+                String[] createSqlLines = createTableSql.split("\n");
 
-            // 最后一行解析表注释
-            String lastLine = createSqlLines[createSqlLines.length - 1];
-            for (String comments : StringUtils.split(lastLine)) {
-                if (comments.startsWith("COMMENT=")) {
-                    table.setRemark(comments.split("=", 2)[1]);
-                }
-            }
+                // 准备字段
+                Map<String, Column> columnMap = Maps.newHashMap();
+                String primaryKeyLine = preColumns(table, columnMap, cfColumns, createSqlLines);
 
-            // 设置主键
-            if (primaryKeyLine != null) {
-                Matcher m = PRIMARY_KEY_PATTERN.matcher(primaryKeyLine);
-                while (m.find()) {
-                    PrimaryKeys primaryKeys = new PrimaryKeys();
-                    primaryKeys.setPkName("PrimaryKey");
-                    String[] pks = StringUtils.split(m.group(1));
-                    for (String pk : pks) {
-                        pk = StringUtils.trim(pk);
-                        if (pks.length == 1) {
-                            primaryKeys.setPkName(CamelCaseUtils.toCapitalizeCamelCase(pk));
-                            primaryKeys.addColumn(columnMap.get(pk));
-                        } else {
-                            primaryKeys.addColumn(columnMap.get(pk));
-                        }
+                // 最后一行解析表注释
+                String lastLine = createSqlLines[createSqlLines.length - 1];
+                for (String comments : StringUtils.split(lastLine)) {
+                    if (comments.startsWith("COMMENT=")) {
+                        table.setRemark(comments.split("=", 2)[1]);
                     }
-                    table.setPrimaryKeys(primaryKeys);
+                }
+
+                // 设置主键
+                if (primaryKeyLine != null) {
+                    Matcher m = PRIMARY_KEY_PATTERN.matcher(primaryKeyLine);
+                    while (m.find()) {
+                        PrimaryKeys primaryKeys = new PrimaryKeys();
+                        primaryKeys.setPkName("PrimaryKey");
+                        String[] pks = StringUtils.split(m.group(1));
+                        for (String pk : pks) {
+                            pk = StringUtils.trim(pk);
+                            if (pks.length == 1) {
+                                primaryKeys.setPkName(CamelCaseUtils.toCapitalizeCamelCase(pk));
+                                primaryKeys.addColumn(columnMap.get(pk));
+                            } else {
+                                primaryKeys.addColumn(columnMap.get(pk));
+                            }
+                        }
+                        table.setPrimaryKeys(primaryKeys);
+                    }
                 }
             }
         }
