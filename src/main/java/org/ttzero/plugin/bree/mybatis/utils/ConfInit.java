@@ -52,13 +52,18 @@ public class ConfInit {
             while (entries.hasMoreElements()) {
                 JarEntry jarEntry = entries.nextElement();
                 String name = jarEntry.getName();
-                System.err.println(name);
-                // Copy template and reserved config
-                if (name.startsWith(TEMPLATES_PATH) || name.equals(RESERVED_PATH)) {
+                // Copy template
+                if (name.startsWith(TEMPLATES_PATH)) {
                     copyAndOverWriteFile(name,
                         new File(breeMojo.getTemplateDirectory().getAbsolutePath() + name
                             .substring(TEMPLATES_PATH.length() - 1)));
-                } else if (name.startsWith(CONFIG_PATH)) {//复制配置文件
+                }
+                // Copy reserved and keyword
+                else if (name.equals(RESERVED_PATH)) {
+                    copyAndOverWriteFile(name, new File(breeMojo.getTemplateDirectory().getParent(), RESERVED_PATH.substring(RESERVED_PATH.indexOf('/') + 1)));
+                }
+                // Copy config file
+                else if (name.startsWith(CONFIG_PATH)) {
                     copyBreeConfig(jarEntry);
                 }
 
@@ -111,8 +116,9 @@ public class ConfInit {
             }
         }
 
-        // ???
-        if (StringUtils.indexOf(sourceName, '.') == -1) {
+        System.err.println("COPY FILE: " + sourceName + " => " + outFile);
+        // If it is a path
+        if (sourceName.charAt(sourceName.length() - 1) == '/') {
             return;
         }
 
