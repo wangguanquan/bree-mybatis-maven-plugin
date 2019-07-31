@@ -161,7 +161,7 @@ public class OBTableRepository implements ITableRepository {
      */
     private String preColumns(Table table, Map<String, Column> columnMap, List<Column> cfColumns, String[] createSqlLines) {
         String primaryKeyLine = null;
-        for (int i = 1; i < createSqlLines.length - 1; i++) {
+        for (int i = 1, len = createSqlLines.length - 1; i < len; i++) {
             String createSqlLine = createSqlLines[i].trim();
             if (StringUtil.isEmpty(createSqlLine)) continue;
 
@@ -199,7 +199,7 @@ public class OBTableRepository implements ITableRepository {
      * @return the java type
      */
     private String getJavaType(Column column, List<Column> cfColumns) {
-        if (cfColumns != null && cfColumns.size() > 0) {
+        if (cfColumns != null && !cfColumns.isEmpty()) {
             for (Column cfColumn : cfColumns) {
                 if (StringUtils.endsWithIgnoreCase(column.getColumn(), cfColumn.getColumn())) {
                     return cfColumn.getJavaType();
