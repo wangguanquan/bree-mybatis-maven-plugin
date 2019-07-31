@@ -20,10 +20,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import org.ttzero.plugin.bree.mybatis.enums.DatabaseTypeEnum;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
@@ -40,19 +39,10 @@ import org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
  */
 public class MySQLTableRepository implements ITableRepository {
 
-    private Set<String> reserved;
+    private DatabaseTypeEnum type;
 
-    public MySQLTableRepository() {
-        // https://dev.mysql.com/doc/refman/8.0/en/keywords.html
-        reserved = new HashSet<>();
-        reserved.add("NAME");
-        reserved.add("DESC");
-        reserved.add("TYPE");
-        reserved.add("CREATE");
-        reserved.add("TABLE");
-        reserved.add("TEXT");
-        reserved.add("ALTER");
-        reserved.add("DATA");
+    public MySQLTableRepository(DatabaseTypeEnum type) {
+        this.type = type;
     }
 
     /**
@@ -100,23 +90,24 @@ public class MySQLTableRepository implements ITableRepository {
             throws SQLException {
         PrimaryKeys primaryKeys = null;
 
-        ResultSet resultSet = databaseMetaData.getPrimaryKeys(connection.getCatalog(),
-                connection.getSchema(), tableName);
+        try (ResultSet resultSet = databaseMetaData.getPrimaryKeys(connection.getCatalog(),
+                connection.getSchema(), tableName)) {
 
-        while (resultSet.next()) {
-            String name = resultSet.getString("COLUMN_NAME")
-                , pkName = resultSet.getString("PK_NAME");
-            for (Column column : table.getColumnList()) {
-                if (column.getColumn().equalsIgnoreCase(name)) {
-                    primaryKeys = primaryKeys == null ? new PrimaryKeys() : primaryKeys;
-                    primaryKeys.addColumn(column);
-                    column.setPrimaryKey(true);
-                    pkName = StringUtil.isEmpty(pkName) ? column.getColumn() : pkName;
-                    primaryKeys.setPkName(CamelCaseUtils.toCapitalizeCamelCase(pkName));
+            while (resultSet.next()) {
+                String name = resultSet.getString("COLUMN_NAME")
+                    , pkName = resultSet.getString("PK_NAME");
+                for (Column column : table.getColumnList()) {
+                    if (column.getColumn().equalsIgnoreCase(name)) {
+                        primaryKeys = primaryKeys == null ? new PrimaryKeys() : primaryKeys;
+                        primaryKeys.addColumn(column);
+                        column.setPrimaryKey(true);
+                        pkName = StringUtil.isEmpty(pkName) ? column.getColumn() : pkName;
+                        primaryKeys.setPkName(CamelCaseUtils.toCapitalizeCamelCase(pkName));
+                    }
                 }
             }
+            table.setPrimaryKeys(primaryKeys);
         }
-        table.setPrimaryKeys(primaryKeys);
     }
 
     /**
@@ -133,19 +124,20 @@ public class MySQLTableRepository implements ITableRepository {
                              DatabaseMetaData databaseMetaData, Table table,
                              List<Column> cfColumns) throws SQLException {
         // 指定表字段
-        ResultSet resultSet = databaseMetaData.getColumns(connection.getCatalog(), null, tableName, null);
+        try (ResultSet resultSet = databaseMetaData.getColumns(connection.getCatalog(), null, tableName, null)) {
 
-        // 组装字段
-        while (resultSet.next()) {
-            Column column = new Column();
-            column.setColumn(resultSet.getString("COLUMN_NAME").toUpperCase());
-            column.setJdbcType(JdbcType.forCode(resultSet.getInt("DATA_TYPE")).name());
-            column.setDefaultValue(resultSet.getString("COLUMN_DEF"));
-            column.setProperty(CamelCaseUtils.toCamelCase(column.getColumn()));
-            column.setJavaType(getJavaType(column, cfColumns));
-            column.setRemark(getOrElse(resultSet, "REMARKS", column.getColumn()));
-            column.setReserved(isReserved(column.getColumn()));
-            table.addColumn(column);
+            // 组装字段
+            while (resultSet.next()) {
+                Column column = new Column();
+                column.setColumn(resultSet.getString("COLUMN_NAME").toUpperCase());
+                column.setJdbcType(JdbcType.forCode(resultSet.getInt("DATA_TYPE")).name());
+                column.setDefaultValue(resultSet.getString("COLUMN_DEF"));
+                column.setProperty(CamelCaseUtils.toCamelCase(column.getColumn()));
+                column.setJavaType(getJavaType(column, cfColumns));
+                column.setRemark(getOrElse(resultSet, "REMARKS", column.getColumn()));
+                column.setReserved(isReserved(column.getColumn()));
+                table.addColumn(column);
+            }
         }
     }
 
@@ -170,13 +162,13 @@ public class MySQLTableRepository implements ITableRepository {
     }
 
     /**
-     * Test the column is reserved word
+     * Returns database type enum
      *
-     * @param column the column name
-     * @return true if the name is reserved
+     * @return the {@link DatabaseTypeEnum}
      */
     @Override
-    public boolean isReserved(String column) {
-        return reserved != null && reserved.contains(column);
+    public DatabaseTypeEnum getType() {
+        return type;
     }
+
 }

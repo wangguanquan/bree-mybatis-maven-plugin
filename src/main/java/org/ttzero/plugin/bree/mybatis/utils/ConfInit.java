@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -39,24 +40,30 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class ConfInit {
     private static final String CONFIG_PATH = "bree/config/";
     private static final String TEMPLATES_PATH = "bree/templates/";
+    private static final String RESERVED_PATH = "bree/reserved";
 
     private static BreeMojo breeMojo;
 
     public static void configInit(BreeMojo breeMojo) throws MojoExecutionException {
         ConfInit.breeMojo = breeMojo;
-        try {
-            JarFile jarFile = new JarFile(URLDecoder.decode(ConfInit.class.getProtectionDomain().getCodeSource()
-                .getLocation().getPath(), "UTF-8"));
+        try (JarFile jarFile = new JarFile(URLDecoder.decode(ConfInit.class.getProtectionDomain().getCodeSource()
+                .getLocation().getPath(), StandardCharsets.UTF_8.name()))) {
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry jarEntry = entries.nextElement();
-                // 复制模板
-                if (StringUtils.startsWithIgnoreCase(jarEntry.getName(), TEMPLATES_PATH)) {
-                    copyAndOverWriteFile(jarEntry.getName(),
-                        new File(breeMojo.getTemplateDirectory().getAbsolutePath()
-                            + jarEntry.getName()
+                String name = jarEntry.getName();
+                // Copy template
+                if (name.startsWith(TEMPLATES_PATH)) {
+                    copyAndOverWriteFile(name,
+                        new File(breeMojo.getTemplateDirectory().getAbsolutePath() + name
                             .substring(TEMPLATES_PATH.length() - 1)));
-                } else if (StringUtils.startsWithIgnoreCase(jarEntry.getName(), CONFIG_PATH)) {//复制配置文件
+                }
+                // Copy reserved and keyword
+                else if (name.equals(RESERVED_PATH)) {
+                    copyAndOverWriteFile(name, new File(breeMojo.getTemplateDirectory().getParent(), RESERVED_PATH.substring(RESERVED_PATH.indexOf('/') + 1)));
+                }
+                // Copy config file
+                else if (name.startsWith(CONFIG_PATH)) {
                     copyBreeConfig(jarEntry);
                 }
 
@@ -109,8 +116,9 @@ public class ConfInit {
             }
         }
 
-        // ???
-        if (StringUtils.indexOf(sourceName, '.') == -1) {
+        System.err.println("COPY FILE: " + sourceName + " => " + outFile);
+        // If it is a path
+        if (sourceName.charAt(sourceName.length() - 1) == '/') {
             return;
         }
 

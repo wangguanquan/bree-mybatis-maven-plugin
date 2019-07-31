@@ -19,6 +19,7 @@ package org.ttzero.plugin.bree.mybatis.model.repository.db;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,6 +28,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Maps;
 
+import org.ttzero.plugin.bree.mybatis.enums.DatabaseTypeEnum;
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
@@ -82,46 +84,48 @@ public class OBTableRepository implements ITableRepository {
      */
     private void fillColumns(Connection connection, String tableName, Table table,
                              List<Column> cfColumns) throws SQLException {
-        // 指定表字段
-        ResultSet resultSet = connection.createStatement().executeQuery(
-                "SHOW CREATE TABLE " + tableName);
-        // 组装字段
-        while (resultSet.next()) {
-            // 得到建表语句
-            String createTableSql = getCreateTableSql(resultSet);
+        try (Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SHOW CREATE TABLE " + tableName)) {
 
-            // 解析建表语句
-            String[] createSqlLines = createTableSql.split("\n");
+            // 指定表字段
+            // 组装字段
+            while (resultSet.next()) {
+                // 得到建表语句
+                String createTableSql = getCreateTableSql(resultSet);
 
-            // 准备字段
-            Map<String, Column> columnMap = Maps.newHashMap();
-            String primaryKeyLine = preColumns(table, columnMap, cfColumns, createSqlLines);
+                // 解析建表语句
+                String[] createSqlLines = createTableSql.split("\n");
 
-            // 最后一行解析表注释
-            String lastLine = createSqlLines[createSqlLines.length - 1];
-            for (String comments : StringUtils.split(lastLine)) {
-                if (comments.startsWith("COMMENT=")) {
-                    table.setRemark(comments.split("=", 2)[1]);
-                }
-            }
+                // 准备字段
+                Map<String, Column> columnMap = Maps.newHashMap();
+                String primaryKeyLine = preColumns(table, columnMap, cfColumns, createSqlLines);
 
-            // 设置主键
-            if (primaryKeyLine != null) {
-                Matcher m = PRIMARY_KEY_PATTERN.matcher(primaryKeyLine);
-                while (m.find()) {
-                    PrimaryKeys primaryKeys = new PrimaryKeys();
-                    primaryKeys.setPkName("PrimaryKey");
-                    String[] pks = StringUtils.split(m.group(1));
-                    for (String pk : pks) {
-                        pk = StringUtils.trim(pk);
-                        if (pks.length == 1) {
-                            primaryKeys.setPkName(CamelCaseUtils.toCapitalizeCamelCase(pk));
-                            primaryKeys.addColumn(columnMap.get(pk));
-                        } else {
-                            primaryKeys.addColumn(columnMap.get(pk));
-                        }
+                // 最后一行解析表注释
+                String lastLine = createSqlLines[createSqlLines.length - 1];
+                for (String comments : StringUtils.split(lastLine)) {
+                    if (comments.startsWith("COMMENT=")) {
+                        table.setRemark(comments.split("=", 2)[1]);
                     }
-                    table.setPrimaryKeys(primaryKeys);
+                }
+
+                // 设置主键
+                if (primaryKeyLine != null) {
+                    Matcher m = PRIMARY_KEY_PATTERN.matcher(primaryKeyLine);
+                    while (m.find()) {
+                        PrimaryKeys primaryKeys = new PrimaryKeys();
+                        primaryKeys.setPkName("PrimaryKey");
+                        String[] pks = StringUtils.split(m.group(1));
+                        for (String pk : pks) {
+                            pk = StringUtils.trim(pk);
+                            if (pks.length == 1) {
+                                primaryKeys.setPkName(CamelCaseUtils.toCapitalizeCamelCase(pk));
+                                primaryKeys.addColumn(columnMap.get(pk));
+                            } else {
+                                primaryKeys.addColumn(columnMap.get(pk));
+                            }
+                        }
+                        table.setPrimaryKeys(primaryKeys);
+                    }
                 }
             }
         }
@@ -157,7 +161,7 @@ public class OBTableRepository implements ITableRepository {
      */
     private String preColumns(Table table, Map<String, Column> columnMap, List<Column> cfColumns, String[] createSqlLines) {
         String primaryKeyLine = null;
-        for (int i = 1; i < createSqlLines.length - 1; i++) {
+        for (int i = 1, len = createSqlLines.length - 1; i < len; i++) {
             String createSqlLine = createSqlLines[i].trim();
             if (StringUtil.isEmpty(createSqlLine)) continue;
 
@@ -195,7 +199,7 @@ public class OBTableRepository implements ITableRepository {
      * @return the java type
      */
     private String getJavaType(Column column, List<Column> cfColumns) {
-        if (cfColumns != null && cfColumns.size() > 0) {
+        if (cfColumns != null && !cfColumns.isEmpty()) {
             for (Column cfColumn : cfColumns) {
                 if (StringUtils.endsWithIgnoreCase(column.getColumn(), cfColumn.getColumn())) {
                     return cfColumn.getJavaType();
@@ -208,13 +212,12 @@ public class OBTableRepository implements ITableRepository {
     }
 
     /**
-     * Test the column is reserved word
+     * Returns database type enum
      *
-     * @param column the column name
-     * @return true if the name is reserved
+     * @return the {@link DatabaseTypeEnum}
      */
     @Override
-    public boolean isReserved(String column) {
-        return false;
+    public DatabaseTypeEnum getType() {
+        return DatabaseTypeEnum.ob;
     }
 }

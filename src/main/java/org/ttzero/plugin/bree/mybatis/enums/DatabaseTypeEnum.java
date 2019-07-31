@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package org.ttzero.plugin.bree.mybatis.model.repository;
-
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+package org.ttzero.plugin.bree.mybatis.enums;
 
 /**
- * Created by guanquan.wang at 2019-05-24 11:55
+ * Create by guanquan.wang at 2019-07-30 21:25
  */
-public class IgnoreDTDEntityResolver implements EntityResolver {
-
-    @Override
-    public InputSource resolveEntity(String publicId, String systemId) {
-        return new InputSource(new ByteArrayInputStream(
-                "<?xml version='1.0' encoding='UTF-8'?>".getBytes(StandardCharsets.UTF_8)));
-    }
+public enum DatabaseTypeEnum {
+    mysql,
+    sqlite,
+    oracle,
+    sqlserver,
+    ob // object database
 }

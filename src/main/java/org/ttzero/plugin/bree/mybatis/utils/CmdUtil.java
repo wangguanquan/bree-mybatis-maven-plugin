@@ -16,6 +16,7 @@
 
 package org.ttzero.plugin.bree.mybatis.utils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +34,7 @@ public class CmdUtil {
      */
     public String consoleInput() {
 
-        Scanner cmdIn = new Scanner(System.in);
+        Scanner cmdIn = new Scanner(System.in, StandardCharsets.UTF_8.name());
         // 只有一个DB时
         if (ConfigUtil.config.getDataSourceMap().size() == 1) {
             ConfigUtil.setCmd(chooseTableCmd(cmdIn));

@@ -16,6 +16,7 @@
 
 package org.ttzero.plugin.bree.mybatis.model.repository.db;
 
+import org.ttzero.plugin.bree.mybatis.enums.DatabaseTypeEnum;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Database;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
@@ -43,12 +44,21 @@ public interface ITableRepository {
     Table gainTable(Connection connection, String tableName, CfTable cfTable) throws SQLException;
 
     /**
+     * Returns database type enum
+     *
+     * @return the {@link DatabaseTypeEnum}
+     */
+    DatabaseTypeEnum getType();
+
+    /**
      * Test the column is reserved word
      *
      * @param column the column name
      * @return true if the name is reserved
      */
-    boolean isReserved(String column);
+    default boolean isReserved(String column) {
+        return ConfigUtil.reserved != null && ConfigUtil.reserved.isReserved(getType(), column);
+    }
 
     /**
      * Parse general information from {@link CfTable}
