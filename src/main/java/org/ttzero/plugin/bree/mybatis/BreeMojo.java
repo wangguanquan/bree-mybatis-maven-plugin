@@ -157,6 +157,7 @@ public class BreeMojo extends AbstractMojo {
      */
     private void executeInit() throws SettingException, EvalException, ProcessingException {
         Settings settings = createDefaultSetting();
+        settings.set(Settings.NAME_OUTPUT_ROOT, config.getParentFile().getParent());
 
         // The table loader
         settings.set(Settings.NAME_DATA, "bree: " + BreeTableLoader.class.getName()
@@ -179,6 +180,7 @@ public class BreeMojo extends AbstractMojo {
      */
     private void executeGen() throws SettingException, EvalException, ProcessingException {
         Settings settings = createDefaultSetting();
+        settings.set(Settings.NAME_OUTPUT_ROOT, outputDirectory.getAbsolutePath());
 
         // The implement loader
         settings.set(Settings.NAME_DATA, "bree: " + BreeLoader.class.getName() + "()");
@@ -200,7 +202,6 @@ public class BreeMojo extends AbstractMojo {
     private Settings createDefaultSetting() throws SettingException {
         Settings settings = new Settings(new File("."));
         settings.set(Settings.NAME_SOURCE_ROOT, templateDirectory.getAbsolutePath());
-        settings.set(Settings.NAME_OUTPUT_ROOT, outputDirectory.getAbsolutePath());
         settings.set(Settings.NAME_OUTPUT_ENCODING, StandardCharsets.UTF_8.name());
         settings.set(Settings.NAME_SOURCE_ENCODING, StandardCharsets.UTF_8.name());
         return settings;
