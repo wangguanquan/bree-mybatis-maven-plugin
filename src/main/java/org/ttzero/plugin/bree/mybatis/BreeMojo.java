@@ -100,11 +100,9 @@ public class BreeMojo extends AbstractMojo {
 
         configInit(testIf);
 
-        if (!outputDirectory.exists()) {
-            if (!outputDirectory.mkdirs()) {
-                getLog().error("创建输出目录[" + outputDirectory + "]失败.");
-                return;
-            }
+        if (!outputDirectory.exists() && !outputDirectory.mkdirs()) {
+            getLog().error("创建输出目录[" + outputDirectory + "]失败.");
+            return;
         }
         getLog().info("创建输出目录成功." + outputDirectory);
 
@@ -157,13 +155,8 @@ public class BreeMojo extends AbstractMojo {
      * @throws EvalException       the eval exception
      * @throws ProcessingException the processing exception
      */
-    private void executeInit() throws SettingException, EvalException,
-        ProcessingException {
-        Settings settings = new Settings(new File("."));
-        settings.set(Settings.NAME_SOURCE_ROOT, templateDirectory.getAbsolutePath());
-        settings.set(Settings.NAME_OUTPUT_ROOT, config.getParentFile().getParent());
-        settings.set(Settings.NAME_OUTPUT_ENCODING, "UTF-8");
-        settings.set(Settings.NAME_SOURCE_ENCODING, "UTF-8");
+    private void executeInit() throws SettingException, EvalException, ProcessingException {
+        Settings settings = createDefaultSetting();
 
         // The table loader
         settings.set(Settings.NAME_DATA, "bree: " + BreeTableLoader.class.getName()
@@ -185,11 +178,7 @@ public class BreeMojo extends AbstractMojo {
      * @throws ProcessingException the processing exception
      */
     private void executeGen() throws SettingException, EvalException, ProcessingException {
-        Settings settings = new Settings(new File("."));
-        settings.set(Settings.NAME_SOURCE_ROOT, templateDirectory.getAbsolutePath());
-        settings.set(Settings.NAME_OUTPUT_ROOT, outputDirectory.getAbsolutePath());
-        settings.set(Settings.NAME_OUTPUT_ENCODING, "UTF-8");
-        settings.set(Settings.NAME_SOURCE_ENCODING, "UTF-8");
+        Settings settings = createDefaultSetting();
 
         // The implement loader
         settings.set(Settings.NAME_DATA, "bree: " + BreeLoader.class.getName() + "()");
@@ -200,6 +189,21 @@ public class BreeMojo extends AbstractMojo {
         settings.execute();
 
         getLog().info("bree-mybatis成功生成");
+    }
+
+    /**
+     * Create a setting with some default properties
+     *
+     * @return the {@link Settings}
+     * @throws SettingException if some error occur
+     */
+    private Settings createDefaultSetting() throws SettingException {
+        Settings settings = new Settings(new File("."));
+        settings.set(Settings.NAME_SOURCE_ROOT, templateDirectory.getAbsolutePath());
+        settings.set(Settings.NAME_OUTPUT_ROOT, outputDirectory.getAbsolutePath());
+        settings.set(Settings.NAME_OUTPUT_ENCODING, StandardCharsets.UTF_8.name());
+        settings.set(Settings.NAME_SOURCE_ENCODING, StandardCharsets.UTF_8.name());
+        return settings;
     }
 
     /**
