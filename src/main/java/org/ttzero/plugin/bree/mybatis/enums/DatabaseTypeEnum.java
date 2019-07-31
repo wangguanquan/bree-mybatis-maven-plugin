@@ -23,5 +23,6 @@ public enum DatabaseTypeEnum {
     mysql,
     sqlite,
     oracle,
-    sqlserver
+    sqlserver,
+    ob // object database
 }
