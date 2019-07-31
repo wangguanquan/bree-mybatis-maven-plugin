@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Maps;
 
+import org.ttzero.plugin.bree.mybatis.enums.DatabaseTypeEnum;
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
@@ -208,13 +209,12 @@ public class OBTableRepository implements ITableRepository {
     }
 
     /**
-     * Test the column is reserved word
+     * Returns database type enum
      *
-     * @param column the column name
-     * @return true if the name is reserved
+     * @return the {@link DatabaseTypeEnum}
      */
     @Override
-    public boolean isReserved(String column) {
-        return false;
+    public DatabaseTypeEnum getType() {
+        return DatabaseTypeEnum.ob;
     }
 }

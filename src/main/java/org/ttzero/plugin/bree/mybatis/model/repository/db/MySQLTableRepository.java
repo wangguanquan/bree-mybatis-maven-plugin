@@ -160,13 +160,13 @@ public class MySQLTableRepository implements ITableRepository {
     }
 
     /**
-     * Test the column is reserved word
+     * Returns database type enum
      *
-     * @param column the column name
-     * @return true if the name is reserved
+     * @return the {@link DatabaseTypeEnum}
      */
     @Override
-    public boolean isReserved(String column) {
-        return ConfigUtil.reserved != null && ConfigUtil.reserved.isReserved(type, column);
+    public DatabaseTypeEnum getType() {
+        return type;
     }
+
 }
