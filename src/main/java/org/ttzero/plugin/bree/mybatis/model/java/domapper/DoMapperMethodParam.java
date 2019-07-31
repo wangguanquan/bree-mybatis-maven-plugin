@@ -16,8 +16,6 @@
 
 package org.ttzero.plugin.bree.mybatis.model.java.domapper;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
 
 /**
@@ -99,8 +97,10 @@ public class DoMapperMethodParam implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        DoMapperMethodParam ob = (DoMapperMethodParam) obj;
-        return StringUtils
-            .equals(this.getParam() + this.getParamType(), ob.getParam() + ob.getParamType());
+        if (obj instanceof DoMapperMethodParam) {
+            DoMapperMethodParam ob = (DoMapperMethodParam) obj;
+            return (param + paramType).equals(ob.param + ob.paramType);
+        }
+        return false;
     }
 }
