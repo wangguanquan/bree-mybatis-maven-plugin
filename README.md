@@ -111,8 +111,8 @@ name随意,goals填写`bree-mybatis:gen` -> Apply。保存好后下次就可以�
 
 ### xml-mapper
 
-修改生成的mybatis xml文件存放位置，默认的xml-mapper放在`${package}/mapper`目录下。
-也可以将期指定到`resource/mapper`下。
+修改生成的mybatis xml文件存放位置，默认的xml-mapper放在`resources/${package}/mapper`目录下。
+也可以将其放到任意目录下。
 
 ### create-default-operation 是否自动创建基础CRUD功能
 

@@ -171,8 +171,8 @@ public class BreeLoader extends AbstractLoader {
             xmlMapper.setDoMapper(doMapper);
             xmlMapper.setTable(table);
             String xmlMapperPath = ConfigUtil.config.getXmlMapperPath();
-            if (StringUtil.isEmpty(xmlMapperPath)) {
-                xmlMapperPath = doMapper.getClassPath();
+            if (StringUtil.isEmpty(xmlMapperPath) || "resources".equals(xmlMapperPath.replaceAll("/|\\\\", ""))) {
+                xmlMapperPath = "resources/" + doMapper.getClassPath();
             }
             xmlMapper.setClassPath(xmlMapperPath);
 
