@@ -82,10 +82,13 @@ public class ConfigUtil {
             config.setConfigPath(configFile);
 
             Element root = document.getRootElement();
-            // type-map
-            List<Element> typeMaps = root.elements("type-map");
-            for (Element e: typeMaps) {
-                config.addTypeMap(getAttr(e, "from"), getAttr(e, "to"));
+            // type-maps
+            Element typeMaps = root.element("type-maps");
+            if (typeMaps != null) {
+                List<Element> typeMapList = typeMaps.elements("type-map");
+                for (Element e : typeMapList) {
+                    config.addTypeMap(getAttr(e, "from"), getAttr(e, "to"));
+                }
             }
 
             String cdo = getValue(root.element("create-default-operation"));

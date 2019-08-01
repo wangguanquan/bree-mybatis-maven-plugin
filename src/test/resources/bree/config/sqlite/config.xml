@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "src/main/resources/bree/config/config-1.0.dtd">
 
 <!-- ============================================================== -->
 <!-- Master configuration file for auto-generation of iPaycore dal. -->
@@ -6,22 +7,7 @@
 
 <config>
   <!-- ========================================================== -->
-  <!-- The typemap("Type Map") maps from one java type to another -->
-  <!-- java type. If you feel the original sql data type to java  -->
-  <!-- type mapping is not satisfactory, you can use typemap to   -->
-  <!-- convert it to a more appropriate one.                      -->
-  <!-- ========================================================== -->
-  <type-map from="java.sql.Date" to="java.util.Date"/>
-  <type-map from="java.sql.Time" to="java.util.Date"/>
-  <type-map from="java.sql.Timestamp" to="java.util.Date"/>
-  <type-map from="java.math.BigDecimal" to="Long"/>
-  <type-map from="byte" to="int"/>
-  <type-map from="short" to="int"/>
-  <!-- 此参数会将未知类型转为String-->
-  <type-map from="other" to="String" />
-
-  <!-- ========================================================== -->
-  <!-- datasource config  可以配置多个                              -->
+  <!-- data-source config  可以配置多个                              -->
   <!-- ========================================================== -->
 
   <database name="test" class="org.sqlite.JDBC" type="sqlite">
@@ -30,6 +16,23 @@
 
   <!-- ========project.name pom.xml中的值========================= -->
   <package value="org.ttzero.hades.${database.name}"/>
+
+  <!-- ========================================================== -->
+  <!-- The typemap("Type Map") maps from one java type to another -->
+  <!-- java type. If you feel the original sql data type to java  -->
+  <!-- type mapping is not satisfactory, you can use typemap to   -->
+  <!-- convert it to a more appropriate one.                      -->
+  <!-- ========================================================== -->
+  <type-maps>
+    <type-map from="java.sql.Date" to="java.util.Date"/>
+    <type-map from="java.sql.Time" to="java.util.Date"/>
+    <type-map from="java.sql.Timestamp" to="java.util.Date"/>
+    <type-map from="java.math.BigDecimal" to="Long"/>
+    <type-map from="byte" to="int"/>
+    <type-map from="short" to="int"/>
+    <!-- 此参数会将未知类型转为String-->
+    <type-map from="other" to="String" />
+  </type-maps>
 
   <!-- 是不创建默认的insert/update/deleteById/getById 默认true-->
   <!-- 如果项目使用了第三方的插件包含这些基础功能，可以将此配置设为false-->

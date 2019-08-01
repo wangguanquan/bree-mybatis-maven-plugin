@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+  <!ELEMENT config (database, package, (type-maps? | create-default-operation?
+    | data-object? | xml-mapper? | do-mapper? | vo? | dao? | service? | controller?
+    | add-to-git-if-new?)*)>
+
+  <!ELEMENT database (property | prefix? | split-suffix?)+>
+  <!ATTLIST database
+    class CDATA #REQUIRED
+    name CDATA #IMPLIED
+    type CDATA #IMPLIED
+    >
+
+  <!ELEMENT property EMPTY>
+  <!ATTLIST property
+    name CDATA #REQUIRED
+    value CDATA #IMPLIED
+    >
+
+  <!ELEMENT prefix EMPTY>
+  <!ATTLIST prefix
+    value CDATA #IMPLIED
+    >
+
+  <!ELEMENT suffix EMPTY>
+  <!ATTLIST suffix
+    value CDATA #IMPLIED
+    >
+
+  <!ELEMENT namespace EMPTY>
+  <!ATTLIST namespace
+    value CDATA #IMPLIED
+    >
+
+  <!ELEMENT split-suffix EMPTY>
+  <!ATTLIST split-suffix
+    value CDATA #IMPLIED
+    >
+
+  <!ELEMENT package EMPTY>
+  <!ATTLIST package
+    value CDATA #IMPLIED
+    >
+
+  <!ELEMENT create-default-operation EMPTY>
+  <!ATTLIST create-default-operation
+    value CDATA #IMPLIED
+    >
+
+  <!ELEMENT useBasePageVo EMPTY>
+  <!ATTLIST useBasePageVo
+    value CDATA #IMPLIED
+    >
+
+  <!ELEMENT type-maps (type-map*)*>
+
+  <!ELEMENT type-map EMPTY>
+  <!ATTLIST type-map
+    from CDATA #REQUIRED
+    to CDATA #REQUIRED
+    >
+
+  <!ELEMENT data-object (namespace? | prefix? | suffix? | extend? | implements? | annotations? | ignore?)*>
+  <!ATTLIST data-object
+    ignore (true|false) #IMPLIED
+    >
+
+  <!ELEMENT do-mapper (namespace? | prefix? | suffix? | extend? | implements? | annotations?)*>
+  <!ATTLIST do-mapper
+    ignore (true|false) #IMPLIED
+    >
+
+  <!ELEMENT vo (namespace? | prefix? | suffix? | extend? | implements? | annotations? | useBasePageVo?)*>
+  <!ATTLIST vo
+    ignore (true|false) #IMPLIED
+    >
+
+  <!ELEMENT dao (namespace? | prefix? | suffix? | extend? | implements? | annotations?)*>
+  <!ATTLIST dao
+    ignore (true|false) #IMPLIED
+    >
+
+  <!ELEMENT service (namespace? | prefix? | suffix? | extend? | implements? | annotations?)*>
+  <!ATTLIST service
+    ignore (true|false) #IMPLIED
+    >
+
+  <!ELEMENT controller (namespace? | prefix? | suffix? | extend? | implements? | annotations?)*>
+  <!ATTLIST controller
+    ignore (true|false) #IMPLIED
+    >
+
+  <!--<!ELEMENT extends (extend)+>-->
+  <!ELEMENT implements (implement)*>
+  <!ELEMENT annotations (annotation)*>
+
+  <!ELEMENT extend EMPTY>
+  <!ATTLIST extend
+    class CDATA #REQUIRED
+    import CDATA #IMPLIED
+    if (paging) #IMPLIED
+    >
+
+  <!ELEMENT implement EMPTY>
+  <!ATTLIST implement
+    class CDATA #REQUIRED
+    import CDATA #IMPLIED
+    >
+
+  <!ELEMENT annotation EMPTY>
+  <!ATTLIST annotation
+    class CDATA #REQUIRED
+    import CDATA #REQUIRED
+    >
+
+  <!ELEMENT ignore (field*)*>
+
+  <!ELEMENT field EMPTY>
+  <!ATTLIST field
+    name CDATA #REQUIRED
+    >
+
+  <!ELEMENT xml-mapper EMPTY>
+  <!ATTLIST xml-mapper
+    output CDATA #IMPLIED
+    >
+
+  <!ELEMENT add-to-git-if-new (#PCDATA)>
