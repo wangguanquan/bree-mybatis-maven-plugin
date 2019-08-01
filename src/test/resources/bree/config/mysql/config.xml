@@ -126,7 +126,7 @@
     <useBasePageVo value="true" />
     <!-- 配置vo类的继承 默认无-->
     <!-- 让分页vo继承定义PageVo 此处PageVo放在vo包下，所以省掉import-->
-    <extend  class="PageVo" if ="paging" />
+    <extend class="PageVo" if="paging" />
     <!-- 配置vo类的实现 默认无-->
     <implements />
     <!-- 配置vo类的注解 默认无-->

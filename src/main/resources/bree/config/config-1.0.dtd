@@ -98,7 +98,7 @@
   <!ATTLIST extend
     class CDATA #REQUIRED
     import CDATA #IMPLIED
-    if CDATA #FIXED "paging"
+    if (paging) #IMPLIED
     >
 
   <!ELEMENT implement EMPTY>
