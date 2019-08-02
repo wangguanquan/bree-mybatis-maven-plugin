@@ -493,7 +493,7 @@ public class BreeLoader extends AbstractLoader {
         dao.setTableName(cfTable.getName());
 
         // append java config
-        addJavaConfig(dao, javaConfig);
+        addJavaConfig(dao, javaConfig, null);
 
         Map<String, String> columnTypeMap = Maps.newHashMap();
 //        Map<String, String> columnDescMap = Maps.newHashMap();
@@ -599,7 +599,7 @@ public class BreeLoader extends AbstractLoader {
         doMapper.setTableName(cfTable.getName());
 
         // add java config
-        addJavaConfig(doMapper, javaConfig);
+        addJavaConfig(doMapper, javaConfig, null);
 
         Map<String, String> columnTypeMap = Maps.newHashMap();
         Map<String, String> columnDescMap = Maps.newHashMap();
@@ -713,7 +713,7 @@ public class BreeLoader extends AbstractLoader {
         paging.setTableName(cfTable.getName());
 
         // append java config
-        addJavaConfig(paging, voConfig);
+        addJavaConfig(paging, voConfig, operation.getMultiplicity());
 
         if (operation.getMultiplicity() == MultiplicityEnum.paging
             && voConfig.isUseBasePageVo() && paging.getExtend() == null) {
@@ -984,10 +984,10 @@ public class BreeLoader extends AbstractLoader {
      * @param base the {@link Base}
      * @param config the {@link JavaConfig}
      */
-    private void addJavaConfig(Base base, JavaConfig config) {
+    private void addJavaConfig(Base base, JavaConfig config, MultiplicityEnum multiplicity) {
         // The extend
         JavaProperty extend = config.getExtend();
-        if (extend != null) {
+        if (extend != null && (multiplicity == null || extend.testCondition(multiplicity.name()))) {
             extend.setClassName(replaceValue(extend.getClassName(), base));
             base.addImport(extend.getImportPath());
             base.setExtend(config.getExtend());
