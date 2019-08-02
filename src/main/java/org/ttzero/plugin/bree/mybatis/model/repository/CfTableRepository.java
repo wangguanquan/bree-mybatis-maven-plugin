@@ -820,7 +820,7 @@ public class CfTableRepository {
         String content = getReplaceInclude(e, tableName);
         Element newElement = stringToXml(content);
         // #\\{(.*?)\\}
-        Matcher m = PARAM_PATTERN.matcher(getContent(e));
+        Matcher m = PARAM_PATTERN.matcher(content);
         List<String> params = Lists.newArrayList();
         while (m.find()) {
             params.add(m.group(1));
@@ -963,17 +963,17 @@ public class CfTableRepository {
         if (!includeArray.isEmpty()) {
             for (Element ic : includeArray) {
                 String refid = getAttr(ic, "refid");
-                if ("Base_Column_List".equalsIgnoreCase(refid)) {
+                if ("Base_Column_List".equals(refid) || "BaseResultMap".equals(refid)) {
                     continue;
                 }
                 if (StringUtil.isEmpty(refid)) {
-                    throw new BreeException("operation["+ getAttr(e, "name")
+                    throw new BreeException(e.getName() + "["+ getAttr(e, "id")
                         +"]包含include节点但是未指定refid值。");
                 }
                 String key = tableName + '_' + refid;
                 Element ref = nodeCache.get(key);
                 if (ref == null) {
-                    throw new BreeException("operation["+ getAttr(e, "name")
+                    throw new BreeException(e.getName() + "["+ getAttr(e, "id")
                         +"]包含include节点但是refid[" + refid + "]并未出现在此xml中。");
                 }
                 cdata = cdata.replace(ic.asXML(), ref.asXML());

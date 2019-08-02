@@ -1,0 +1,60 @@
+<!DOCTYPE table SYSTEM "../config/table-config-1.1.dtd">
+<table name="STUDENT" physicalName="STUDENT" remark="STUDENT">
+    <!--  特殊字符说明  &lt;&gt;   <> -->
+    <!-- BaseResultMap 和 Base_Column_List 已全量生成include引用即可-->
+
+    <insert id="insert" paramType="object" remark="插入表:STUDENT">
+        INSERT INTO STUDENT(
+            
+            `NAME`
+            , AGE
+        ) VALUES (
+            
+            #{name, jdbcType=VARCHAR}
+            , #{age, jdbcType=INTEGER}
+        )
+    </insert>
+
+    <update id="update" paramType="object" remark="更新表:STUDENT">
+        UPDATE STUDENT
+        SET
+            `NAME`            = #{name, jdbcType=VARCHAR}
+            , AGE             = #{age, jdbcType=INTEGER}
+        WHERE
+            ID              = #{id, jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteById" remark="根据主键删除数据:STUDENT">
+        DELETE FROM STUDENT
+        WHERE
+            ID = #{id, jdbcType=INTEGER}
+    </delete>
+
+    <select id="getById" multiplicity="one" remark="根据主键获取数据:STUDENT">
+        SELECT *
+        FROM STUDENT
+        WHERE
+            ID = #{id, jdbcType=INTEGER}
+    </select>
+
+  <sql id="whereCondition">
+    <where>
+      <if test="name != null">and `name` like #{name, jdbcType=VARCHAR}</if>
+      <if test="ids != null and !ids.isEmpty()">
+        and ID in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+          #{id, jdbcType=INTEGER}
+        </foreach>
+      </if>
+    </where>
+  </sql>
+
+  <select id="queryByCondition" multiplicity="many" vo="Student" remark="按条件查询">
+    select
+    <include refid="BaseResultMap" />
+    from STUDENT
+    where
+    <include refid="whereCondition" />
+  </select>
+
+</table>
