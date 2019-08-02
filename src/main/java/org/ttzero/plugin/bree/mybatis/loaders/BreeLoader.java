@@ -949,7 +949,7 @@ public class BreeLoader extends AbstractLoader {
         }
 
         // add class config
-        addJavaConfig(doClass, doConfig);
+        addJavaConfig(doClass, doConfig, null);
 
         // TODO collection
         return doClass;
