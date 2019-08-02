@@ -71,7 +71,7 @@
     resultType CDATA #IMPLIED
     resultMap CDATA #IMPLIED
     timeout CDATA #IMPLIED
-    noCount (yes|no) #IMPLIED
+    noCount (true|false) #IMPLIED
     resultSetType (FORWARD_ONLY | SCROLL_INSENSITIVE | SCROLL_SENSITIVE | DEFAULT) #IMPLIED
     statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
     fetchSize CDATA #IMPLIED
