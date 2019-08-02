@@ -55,6 +55,7 @@
     from STUDENT
     where
     <include refid="whereCondition" />
+    and delete_flag = #{deleteFlag, jdbcType=INTEGER}
   </select>
 
   <select id="paging" multiplicity="paging" vo="Student" remark="分页测试">
