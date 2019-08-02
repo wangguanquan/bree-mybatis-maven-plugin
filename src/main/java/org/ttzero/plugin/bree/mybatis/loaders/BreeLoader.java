@@ -159,7 +159,7 @@ public class BreeLoader extends AbstractLoader {
 
             // 准备DAO类
             if (!ConfigUtil.config.isIgnoreDao()) {
-                Dao dao = preDAO(gen, cfTable, table, doClass, resultMaps);
+                Dao dao = preDAO(cfTable, table, doClass, resultMaps);
                 getClassAndImport(dao, doMapper.getPackageName() + "." + doMapper.getClassName());
                 dao.setDoMapper(doMapper);
                 gen.addDao(dao);
@@ -462,14 +462,13 @@ public class BreeLoader extends AbstractLoader {
     /**
      * Pre dao dao.
      *
-     * @param gen        the gen
      * @param cfTable    the cf table
      * @param table      the table
      * @param doClass    the do class
      * @param resultMaps the result maps
      * @return the dao
      */
-    private Dao preDAO(Gen gen, CfTable cfTable, Table table, Do doClass,
+    private Dao preDAO(CfTable cfTable, Table table, Do doClass,
                        Map<String, ResultMap> resultMaps) {
         Dao dao = new Dao();
         JavaConfig javaConfig = ConfigUtil.config.getDaoConfig();
