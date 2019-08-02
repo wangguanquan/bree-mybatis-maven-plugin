@@ -57,4 +57,11 @@
     <include refid="whereCondition" />
   </select>
 
+  <select id="paging" multiplicity="paging" vo="Student" remark="分页测试">
+    select
+    <include refid="BaseResultMap" />
+    from STUDENT
+    where
+    <include refid="whereCondition" />
+  </select>
 </table>

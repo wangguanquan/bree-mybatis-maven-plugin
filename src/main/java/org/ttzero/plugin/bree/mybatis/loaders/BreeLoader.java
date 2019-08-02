@@ -671,11 +671,6 @@ public class BreeLoader extends AbstractLoader {
             paging.setPackageName(packageName);
         }
 
-        if (voConfig.isUseBasePageVo()) {
-//            paging.setBasePackageName(ConfigUtil.getCurrentDb().getGenDalCommonPackage() + "." + paging);
-//            paging.setBaseClassPath(ConfigUtil.getCurrentDb().getGenDalCommonPackagePath() + "/" + paging);
-            getClassAndImport(paging, paging.getPackageName() + ".BasePage");
-        }
         paging.setDesc(StringUtil.join(table.getName(), cfTable.getRemark()));
         paging.setTableName(cfTable.getName());
 
@@ -683,6 +678,11 @@ public class BreeLoader extends AbstractLoader {
 
         // append java config
         addJavaConfig(paging, voConfig);
+
+        if (voConfig.isUseBasePageVo() && paging.getExtend() == null) {
+            // BasePage package is same as Vo
+            paging.setExtend(new JavaProperty("BasePage", null));
+        }
 
         paging.setResultType(pagingResultType);
         List<DoMapperMethodParam> params = preMethodParams(paging, operation, columnTypeMap);
