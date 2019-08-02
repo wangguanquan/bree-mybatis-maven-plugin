@@ -345,13 +345,23 @@ public class Gen {
                     // Merge implements, extends, annotations and fields
                     if (p.getExtend() == null) {
                         p.setExtend(vo.getExtend());
-                    } else if (vo.getExtend() != null && p.getExtend().equals(vo.getExtend())) {
+                    } else if (vo.getExtend() != null && !p.getExtend().equals(vo.getExtend())) {
                         throw new BreeException("Vo [" + vo.getClassName() + "] has diff extend ["
                             + p.getExtend().getClassName() + " and " + vo.getExtend().getClassName() + "]");
                     }
+                    p.addImport(p.getExtend().getImportPath());
 
-                    p.setImplementArray(merge(p.getImplementArray(), vo.getImplementArray()));
-                    p.setAnnotationArray(merge(p.getAnnotationArray(), vo.getAnnotationArray()));
+                    List<JavaProperty> implementArray = merge(p.getImplementArray(), vo.getImplementArray());
+                    p.setImplementArray(implementArray);
+                    for (JavaProperty jp : implementArray) {
+                        p.addImport(jp.getImportPath());
+                    }
+
+                    List<JavaProperty> annotationArray = merge(p.getAnnotationArray(), vo.getAnnotationArray());
+                    p.setAnnotationArray(annotationArray);
+                    for (JavaProperty jp : annotationArray) {
+                        p.addImport(jp.getImportPath());
+                    }
                 }
             }
             return;
