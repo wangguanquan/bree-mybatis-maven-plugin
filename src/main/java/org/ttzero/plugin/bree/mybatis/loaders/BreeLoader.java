@@ -181,8 +181,6 @@ public class BreeLoader extends AbstractLoader {
             // TODO Service
             // TODO Controller
 
-            // Test
-            gen.setUseBasePage(ConfigUtil.config.getVoConfig().isUseBasePageVo());
 
             // FIXME check exists author
             // FIXME don't rewrite if author exists
@@ -617,6 +615,9 @@ public class BreeLoader extends AbstractLoader {
                     columnDescMap, operation);
             } else {
                 preMethod(doClass, resultMaps, doMapper, operation, columnTypeMap);
+                if (StringUtil.isNotEmpty(operation.getVo())) {
+                    gen.addVo(createVo(cfTable, table, columnTypeMap, columnDescMap, operation));
+                }
             }
         }
         return doMapper;
@@ -640,15 +641,7 @@ public class BreeLoader extends AbstractLoader {
                                  Map<String, String> columnTypeMap,
                                  Map<String, String> columnDescMap, CfOperation operation) {
         DoMapperMethod pagingResultMethod = new DoMapperMethod();
-        VoConfig voConfig = ConfigUtil.config.getVoConfig();
-        String namespace;
-        if (StringUtil.isEmpty(namespace = voConfig.getNamespace())) {
-            namespace = "vo";
-        }
-        String prefix = voConfig.getPrefix()
-            , suffix = voConfig.getSuffix();
-        if (prefix == null) prefix = "";
-        if (suffix == null) suffix = "Vo";
+
 
         pagingResultMethod.setName(operation.getId() + "Result");
         pagingResultMethod.setPagingName(operation.getId());
@@ -656,52 +649,13 @@ public class BreeLoader extends AbstractLoader {
         pagingResultMethod.setSql(operation.getSqlDesc());
         pagingResultMethod.setPagingFlag("true");
 
-        Vo paging = new Vo();
-
-        String vo = operation.getVo();
-        int index = vo.lastIndexOf('.');
-        if (index < 0) {
-            paging.setClassName(prefix + vo + suffix);
-            paging.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
-            paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
-        } else {
-            paging.setClassName(vo.substring(index + 1));
-            String packageName = vo.substring(0, index);
-            paging.setClassPath(packageName.replace('.', '/'));
-            paging.setPackageName(packageName);
-        }
-
-        paging.setDesc(StringUtil.join(table.getName(), cfTable.getRemark()));
-        paging.setTableName(cfTable.getName());
+        Vo paging = createVo(cfTable, table, columnTypeMap, columnDescMap, operation);
 
         String pagingResultType = operationResultType(doClass, paging, operation, resultMaps);
-
-        // append java config
-        addJavaConfig(paging, voConfig);
-
-        if (voConfig.isUseBasePageVo() && paging.getExtend() == null) {
-            // BasePage package is same as Vo
-            paging.setExtend(new JavaProperty("BasePage", null));
-        }
-
         paging.setResultType(pagingResultType);
-        List<DoMapperMethodParam> params = preMethodParams(paging, operation, columnTypeMap);
-        boolean hasForeach = !operation.getPrimitiveForeachParams().isEmpty();
-        Map<String, String> foreachMap = null;
-        if (hasForeach) {
-            foreachMap = Maps.newHashMap();
-            for (Map.Entry<String, String> entry : operation.getPrimitiveForeachParams().entrySet()) {
-                foreachMap.put(entry.getValue(), entry.getKey());
-            }
-        }
-        for (DoMapperMethodParam param : params) {
-            Field field = new Field();
-            field.setName(param.getParam());
-            field.setJavaType(param.getParamType());
-            field.setDesc(getFieldDesc(param, columnDescMap, foreachMap));
-            paging.addField(field);
-        }
         gen.addVo(paging);
+        gen.setUseBasePage(ConfigUtil.config.getVoConfig().isUseBasePageVo());
+
         // paging import到doMapper
         getClassAndImport(doMapper, paging.getPackageName() + "." + paging.getClassName());
         getClassAndImport(doMapper, "java.util.List");
@@ -726,6 +680,64 @@ public class BreeLoader extends AbstractLoader {
         }
 
         doMapper.addMethod(pagingResultMethod);
+    }
+
+    private Vo createVo(CfTable cfTable, Table table, Map<String, String> columnTypeMap
+        , Map<String, String> columnDescMap, CfOperation operation) {
+        VoConfig voConfig = ConfigUtil.config.getVoConfig();
+        String namespace = voConfig.getNamespace();
+        if (StringUtil.isEmpty(namespace)) {
+            namespace = "vo";
+        }
+        String prefix = voConfig.getPrefix()
+            , suffix = voConfig.getSuffix();
+        if (prefix == null) prefix = "";
+        if (suffix == null) suffix = "Vo";
+
+        Vo paging = new Vo();
+
+        String vo = operation.getVo();
+        int index = vo.lastIndexOf('.');
+        if (index < 0) {
+            paging.setClassName(prefix + vo + suffix);
+            paging.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
+            paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+        } else {
+            paging.setClassName(vo.substring(index + 1));
+            String packageName = vo.substring(0, index);
+            paging.setClassPath(packageName.replace('.', '/'));
+            paging.setPackageName(packageName);
+        }
+
+        paging.setDesc(StringUtil.join(table.getName(), cfTable.getRemark()));
+        paging.setTableName(cfTable.getName());
+
+        // append java config
+        addJavaConfig(paging, voConfig);
+
+        if (operation.getMultiplicity() == MultiplicityEnum.paging
+            && voConfig.isUseBasePageVo() && paging.getExtend() == null) {
+            // BasePage package is same as Vo
+            paging.setExtend(new JavaProperty("BasePage", null));
+        }
+
+        List<DoMapperMethodParam> params = preMethodParams(paging, operation, columnTypeMap);
+        boolean hasForeach = !operation.getPrimitiveForeachParams().isEmpty();
+        Map<String, String> foreachMap = null;
+        if (hasForeach) {
+            foreachMap = Maps.newHashMap();
+            for (Map.Entry<String, String> entry : operation.getPrimitiveForeachParams().entrySet()) {
+                foreachMap.put(entry.getValue(), entry.getKey());
+            }
+        }
+        for (DoMapperMethodParam param : params) {
+            Field field = new Field();
+            field.setName(param.getParam());
+            field.setJavaType(param.getParamType());
+            field.setDesc(getFieldDesc(param, columnDescMap, foreachMap));
+            paging.addField(field);
+        }
+        return paging;
     }
 
     /**
@@ -760,8 +772,8 @@ public class BreeLoader extends AbstractLoader {
      */
     private void preMethodParam(Do doClass, Base doMapper, CfOperation operation,
                                 DoMapperMethod method, Map<String, String> columnMap) {
-        boolean hasVo;
-        if (hasVo = StringUtil.isNotEmpty(operation.getVo())) {
+        boolean hasVo = StringUtil.isNotEmpty(operation.getVo());
+        if (hasVo) {
             operation.setParamType(ParamTypeEnum.object);
         }
 
@@ -773,8 +785,8 @@ public class BreeLoader extends AbstractLoader {
                 int index = vo.lastIndexOf('.');
                 if (index < 0) {
                     VoConfig voConfig = ConfigUtil.config.getVoConfig();
-                    String namespace;
-                    if (StringUtil.isEmpty(namespace = voConfig.getNamespace())) {
+                    String namespace = voConfig.getNamespace();
+                    if (StringUtil.isEmpty(namespace)) {
                         namespace = "vo";
                     }
                     String prefix = voConfig.getPrefix()
@@ -782,8 +794,8 @@ public class BreeLoader extends AbstractLoader {
                     if (prefix == null) prefix = "";
                     if (suffix == null) suffix = "Vo";
 
-                    voName = prefix + vo + suffix;
-                    vo = ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace + '.' + voName;
+                    voName = StringUtil.lowerFirst(vo);
+                    vo = ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace + '.' + prefix + vo + suffix;
                 } else {
                     voName = vo.substring(index + 1);
                 }
@@ -863,7 +875,6 @@ public class BreeLoader extends AbstractLoader {
             || operation.getOperation() == OperationMethod.delete) {
             return "int";
         }
-        //返回类不为null
         String resultType;
         if (!StringUtils.isBlank(operation.getResultType())) {
             resultType = getClassAndImport(base, operation.getResultType());
@@ -882,7 +893,6 @@ public class BreeLoader extends AbstractLoader {
                 doClass.getPackageName() + "." + doClass.getClassName());
         }
 
-        //返回一行
         if (MultiplicityEnum.many == operation.getMultiplicity()) {
             base.addImport("java.util.List");
             return MessageFormat.format(RESULT_MANY, resultType);

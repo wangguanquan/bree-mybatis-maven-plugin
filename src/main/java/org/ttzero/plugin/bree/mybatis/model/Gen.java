@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.common.collect.Lists;
+import org.ttzero.plugin.bree.mybatis.BreeException;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.model.java.Dao;
 import org.ttzero.plugin.bree.mybatis.model.java.Do;
@@ -31,6 +32,7 @@ import org.ttzero.plugin.bree.mybatis.model.java.Field;
 import org.ttzero.plugin.bree.mybatis.model.java.ResultMap;
 import org.ttzero.plugin.bree.mybatis.model.java.Vo;
 import org.ttzero.plugin.bree.mybatis.model.java.XmlMapper;
+import org.ttzero.plugin.bree.mybatis.model.repository.JavaProperty;
 
 /**
  * Created by guanquan.wang at 2019-05-24 17:25
@@ -106,7 +108,7 @@ public class Gen {
     /**
      * Paging base vo
      */
-    private boolean useBasePage = true;
+    private boolean useBasePage;
 
     /**
      * Returns tables path.
@@ -333,18 +335,42 @@ public class Gen {
         String fullPath = vo.getBaseClassPath() + vo.getClassName();
         if (existVoPath.contains(fullPath)) {
             for (Vo p : voList) {
-                // 如果有相同的vo则合并参数
                 if (fullPath.equals(p.getBaseClassPath() + p.getClassName())) {
+                    // merge fields
                     List<Field> list = vo.getFieldList();
                     for (Field e : list) {
                         p.addField(e);
                     }
+
+                    // Merge implements, extends, annotations and fields
+                    if (p.getExtend() == null) {
+                        p.setExtend(vo.getExtend());
+                    } else if (vo.getExtend() != null && p.getExtend().equals(vo.getExtend())) {
+                        throw new BreeException("Vo [" + vo.getClassName() + "] has diff extend ["
+                            + p.getExtend().getClassName() + " and " + vo.getExtend().getClassName() + "]");
+                    }
+
+                    p.setImplementArray(merge(p.getImplementArray(), vo.getImplementArray()));
+                    p.setAnnotationArray(merge(p.getAnnotationArray(), vo.getAnnotationArray()));
                 }
             }
             return;
         }
         this.voList.add(vo);
         existVoPath.add(fullPath);
+    }
+
+    private List<JavaProperty> merge(List<JavaProperty> l1, List<JavaProperty> l2) {
+        if (l1 == null) {
+            return l2;
+        } else if (l2 != null) {
+            for (JavaProperty jp : l2) {
+                if (!l1.contains(jp)) {
+                    l1.add(jp);
+                }
+            }
+        }
+        return l1;
     }
 
     public boolean isUseBasePage() {
