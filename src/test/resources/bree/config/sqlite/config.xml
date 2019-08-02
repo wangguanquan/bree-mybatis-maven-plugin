@@ -67,7 +67,7 @@
 
   <!-- 最终生成XXXVo.java接口-->
   <vo>
-    <useBasePageVo value="true" />
+    <extend class="PageParams" import="org.ttzero.plugin.bree.PageParams" if="paging" />
   </vo>
 
   <!-- ========================================================== -->
