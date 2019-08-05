@@ -1,11 +1,13 @@
-# bree-mybatis-maven-plugin
+[ ![Build Status] [travis-image] ] [travis] [ ![Release] [release-image] ] [releases] [ ![License] [license-image] ] [license]
 
-bree-mybatis-maven-plugin源于github开源项目`mybatis-dalgen`，
-对其进行魔改变为现在的版本，后来作者将项目迁到国内oschina地址是[mybatis.generator](https://gitee.com/bangis/mybatis.generator)
-在此感谢原作者bangis.wangdf
+bree-mybatis-maven-plugin源于github开源项目`mybatis-dalgen`，本项目修改了大量已知BUG并且在设计思路也与原项目异同，
+bree更接近mybatis原始mapper，除了个别增强属性外几乎与原始mapper相同，这样可以减少学习成本，同时对老项目有较好的兼容。
+后来作者将项目迁到国内oschina地址是[mybatis.generator](https://gitee.com/bangis/mybatis.generator)在此感谢原作者bangis.wangdf
 
-bree与原项目相比有着更加丰富的配置项，可以对Mapper, dao, service, vo, dto等java
-文件的`annotation`，`extends`以及`implements`进行配置，以满足不同项目的需求。
+bree与原项目相比有着更加丰富的配置项，可以对Mapper, dao, service, vo, dto等java文件的`annotation`，`extends`以及`implements`进行配置，
+以满足不同项目的需求。
+
+除此之外还可以在reserved文件添加数据库"保留词"，这些保留词或关键词将被特殊包裹（自动生成的部分）。
 
 默认的bree通过DML生成初始的全字段的BaseResultMap和Base_Column_List，以及与表对应
 的do对象。同时还会生成默认insert/update/deleteById/getById操作，如果项目集成第
@@ -33,7 +35,7 @@ CRUD操作。
           </dependency>
         </dependencies>
         <configuration>
-          <copyTemplate>true</copyTemplate><!-- 初次动行设为true以复制模版 -->
+          <copyTemplate>true</copyTemplate><!-- 初次执行时设为true以复制模版 -->
         </configuration>
       </plugin>
     </plugins>
@@ -68,9 +70,16 @@ name随意,goals填写`bree-mybatis:gen` -> Apply。保存好后下次就可以�
 ```
 
 默认情况下会在项目的根目录生成一个bree文件夹，结构如下
+
+```
 |-bree
-|--config
-|--templates
+ |-config
+ |-templates
+  |-fmpp
+  |-init
+  |-lib
+ |-reserved
+```
 
 下一步需要在`config.xml`文件中配置数据源和其它代码生成相关配置项，然后再次执行`mvn bree-mybatis:gen`命令，命令窗口会提示你输入要生成
 的表名，输入表名回车即完成Mapper接口,vo,dto以及mapper.xml的自动生成。
@@ -121,7 +130,7 @@ bree-mybatis会生成基础的insert/update/deleteById/getById功能，其中ins
 
 ### java 文件相关配置
 
-bree-mybatis将生成DO,VO,DAO,Service,Controller等java相关文件，每一种类型都可以独立配置，
+bree-mybatis将生成Do,Vo,Dao,Service,Controller等java相关文件，每一种类型都可以独立配置，
 并且它们有相同的配置项。
 
 > 目录对泛型支持不友好
@@ -229,6 +238,16 @@ VO是SQL参数对象，分页SQL默认继承bree-mybatis自带的`BasePageVo`，
 生成的新文件自动运行`git add`命令，默认true
 
 **此功能要求命令行支持git命令，可自行设置class path以支持git命令**
+
+
+## 关于junit
+
+- [BreeMojoTest](src/test/java/org/ttzero/plugin/bree/mybatis/BreeMojoTest.java) 测试mysql数据库需要自行配置[config](src/test/resources/bree/config/mysql/config.xml)文件
+然后修改`ConfigUtil.setCmd("sdm_rewrite")`为测试表名即可
+- [BreeMojoSqliteTest](src/test/java/org/ttzero/plugin/bree/mybatis/BreeMojoSqliteTest.java) 测试sqlite数据库，可以直接运行。初始表为STUDENT配置文件[config](src/test/resources/bree/config/sqlite/config.xml)
+，同时测试SQL文件对应[mapper](src/test/resources/bree/config/testTables/STUDENT.xml)，需要将SQL写在此文件
+
+*测试输出文件放在target/out目录下*
 
 ## 示例
 
