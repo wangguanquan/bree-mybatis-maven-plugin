@@ -1,6 +1,5 @@
 # bree-mybatis-maven-plugin
 
-[![Build Status]【travis-image]][travis]
 [![Release][release-image]][releases]
 [![License][license-image]][license]
 
@@ -310,3 +309,10 @@ List<Rewrite> pagingResult(RewriteVo rewrite);
 ```
 
 2. 同一个xml文件分页语句paging属性相同时，将会进行合并处理。
+
+
+[releases]: https://github.com/wangguanquan/bree-mybatis-maven-plugin/releases
+[release-image]: http://img.shields.io/badge/release-0.1.13-blue.svg?style=flat
+
+[license]: http://www.apache.org/licenses/LICENSE-2.0
+[license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
