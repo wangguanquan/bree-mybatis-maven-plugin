@@ -166,6 +166,10 @@ public class ConfigUtil {
             for (Element splitSuffix : splitSuffixs) {
                 dataBase.addSplitSuffix(getValue(splitSuffix));
             }
+
+            if (StringUtil.isEmpty(dataBase.getType())) {
+                dataBase.setType(getType(dataBase.getPropertyMapVal("url")));
+            }
             config.addDataSource(dataBase);
         }
     }
@@ -403,4 +407,25 @@ public class ConfigUtil {
         return config.getDataSourceMap().get(currentDb);
     }
 
+    /**
+     * database type: mysql oracle sqlite
+     * @return the database type name
+     */
+    public static String getType(String url) {
+        if (url != null) {
+            int index = url.indexOf(':'), next = index > 0 ? url.indexOf(':', ++index) : -1;
+            if (next < 0) return null;
+            String type = url.substring(index, next);
+            // special case type
+            if ("microsoft".equals(type)) {
+                index = ++next;
+                next = url.indexOf(':', index);
+                if (next > index) {
+                    type = url.substring(next, index);
+                }
+            }
+            return type;
+        }
+        return null;
+    }
 }
