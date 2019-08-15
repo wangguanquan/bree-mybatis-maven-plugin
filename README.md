@@ -1,7 +1,6 @@
 # bree-mybatis-maven-plugin
 
-[![Release][release-image]][releases]
-[![License][license-image]][license]
+[![Build Status][travis-image]][travis] [![Release][release-image]][releases] [![License][license-image]][license]
 
 bree-mybatis-maven-plugin源于github开源项目`mybatis-dalgen`，本项目修改了大量已知BUG并且在设计思路也与原项目异同，
 bree更接近mybatis原始mapper，除了个别增强属性外几乎与原始mapper相同，这样可以减少学习成本，同时对老项目有较好的兼容。
@@ -310,6 +309,8 @@ List<Rewrite> pagingResult(RewriteVo rewrite);
 
 2. 同一个xml文件分页语句paging属性相同时，将会进行合并处理。
 
+[travis]: https://travis-ci.org/wangguanquan/bree-mybatis-maven-plugin
+[travis-image]: https://travis-ci.org/wangguanquan/bree-mybatis-maven-plugin.png?branch=master
 
 [releases]: https://github.com/wangguanquan/bree-mybatis-maven-plugin/releases
 [release-image]: http://img.shields.io/badge/release-0.1.13-blue.svg?style=flat
