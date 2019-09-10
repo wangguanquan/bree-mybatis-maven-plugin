@@ -349,7 +349,9 @@ public class Gen {
                         throw new BreeException("Vo [" + vo.getClassName() + "] has diff extend ["
                             + p.getExtend().getClassName() + " and " + vo.getExtend().getClassName() + "]");
                     }
-                    p.addImport(p.getExtend().getImportPath());
+                    if (p.getExtend() != null) {
+                        p.addImport(p.getExtend().getImportPath());
+                    }
 
                     List<JavaProperty> implementArray = merge(p.getImplementArray(), vo.getImplementArray());
                     p.setImplementArray(implementArray);
