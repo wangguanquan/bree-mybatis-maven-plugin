@@ -117,6 +117,28 @@ public class BreeMojoSqliteTest {
                 ps.executeBatch();
                 con.commit();
             }
+
+            // Create teacher
+            String teacher = "create table if not exists bl_teacher(id integer primary key, name text, bl integer)";
+            ps = con.prepareStatement(teacher);
+            ps.executeUpdate();
+            ps.close();
+            ps = con.prepareStatement("select id from bl_teacher limit 1");
+            rs = ps.executeQuery();
+            // No data in database
+            if (!rs.next()) {
+                ps.close();
+                con.setAutoCommit(false);
+                ps = con.prepareStatement("insert into bl_teacher(name, bl) values (?,?)");
+                int size = 1000;
+                for (int i = 0; i < size; i++) {
+                    ps.setString(1, getRandomString());
+                    ps.setInt(2, random.nextInt(10) >= 8 ? 1 : 0);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+                con.commit();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -152,7 +174,7 @@ public class BreeMojoSqliteTest {
         BreeMojo mojo = new BreeMojo(getOutputTestPath().toFile()
             , testResourceRoot().resolve("bree/templates/").toFile(), getConfigPath().toFile(), true);
 
-        ConfigUtil.setCmd("student");
+        ConfigUtil.setCmd("student,bl_teacher");
         mojo.execute();
     }
 }

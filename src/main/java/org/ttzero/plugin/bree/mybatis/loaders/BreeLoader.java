@@ -201,7 +201,7 @@ public class BreeLoader extends AbstractLoader {
         if ("*".equals(cmd.trim())) {
             needGenTableNames = Lists.newArrayList(cfTableMap.keySet());
         } else {
-            for (String tableName : StringUtils.split(cmd.toUpperCase())) {
+            for (String tableName : cmd.toUpperCase().split(",")) {
                 tableName = tableName.toUpperCase();
                 boolean flag = true;
                 for (String splitTableSuffix : ConfigUtil.getCurrentDb().getSplitSuffixs()) {
