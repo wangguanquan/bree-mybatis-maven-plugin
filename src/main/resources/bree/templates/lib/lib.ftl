@@ -53,3 +53,29 @@
     </#list>
     <#return true>
 </#function>
+
+<#-- 下划线转驼峰 -->
+<#function toCamelCase s>
+    <#if s?contains("_")>
+        <#assign result = ""/>
+        <#list s?lower_case?split("_") as x>
+            <#if x_index == 0>
+                <#assign result = result + x/>
+            <#else>
+                <#assign result = result + x?capitalize/>
+            </#if>
+        </#list>
+        <#return result>
+    <#else>
+        <#return s?lower_case>
+    </#if>
+</#function>
+
+<#-- 驼峰转下划线 -->
+<#function toUnderlineName s>
+    <#if s?contains("_")>
+        <#return s?upper_case>
+    <#else>
+        <#return s?replace("([A-Z]+)", "_$1", "r")?upper_case>
+    </#if>
+</#function>
