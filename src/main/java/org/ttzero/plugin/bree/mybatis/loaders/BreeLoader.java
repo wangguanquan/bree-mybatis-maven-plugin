@@ -72,6 +72,8 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
+import static org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils.toCamelCase;
+
 /**
  * 主逻辑
  * Created by guanquan.wang at 2019-05-24 09:05
@@ -201,7 +203,7 @@ public class BreeLoader extends AbstractLoader {
         if ("*".equals(cmd.trim())) {
             needGenTableNames = Lists.newArrayList(cfTableMap.keySet());
         } else {
-            for (String tableName : StringUtils.split(cmd.toUpperCase())) {
+            for (String tableName : cmd.toUpperCase().split(",")) {
                 tableName = tableName.toUpperCase();
                 boolean flag = true;
                 for (String splitTableSuffix : ConfigUtil.getCurrentDb().getSplitSuffixs()) {
@@ -244,6 +246,7 @@ public class BreeLoader extends AbstractLoader {
         for (CfResultMap cfResultMap : resultMapList) {
             ResultMap resultMap = new ResultMap();
             resultMap.setTableName(table.getName());
+            resultMap.setEntryName(toCamelCase(table.getName()));
             resultMap.setId(cfResultMap.getId());
             resultMap.setType(cfResultMap.getType());
 
@@ -490,6 +493,7 @@ public class BreeLoader extends AbstractLoader {
         dao.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property);
         dao.setDesc(cfTable.getRemark());
         dao.setTableName(cfTable.getName());
+        dao.setEntryName(toCamelCase(cfTable.getName()));
 
         // append java config
         addJavaConfig(dao, javaConfig, null);
@@ -596,6 +600,7 @@ public class BreeLoader extends AbstractLoader {
         doMapper.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property);
         doMapper.setDesc(cfTable.getRemark());
         doMapper.setTableName(cfTable.getName());
+        doMapper.setEntryName(toCamelCase(cfTable.getName()));
 
         // add java config
         addJavaConfig(doMapper, javaConfig, null);
@@ -710,6 +715,7 @@ public class BreeLoader extends AbstractLoader {
 
         paging.setDesc(StringUtil.join(table.getName(), cfTable.getRemark()));
         paging.setTableName(cfTable.getName());
+        paging.setEntryName(toCamelCase(cfTable.getName()));
 
         // append java config
         addJavaConfig(paging, voConfig, operation.getMultiplicity());
@@ -928,6 +934,7 @@ public class BreeLoader extends AbstractLoader {
         doClass.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
         doClass.setDesc(table.getRemark());
         doClass.setTableName(table.getName());
+        doClass.setEntryName(toCamelCase(table.getName()));
 
         // 不在DO中输出地字段
         Set<String> ignoreField = doConfig.getIgnoreFields();
