@@ -49,6 +49,10 @@ public class JavaConfig {
      * The class's annotation
      */
     private List<JavaProperty> annotationArray = Lists.newArrayList();
+    /**
+     * Impl config
+     */
+    private JavaConfig impl;
 
     public String getNamespace() {
         return namespace;
@@ -104,5 +108,13 @@ public class JavaConfig {
 
     public void addAnnotation(JavaProperty jp) {
         this.annotationArray.add(jp);
+    }
+
+    public JavaConfig getImpl() {
+        return impl;
+    }
+
+    public void setImpl(JavaConfig impl) {
+        this.impl = impl;
     }
 }

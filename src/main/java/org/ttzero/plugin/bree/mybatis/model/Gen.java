@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.BreeException;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.model.java.Dao;
+import org.ttzero.plugin.bree.mybatis.model.java.DaoImpl;
 import org.ttzero.plugin.bree.mybatis.model.java.Do;
 import org.ttzero.plugin.bree.mybatis.model.java.DoMapper;
 import org.ttzero.plugin.bree.mybatis.model.java.Field;
@@ -104,6 +105,11 @@ public class Gen {
     private List<Vo> voList = Lists.newArrayList();
 
     private Set<String> existVoPath = Sets.newHashSet();
+
+    /**
+     * The DaoImpls.
+     */
+    private List<DaoImpl> daoImpls = Lists.newArrayList();
 
     /**
      * Paging base vo
@@ -399,5 +405,13 @@ public class Gen {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public List<DaoImpl> getDaoImpls() {
+        return daoImpls;
+    }
+
+    public void setDaoImpls(List<DaoImpl> daoImpls) {
+        this.daoImpls = daoImpls;
     }
 }

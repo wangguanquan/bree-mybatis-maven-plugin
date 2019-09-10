@@ -5,7 +5,7 @@
 
   <groupId>org.ttzero.plugin</groupId>
   <artifactId>bree-mybatis-maven-plugin</artifactId>
-  <version>0.1.13</version>
+  <version>0.1.14</version>
   <packaging>maven-plugin</packaging>
 
   <name>bree-mybatis</name>

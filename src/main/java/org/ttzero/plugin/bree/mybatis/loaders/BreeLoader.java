@@ -40,6 +40,7 @@ import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.model.java.Base;
 import org.ttzero.plugin.bree.mybatis.model.java.Dao;
+import org.ttzero.plugin.bree.mybatis.model.java.DaoImpl;
 import org.ttzero.plugin.bree.mybatis.model.java.Do;
 import org.ttzero.plugin.bree.mybatis.model.java.DoMapper;
 import org.ttzero.plugin.bree.mybatis.model.java.Field;
@@ -251,8 +252,8 @@ public class BreeLoader extends AbstractLoader {
             int index = type.lastIndexOf('.');
             if (index < 0) {
                 resultMap.setClassName(prefix + cfResultMap.getType() + suffix);
-                resultMap.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
-                resultMap.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+                resultMap.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace.replace('.', '/'));
+                resultMap.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.'));
             } else {
                 resultMap.setClassName(type.substring(index + 1));
                 String packageName = type.substring(0, index);
@@ -486,8 +487,8 @@ public class BreeLoader extends AbstractLoader {
         if (StringUtil.isEmpty(property = javaConfig.getNamespace())) {
             property = "dao";
         }
-        dao.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property);
-        dao.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property);
+        dao.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property.replace('/', '.'));
+        dao.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property.replace('.', '/'));
         dao.setDesc(cfTable.getRemark());
         dao.setTableName(cfTable.getName());
 
@@ -541,7 +542,7 @@ public class BreeLoader extends AbstractLoader {
             int index = vo.lastIndexOf('.');
             if (index < 0) {
                 paging.setClassName(prefix + StringUtil.upperFirst(operation.getVo()) + suffix);
-                paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+                paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.'));
             } else {
                 paging.setClassName(vo.substring(index + 1));
                 paging.setPackageName(vo.substring(0, index));
@@ -562,6 +563,54 @@ public class BreeLoader extends AbstractLoader {
         method.setReturnClass(resultType);
 
         dao.addMethod(method);
+    }
+
+    /**
+     * Pre dao dao.
+     *
+     * @param cfTable    the cf table
+     * @param table      the table
+     * @param doClass    the do class
+     * @param resultMaps the result maps
+     * @return the dao
+     */
+    private DaoImpl preDaoImpl(CfTable cfTable, Table table, Do doClass,
+                               Map<String, ResultMap> resultMaps) {
+        Dao dao = new Dao();
+        JavaConfig javaConfig = ConfigUtil.config.getDaoConfig();
+        String property;
+        // The suffix
+        if (StringUtil.isEmpty(property = javaConfig.getSuffix())) {
+            property = "Dao";
+        }
+        String prefix;
+        if (StringUtil.isEmpty(prefix = javaConfig.getPrefix())) {
+            prefix = "";
+        }
+        dao.setClassName(prefix + table.getJavaName() + property);
+        // The namespace, default "mapper"
+        if (StringUtil.isEmpty(property = javaConfig.getNamespace())) {
+            property = "dao";
+        }
+        dao.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property.replace('/', '.'));
+        dao.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property.replace('.', '/'));
+        dao.setDesc(cfTable.getRemark());
+        dao.setTableName(cfTable.getName());
+
+        // append java config
+        addJavaConfig(dao, javaConfig, null);
+
+        Map<String, String> columnTypeMap = Maps.newHashMap();
+//        Map<String, String> columnDescMap = Maps.newHashMap();
+        for (Column column : table.getColumnList()) {
+            columnTypeMap.put(column.getProperty(), column.getJavaType());
+//            columnDescMap.put(column.getJavaName(), column.getRemarks());
+        }
+
+        for (CfOperation operation : cfTable.getOperations()) {
+            preDAOMethod(doClass, resultMaps, dao, operation, columnTypeMap);
+        }
+        return dao;
     }
 
     /**
@@ -592,8 +641,8 @@ public class BreeLoader extends AbstractLoader {
         if (StringUtil.isEmpty(property = javaConfig.getNamespace())) {
             property = "mapper";
         }
-        doMapper.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property);
-        doMapper.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property);
+        doMapper.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property.replace('/', '.'));
+        doMapper.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property.replace('.', '/'));
         doMapper.setDesc(cfTable.getRemark());
         doMapper.setTableName(cfTable.getName());
 
@@ -699,8 +748,8 @@ public class BreeLoader extends AbstractLoader {
         int index = vo.lastIndexOf('.');
         if (index < 0) {
             paging.setClassName(prefix + vo + suffix);
-            paging.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
-            paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+            paging.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace.replace('.', '/'));
+            paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.'));
         } else {
             paging.setClassName(vo.substring(index + 1));
             String packageName = vo.substring(0, index);
@@ -794,7 +843,7 @@ public class BreeLoader extends AbstractLoader {
                     if (suffix == null) suffix = "Vo";
 
                     voName = StringUtil.lowerFirst(vo);
-                    vo = ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace + '.' + prefix + vo + suffix;
+                    vo = ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.') + '.' + prefix + vo + suffix;
                 } else {
                     voName = vo.substring(index + 1);
                 }
@@ -924,8 +973,8 @@ public class BreeLoader extends AbstractLoader {
         if (StringUtil.isEmpty(namespace)) {
             namespace = "do";
         }
-        doClass.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
-        doClass.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
+        doClass.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.'));
+        doClass.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace.replace('.', '/'));
         doClass.setDesc(table.getRemark());
         doClass.setTableName(table.getName());
 

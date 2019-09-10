@@ -19,37 +19,6 @@ package org.ttzero.plugin.bree.mybatis.model.java;
 /**
  * Created by guanquan.wang at 2019-05-24 23:54
  */
-public class Dao extends DoMapper {
-    /**
-     * The Do mapper.
-     */
-    private DoMapper doMapper;
+public class DaoImpl extends Dao {
 
-    private boolean hasImpl;
-
-    /**
-     * Gets do mapper.
-     *
-     * @return the do mapper
-     */
-    public DoMapper getDoMapper() {
-        return doMapper;
-    }
-
-    /**
-     * Sets do mapper.
-     *
-     * @param doMapper the do mapper
-     */
-    public void setDoMapper(DoMapper doMapper) {
-        this.doMapper = doMapper;
-    }
-
-    public boolean isHasImpl() {
-        return hasImpl;
-    }
-
-    public void setHasImpl(boolean hasImpl) {
-        this.hasImpl = hasImpl;
-    }
 }
