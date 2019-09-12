@@ -75,12 +75,12 @@
     ignore (true|false) #IMPLIED
     >
 
-  <!ELEMENT dao (namespace? | prefix? | suffix? | extend? | implements? | annotations?)*>
+  <!ELEMENT dao (namespace? | prefix? | suffix? | extend? | implements? | annotations? | impl?)*>
   <!ATTLIST dao
     ignore (true|false) #IMPLIED
     >
 
-  <!ELEMENT service (namespace? | prefix? | suffix? | extend? | implements? | annotations?)*>
+  <!ELEMENT service (namespace? | prefix? | suffix? | extend? | implements? | annotations? | impl?)*>
   <!ATTLIST service
     ignore (true|false) #IMPLIED
     >
@@ -89,6 +89,11 @@
   <!ATTLIST controller
     ignore (true|false) #IMPLIED
     >
+
+    <!ELEMENT impl (namespace? | prefix? | suffix? | extend? | implements? | annotations?)*>
+    <!ATTLIST impl
+        ignore (true|false) #IMPLIED
+        >
 
   <!--<!ELEMENT extends (extend)+>-->
   <!ELEMENT implements (implement)*>

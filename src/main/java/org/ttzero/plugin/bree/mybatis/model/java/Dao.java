@@ -25,6 +25,8 @@ public class Dao extends DoMapper {
      */
     private DoMapper doMapper;
 
+    private boolean hasImpl;
+
     /**
      * Gets do mapper.
      *
@@ -41,5 +43,23 @@ public class Dao extends DoMapper {
      */
     public void setDoMapper(DoMapper doMapper) {
         this.doMapper = doMapper;
+    }
+
+    public boolean isHasImpl() {
+        return hasImpl;
+    }
+
+    public void setHasImpl(boolean hasImpl) {
+        this.hasImpl = hasImpl;
+    }
+
+    @Override
+    public Dao clone() {
+        try {
+            return (Dao) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

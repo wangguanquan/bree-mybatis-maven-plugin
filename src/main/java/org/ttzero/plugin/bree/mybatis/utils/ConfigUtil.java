@@ -244,7 +244,12 @@ public class ConfigUtil {
         if (isIgnore(element)) {
             config.ignoreDao();
         } else {
-            config.setDaoConfig(parseJavaConfig(element));
+            JavaConfig daoConfig = parseJavaConfig(element);
+            config.setDaoConfig(daoConfig);
+            Element impl = element.element("impl");
+            if (!isIgnore(impl)) {
+                daoConfig.setImpl(parseJavaConfig(impl));
+            }
         }
     }
 
@@ -258,7 +263,12 @@ public class ConfigUtil {
         if (isIgnore(element)) {
             config.ignoreService();
         } else {
-            config.setServiceConfig(parseJavaConfig(element));
+            JavaConfig serviceConfig = parseJavaConfig(element);
+            config.setServiceConfig(serviceConfig);
+            Element impl = element.element("impl");
+            if (!isIgnore(impl)) {
+                serviceConfig.setImpl(parseJavaConfig(impl));
+            }
         }
     }
 

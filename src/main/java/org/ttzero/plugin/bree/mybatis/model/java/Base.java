@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Created by guanquan.wang at 2019-05-24 11:13
  */
-public class Base {
+public class Base implements Cloneable {
     /**
      * The Class name.
      */

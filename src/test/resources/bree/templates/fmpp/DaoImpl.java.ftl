@@ -1,5 +1,5 @@
 <@pp.dropOutputFile />
-<#list bree.daos as dao>
+<#list bree.daoImpls as dao>
     <@pp.changeOutputFile name = "/main/java/${dao.classPath}/${dao.className}.java" />
 package ${dao.packageName};
 
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @${annotation.className}
     </#list>
 </#if>
-<#if hasImpl??>
 public class ${dao.className}<#if dao.extend??> extends ${dao.extend.className}</#if><#if dao.implementArray.size() gt 0> implements <#list dao.implementArray as impl><#if impl_index gt 0>, </#if>${impl.className}</#list></#if> {
 
     @Autowired
@@ -54,18 +53,4 @@ public class ${dao.className}<#if dao.extend??> extends ${dao.extend.className}<
     }
     </#list>
 }
-<#else>
-public interface ${dao.className}<#if dao.extend??> extends ${dao.extend.className}</#if><#if dao.implementArray.size() gt 0><#if dao.extend??><#list dao.implementArray as impl>, ${impl.className}</#list><#else><#list dao.implementArray as impl><#if impl_index gt 0>, <#else> extends </#if>${impl.className}</#list></#if></#if> {
-    <#list dao.methods as method>
-    /**
-     * ${method.desc!method.name!}.
-    <#list method.params as param>
-     * @param ${param.param} ${param.param}
-    </#list>
-     * @return ${method.returnClass!}
-     */
-    ${method.returnClass!} ${method.name}(<#list  method.params as param><#if param_index gt 0>, </#if>${param.paramType!} <#assign pagingParam = param.param/>${param.param}</#list>);
-    </#list>
-}
-</#if>
 </#list>

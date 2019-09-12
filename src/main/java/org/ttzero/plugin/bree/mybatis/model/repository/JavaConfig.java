@@ -18,13 +18,19 @@ package org.ttzero.plugin.bree.mybatis.model.repository;
 
 import com.google.common.collect.Lists;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Java类基本通用
  * Create by guanquan.wang at 2019-05-24 09:51
  */
-public class JavaConfig {
+public class JavaConfig implements Serializable {
     /**
      * The directory name
      */
@@ -49,6 +55,10 @@ public class JavaConfig {
      * The class's annotation
      */
     private List<JavaProperty> annotationArray = Lists.newArrayList();
+    /**
+     * Impl config
+     */
+    private JavaConfig impl;
 
     public String getNamespace() {
         return namespace;
@@ -104,5 +114,44 @@ public class JavaConfig {
 
     public void addAnnotation(JavaProperty jp) {
         this.annotationArray.add(jp);
+    }
+
+    public JavaConfig getImpl() {
+        return impl;
+    }
+
+    public void setImpl(JavaConfig impl) {
+        this.impl = impl;
+    }
+
+    public JavaConfig deepClone() {
+        ObjectOutputStream oos = null;
+        ObjectInputStream ois = null;
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            oos = new ObjectOutputStream(bos);
+            oos.writeObject(this);
+
+            ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
+            return (JavaConfig) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            if (oos != null) {
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (ois != null) {
+                try {
+                    ois.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
     }
 }

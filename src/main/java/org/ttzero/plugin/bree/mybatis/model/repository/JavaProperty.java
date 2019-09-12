@@ -18,13 +18,14 @@ package org.ttzero.plugin.bree.mybatis.model.repository;
 
 import com.google.common.collect.Sets;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
 /**
  * Create by guanquan.wang at 2019-05-24 09:55
  */
-public class JavaProperty {
+public class JavaProperty implements Serializable {
     /**
      * The class name
      */

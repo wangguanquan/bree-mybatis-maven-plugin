@@ -106,6 +106,11 @@ public class Gen {
     private Set<String> existVoPath = Sets.newHashSet();
 
     /**
+     * The DaoImpls.
+     */
+    private List<Dao> daoImpls = Lists.newArrayList();
+
+    /**
      * Paging base vo
      */
     private boolean useBasePage;
@@ -234,6 +239,17 @@ public class Gen {
      */
     public void addDao(Dao dao) {
         this.daos.add(dao);
+    }
+
+    /**
+     * Add daoImpl.
+     *
+     * @param daoImpl the dao implement
+     */
+    public void addDaoImpl(Dao daoImpl) {
+        if (daoImpl != null) {
+            this.daoImpls.add(daoImpl);
+        }
     }
 
     /**
@@ -399,5 +415,13 @@ public class Gen {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public List<Dao> getDaoImpls() {
+        return daoImpls;
+    }
+
+    public void setDaoImpls(List<Dao> daoImpls) {
+        this.daoImpls = daoImpls;
     }
 }

@@ -154,17 +154,18 @@ public class BreeLoader extends AbstractLoader {
             preResultMap(gen, tbName, cfTable, table, xmlMapper, resultMaps);
 
             // 准备Mapper接口
-            DoMapper doMapper = preDOMapper(gen, cfTable, table, doClass, resultMaps);
+            DoMapper doMapper = preDoMapper(gen, cfTable, table, doClass, resultMaps);
             gen.addDoMapper(doMapper);
 
             // TODO
 
             // 准备DAO类
             if (!ConfigUtil.config.isIgnoreDao()) {
-                Dao dao = preDAO(cfTable, table, doClass, resultMaps);
+                Dao dao = preDao(cfTable, table, doClass, resultMaps);
                 getClassAndImport(dao, doMapper.getPackageName() + "." + doMapper.getClassName());
                 dao.setDoMapper(doMapper);
                 gen.addDao(dao);
+                gen.addDaoImpl(preDaoImpl(dao));
             }
 
             // xml-mapper
@@ -254,8 +255,8 @@ public class BreeLoader extends AbstractLoader {
             int index = type.lastIndexOf('.');
             if (index < 0) {
                 resultMap.setClassName(prefix + cfResultMap.getType() + suffix);
-                resultMap.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
-                resultMap.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+                resultMap.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace.replace('.', '/'));
+                resultMap.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.'));
             } else {
                 resultMap.setClassName(type.substring(index + 1));
                 String packageName = type.substring(0, index);
@@ -471,7 +472,7 @@ public class BreeLoader extends AbstractLoader {
      * @param resultMaps the result maps
      * @return the dao
      */
-    private Dao preDAO(CfTable cfTable, Table table, Do doClass,
+    private Dao preDao(CfTable cfTable, Table table, Do doClass,
                        Map<String, ResultMap> resultMaps) {
         Dao dao = new Dao();
         JavaConfig javaConfig = ConfigUtil.config.getDaoConfig();
@@ -489,8 +490,8 @@ public class BreeLoader extends AbstractLoader {
         if (StringUtil.isEmpty(property = javaConfig.getNamespace())) {
             property = "dao";
         }
-        dao.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property);
-        dao.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property);
+        dao.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property.replace('/', '.'));
+        dao.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property.replace('.', '/'));
         dao.setDesc(cfTable.getRemark());
         dao.setTableName(cfTable.getName());
         dao.setEntryName(toCamelCase(cfTable.getName()));
@@ -506,7 +507,7 @@ public class BreeLoader extends AbstractLoader {
         }
 
         for (CfOperation operation : cfTable.getOperations()) {
-            preDAOMethod(doClass, resultMaps, dao, operation, columnTypeMap);
+            preDaoMethod(doClass, resultMaps, dao, operation, columnTypeMap);
         }
         return dao;
     }
@@ -520,7 +521,7 @@ public class BreeLoader extends AbstractLoader {
      * @param operation  the operation
      * @param columnMap  the column map
      */
-    private void preDAOMethod(Do doClass, Map<String, ResultMap> resultMaps, Dao dao,
+    private void preDaoMethod(Do doClass, Map<String, ResultMap> resultMaps, Dao dao,
                               CfOperation operation, Map<String, String> columnMap) {
 
         DoMapperMethod method = new DoMapperMethod();
@@ -545,7 +546,7 @@ public class BreeLoader extends AbstractLoader {
             int index = vo.lastIndexOf('.');
             if (index < 0) {
                 paging.setClassName(prefix + StringUtil.upperFirst(operation.getVo()) + suffix);
-                paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+                paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.'));
             } else {
                 paging.setClassName(vo.substring(index + 1));
                 paging.setPackageName(vo.substring(0, index));
@@ -569,7 +570,50 @@ public class BreeLoader extends AbstractLoader {
     }
 
     /**
-     * Pre do mapper do mapper.
+     * Pre dao dao.
+     *
+     * @param dao    the dao entry
+     * @return the dao
+     */
+    private Dao preDaoImpl(Dao dao) {
+        JavaConfig daoConfig = ConfigUtil.config.getDaoConfig();
+        if (daoConfig.getImpl() != null) {
+            dao.setHasImpl(true);
+            JavaConfig implConfig = daoConfig.getImpl();
+
+            Dao daoImpl = dao.clone();
+            String suffix;
+            if (StringUtil.isEmpty(suffix = implConfig.getSuffix())) {
+                suffix = "Impl";
+            }
+            String prefix;
+            if (StringUtil.isEmpty(prefix = implConfig.getPrefix())) {
+                prefix = "";
+            }
+            daoImpl.setClassName(prefix + dao.getClassName() + suffix);
+            // The namespace, default "mapper"
+            String namespace;
+            if (StringUtil.isEmpty(namespace = implConfig.getNamespace())) {
+                namespace = "impl";
+            }
+            daoImpl.setPackageName(dao.getPackageName() + "." + namespace);
+            daoImpl.setClassPath(dao.getClassPath() + "/" + namespace);
+
+            JavaConfig cloneConfig = implConfig.deepClone();
+            if (cloneConfig != null) {
+                cloneConfig.addImplement(dao.getClassName(), dao.getPackageName() + "." + dao.getClassName());
+                // add java config
+                addJavaConfig(daoImpl, cloneConfig, null);
+            }
+
+            return daoImpl;
+        }
+
+        return null;
+    }
+
+    /**
+     * Pre do mapper.
      *
      * @param gen        the gen
      * @param cfTable    the cf table
@@ -578,7 +622,7 @@ public class BreeLoader extends AbstractLoader {
      * @param resultMaps the result maps
      * @return the do mapper
      */
-    private DoMapper preDOMapper(Gen gen, CfTable cfTable, Table table, Do doClass,
+    private DoMapper preDoMapper(Gen gen, CfTable cfTable, Table table, Do doClass,
                                  Map<String, ResultMap> resultMaps) {
         DoMapper doMapper = new DoMapper();
         JavaConfig javaConfig = ConfigUtil.config.getDoMapperConfig();
@@ -596,8 +640,8 @@ public class BreeLoader extends AbstractLoader {
         if (StringUtil.isEmpty(property = javaConfig.getNamespace())) {
             property = "mapper";
         }
-        doMapper.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property);
-        doMapper.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property);
+        doMapper.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property.replace('/', '.'));
+        doMapper.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property.replace('.', '/'));
         doMapper.setDesc(cfTable.getRemark());
         doMapper.setTableName(cfTable.getName());
         doMapper.setEntryName(toCamelCase(cfTable.getName()));
@@ -704,8 +748,8 @@ public class BreeLoader extends AbstractLoader {
         int index = vo.lastIndexOf('.');
         if (index < 0) {
             paging.setClassName(prefix + vo + suffix);
-            paging.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
-            paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
+            paging.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace.replace('.', '/'));
+            paging.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.'));
         } else {
             paging.setClassName(vo.substring(index + 1));
             String packageName = vo.substring(0, index);
@@ -800,7 +844,7 @@ public class BreeLoader extends AbstractLoader {
                     if (suffix == null) suffix = "Vo";
 
                     voName = StringUtil.lowerFirst(vo);
-                    vo = ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace + '.' + prefix + vo + suffix;
+                    vo = ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.') + '.' + prefix + vo + suffix;
                 } else {
                     voName = vo.substring(index + 1);
                 }
@@ -930,8 +974,8 @@ public class BreeLoader extends AbstractLoader {
         if (StringUtil.isEmpty(namespace)) {
             namespace = "do";
         }
-        doClass.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace);
-        doClass.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace);
+        doClass.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace.replace('/', '.'));
+        doClass.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + namespace.replace('.', '/'));
         doClass.setDesc(table.getRemark());
         doClass.setTableName(table.getName());
         doClass.setEntryName(toCamelCase(table.getName()));
@@ -1002,7 +1046,7 @@ public class BreeLoader extends AbstractLoader {
         // The implement array
         for (JavaProperty jp : config.getImplementArray()) {
             base.addImport(jp.getImportPath());
-            jp.setClassName(replaceValue(jp.getImportPath(), base));
+            jp.setClassName(replaceValue(jp.getClassName(), base));
         }
         base.setImplementArray(config.getImplementArray());
 
