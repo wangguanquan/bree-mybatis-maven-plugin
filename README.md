@@ -313,7 +313,7 @@ List<Rewrite> pagingResult(RewriteVo rewrite);
 [travis-image]: https://travis-ci.org/wangguanquan/bree-mybatis-maven-plugin.png?branch=master
 
 [releases]: https://github.com/wangguanquan/bree-mybatis-maven-plugin/releases
-[release-image]: http://img.shields.io/badge/release-0.1.13-blue.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-0.1.14-blue.svg?style=flat
 
 [license]: http://www.apache.org/licenses/LICENSE-2.0
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat

@@ -1,4 +1,4 @@
-Version 0.1.14 (2019-09-10)
+Version 0.1.14 (2019-09-12)
 -------------
 1. hotfix xml配置相同vo抛NPE
 2. paramType 增加Map类型
