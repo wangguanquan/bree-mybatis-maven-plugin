@@ -74,4 +74,12 @@
     where
     <include refid="whereCondition" />
   </select>
+
+  <select id="mapTest" paramType="map" multiplicity="many" remark="Map testing">
+    select
+    <include refid="BaseResultMap" />
+    from STUDENT
+    where
+    <include refid="whereCondition" />
+  </select>
 </table>

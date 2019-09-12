@@ -19,12 +19,13 @@ package org.ttzero.plugin.bree.mybatis.model.java;
 import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.model.repository.JavaProperty;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by guanquan.wang at 2019-05-24 11:13
  */
-public class Base implements Cloneable {
+public class Base implements Serializable {
     /**
      * The Class name.
      */

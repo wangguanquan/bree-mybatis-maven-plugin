@@ -31,6 +31,9 @@ public enum ParamTypeEnum {
     /**
      * 原生态参数.
      */
-    primitive
-
+    primitive,
+    /**
+     * Map parameter
+     */
+    map
 }

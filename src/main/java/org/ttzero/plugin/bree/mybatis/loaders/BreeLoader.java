@@ -162,10 +162,19 @@ public class BreeLoader extends AbstractLoader {
             // 准备DAO类
             if (!ConfigUtil.config.isIgnoreDao()) {
                 Dao dao = preDao(cfTable, table, doClass, resultMaps);
-                getClassAndImport(dao, doMapper.getPackageName() + "." + doMapper.getClassName());
                 dao.setDoMapper(doMapper);
                 gen.addDao(dao);
-                gen.addDaoImpl(preDaoImpl(dao));
+                if (ConfigUtil.config.getDaoConfig().getImpl() != null) {
+                    Dao daoImpl = preDaoImpl(dao);
+                    if (daoImpl != null) {
+                        daoImpl.addImport("org.springframework.beans.factory.annotation.Autowired");
+                        getClassAndImport(daoImpl, doMapper.getPackageName() + "." + doMapper.getClassName());
+                        gen.addDaoImpl(daoImpl);
+                    }
+                } else {
+                    getClassAndImport(dao, doMapper.getPackageName() + "." + doMapper.getClassName());
+                    dao.addImport("org.springframework.beans.factory.annotation.Autowired");
+                }
             }
 
             // xml-mapper
@@ -581,7 +590,7 @@ public class BreeLoader extends AbstractLoader {
             dao.setHasImpl(true);
             JavaConfig implConfig = daoConfig.getImpl();
 
-            Dao daoImpl = dao.clone();
+            Dao daoImpl = dao.deepClone();
             String suffix;
             if (StringUtil.isEmpty(suffix = implConfig.getSuffix())) {
                 suffix = "Impl";
@@ -898,6 +907,12 @@ public class BreeLoader extends AbstractLoader {
                 params.add(new DoMapperMethodParam("List<" + paramType + ">", foreachName));
             }
         }
+
+        if (operation.getParamType() == ParamTypeEnum.map) {
+            getClassAndImport(doMapper, "java.util.Map");
+            params.add(new DoMapperMethodParam("Map<String, ?>", "map"));
+        }
+
         // 仅有一个参数且类型为数组时需要添加注解
         if (params.size() == 1) {
             String paramType = params.get(0).getParamType();

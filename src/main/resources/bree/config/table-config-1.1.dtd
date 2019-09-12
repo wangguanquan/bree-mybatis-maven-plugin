@@ -53,7 +53,7 @@
   最定义操作, 根据这里生成对应的 操作
   name          name
   paging        分页设置  - 暂时没想好怎么扩展 -后续加上(思路,如果设置paging 则自动添加分页参数 不需要自己写limit 只需要写查询条件即可)
-  paramType     参数类型: object 会自动翻译为 生成的对象,primitive 根据字段类型生成
+  paramType     参数类型: object 会自动翻译为 生成的对象,primitive 根据字段类型生成, map 使用Map<String, Object>使用参数
   multiplicity  one 返回对象,many 返回list, paging 返回分页
   resultType    指定返回类型(Map)
   resultMap     指定使用哪个resultMap 不写则使用自动生成的resultMap
@@ -65,7 +65,7 @@
   <!ATTLIST select
     id CDATA #REQUIRED
     vo CDATA #IMPLIED
-    paramType (object|primitive) #IMPLIED
+    paramType (object|primitive|map) #IMPLIED
     multiplicity (one|many|paging) #IMPLIED
     remark CDATA #IMPLIED
     resultType CDATA #IMPLIED
