@@ -61,6 +61,33 @@ public interface ITableRepository {
     }
 
     /**
+     * Wrapper the reserved column name
+     *
+     * @param column the column name
+     * @return the wrapper name
+     */
+    default String reservedColumn(String column) {
+        if (isReserved(column)) {
+            return preReservedTag() + column + postReservedTag();
+        }
+        return column;
+    }
+
+    /**
+     * The reserved column pre tag
+     *
+     * @return the pre tag
+     */
+    String preReservedTag();
+
+    /**
+     * The reserved column post tag
+     *
+     * @return the post tag
+     */
+    String postReservedTag();
+
+    /**
      * Parse general information from {@link CfTable}
      *
      * @param cfTable the table defined

@@ -184,7 +184,7 @@ public class OBTableRepository implements ITableRepository {
             if (StringUtil.isEmpty(column.getRemark())) {
                 column.setRemark(column.getColumn());
             }
-            column.setReserved(isReserved(column.getColumn()));
+            column.setReserveColumn(reservedColumn(column.getColumn()));
             table.addColumn(column);
             columnMap.put(column.getColumn(), column);
         }
@@ -219,5 +219,25 @@ public class OBTableRepository implements ITableRepository {
     @Override
     public DatabaseTypeEnum getType() {
         return DatabaseTypeEnum.ob;
+    }
+
+    /**
+     * The reserved column pre tag
+     *
+     * @return the pre tag
+     */
+    @Override
+    public String preReservedTag() {
+        return "`";
+    }
+
+    /**
+     * The reserved column post tag
+     *
+     * @return the post tag
+     */
+    @Override
+    public String postReservedTag() {
+        return "`";
     }
 }
