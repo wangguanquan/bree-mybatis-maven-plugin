@@ -135,7 +135,7 @@ public class MySQLTableRepository implements ITableRepository {
                 column.setProperty(CamelCaseUtils.toCamelCase(column.getColumn()));
                 column.setJavaType(getJavaType(column, cfColumns));
                 column.setRemark(getOrElse(resultSet, "REMARKS", column.getColumn()));
-                column.setReserved(isReserved(column.getColumn()));
+                column.setReserveColumn(reservedColumn(column.getColumn()));
                 table.addColumn(column);
             }
         }
@@ -171,4 +171,23 @@ public class MySQLTableRepository implements ITableRepository {
         return type;
     }
 
+    /**
+     * The reserved column pre tag
+     *
+     * @return the pre tag
+     */
+    @Override
+    public String preReservedTag() {
+        return "`";
+    }
+
+    /**
+     * The reserved column post tag
+     *
+     * @return the post tag
+     */
+    @Override
+    public String postReservedTag() {
+        return "`";
+    }
 }

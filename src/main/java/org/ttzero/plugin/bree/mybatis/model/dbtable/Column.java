@@ -68,7 +68,7 @@ public class Column implements Comparable<Column> {
     /**
      * Mark the column name is a reserved word
      */
-    private boolean reserved;
+    private String reserveColumn;
 
     /**
      * Returns remark.
@@ -238,17 +238,17 @@ public class Column implements Comparable<Column> {
      *
      * @return the reserved value
      */
-    public boolean isReserved() {
-        return reserved;
+    public String getReserveColumn() {
+        return reserveColumn;
     }
 
     /**
      * Setting the column name is reserved
      *
-     * @param reserved the reserved value
+     * @param reserveColumn the reserve column value
      */
-    public void setReserved(boolean reserved) {
-        this.reserved = reserved;
+    public void setReserveColumn(String reserveColumn) {
+        this.reserveColumn = reserveColumn;
     }
 
     /**

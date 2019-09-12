@@ -30,7 +30,7 @@
 
 <#-- baseSql -->
     <sql id="Base_Column_List">
-        <#list xmlMapper.table.columnList as column><#if column_index gt 0>,</#if><#if column.reserved>`${column.column}`<#else>${column.column}</#if></#list>
+        <#list xmlMapper.table.columnList as column><#if column_index gt 0>,</#if>${column.reserveColumn}</#list>
     </sql>
     <#list xmlMapper.cfTable.sqlList as sqlTag>
 
