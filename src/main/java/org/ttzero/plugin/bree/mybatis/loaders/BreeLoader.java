@@ -40,7 +40,6 @@ import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.model.java.Base;
 import org.ttzero.plugin.bree.mybatis.model.java.Dao;
-import org.ttzero.plugin.bree.mybatis.model.java.DaoImpl;
 import org.ttzero.plugin.bree.mybatis.model.java.Do;
 import org.ttzero.plugin.bree.mybatis.model.java.DoMapper;
 import org.ttzero.plugin.bree.mybatis.model.java.Field;
@@ -155,17 +154,18 @@ public class BreeLoader extends AbstractLoader {
             preResultMap(gen, tbName, cfTable, table, xmlMapper, resultMaps);
 
             // 准备Mapper接口
-            DoMapper doMapper = preDOMapper(gen, cfTable, table, doClass, resultMaps);
+            DoMapper doMapper = preDoMapper(gen, cfTable, table, doClass, resultMaps);
             gen.addDoMapper(doMapper);
 
             // TODO
 
             // 准备DAO类
             if (!ConfigUtil.config.isIgnoreDao()) {
-                Dao dao = preDAO(cfTable, table, doClass, resultMaps);
+                Dao dao = preDao(cfTable, table, doClass, resultMaps);
                 getClassAndImport(dao, doMapper.getPackageName() + "." + doMapper.getClassName());
                 dao.setDoMapper(doMapper);
                 gen.addDao(dao);
+                gen.addDaoImpl(preDaoImpl(dao));
             }
 
             // xml-mapper
@@ -472,7 +472,7 @@ public class BreeLoader extends AbstractLoader {
      * @param resultMaps the result maps
      * @return the dao
      */
-    private Dao preDAO(CfTable cfTable, Table table, Do doClass,
+    private Dao preDao(CfTable cfTable, Table table, Do doClass,
                        Map<String, ResultMap> resultMaps) {
         Dao dao = new Dao();
         JavaConfig javaConfig = ConfigUtil.config.getDaoConfig();
@@ -507,7 +507,7 @@ public class BreeLoader extends AbstractLoader {
         }
 
         for (CfOperation operation : cfTable.getOperations()) {
-            preDAOMethod(doClass, resultMaps, dao, operation, columnTypeMap);
+            preDaoMethod(doClass, resultMaps, dao, operation, columnTypeMap);
         }
         return dao;
     }
@@ -521,7 +521,7 @@ public class BreeLoader extends AbstractLoader {
      * @param operation  the operation
      * @param columnMap  the column map
      */
-    private void preDAOMethod(Do doClass, Map<String, ResultMap> resultMaps, Dao dao,
+    private void preDaoMethod(Do doClass, Map<String, ResultMap> resultMaps, Dao dao,
                               CfOperation operation, Map<String, String> columnMap) {
 
         DoMapperMethod method = new DoMapperMethod();
@@ -572,53 +572,48 @@ public class BreeLoader extends AbstractLoader {
     /**
      * Pre dao dao.
      *
-     * @param cfTable    the cf table
-     * @param table      the table
-     * @param doClass    the do class
-     * @param resultMaps the result maps
+     * @param dao    the dao entry
      * @return the dao
      */
-    private DaoImpl preDaoImpl(CfTable cfTable, Table table, Do doClass,
-                               Map<String, ResultMap> resultMaps) {
-        Dao dao = new Dao();
-        JavaConfig javaConfig = ConfigUtil.config.getDaoConfig();
-        String property;
-        // The suffix
-        if (StringUtil.isEmpty(property = javaConfig.getSuffix())) {
-            property = "Dao";
-        }
-        String prefix;
-        if (StringUtil.isEmpty(prefix = javaConfig.getPrefix())) {
-            prefix = "";
-        }
-        dao.setClassName(prefix + table.getJavaName() + property);
-        // The namespace, default "mapper"
-        if (StringUtil.isEmpty(property = javaConfig.getNamespace())) {
-            property = "dao";
-        }
-        dao.setPackageName(ConfigUtil.getCurrentDb().getGenPackage() + "." + property.replace('/', '.'));
-        dao.setClassPath(ConfigUtil.getCurrentDb().getGenPackagePath() + "/" + property.replace('.', '/'));
-        dao.setDesc(cfTable.getRemark());
-        dao.setTableName(cfTable.getName());
+    private Dao preDaoImpl(Dao dao) {
+        JavaConfig daoConfig = ConfigUtil.config.getDaoConfig();
+        if (daoConfig.getImpl() != null) {
+            dao.setHasImpl(true);
+            JavaConfig implConfig = daoConfig.getImpl();
 
-        // append java config
-        addJavaConfig(dao, javaConfig, null);
+            Dao daoImpl = dao.clone();
+            String suffix;
+            if (StringUtil.isEmpty(suffix = implConfig.getSuffix())) {
+                suffix = "Impl";
+            }
+            String prefix;
+            if (StringUtil.isEmpty(prefix = implConfig.getPrefix())) {
+                prefix = "";
+            }
+            daoImpl.setClassName(prefix + dao.getClassName() + suffix);
+            // The namespace, default "mapper"
+            String namespace;
+            if (StringUtil.isEmpty(namespace = implConfig.getNamespace())) {
+                namespace = "impl";
+            }
+            daoImpl.setPackageName(dao.getPackageName() + "." + namespace);
+            daoImpl.setClassPath(dao.getClassPath() + "/" + namespace);
 
-        Map<String, String> columnTypeMap = Maps.newHashMap();
-//        Map<String, String> columnDescMap = Maps.newHashMap();
-        for (Column column : table.getColumnList()) {
-            columnTypeMap.put(column.getProperty(), column.getJavaType());
-//            columnDescMap.put(column.getJavaName(), column.getRemarks());
+            JavaConfig cloneConfig = implConfig.deepClone();
+            if (cloneConfig != null) {
+                cloneConfig.addImplement(dao.getClassName(), dao.getPackageName() + "." + dao.getClassName());
+                // add java config
+                addJavaConfig(daoImpl, cloneConfig, null);
+            }
+
+            return daoImpl;
         }
 
-        for (CfOperation operation : cfTable.getOperations()) {
-            preDAOMethod(doClass, resultMaps, dao, operation, columnTypeMap);
-        }
-        return dao;
+        return null;
     }
 
     /**
-     * Pre do mapper do mapper.
+     * Pre do mapper.
      *
      * @param gen        the gen
      * @param cfTable    the cf table
@@ -627,7 +622,7 @@ public class BreeLoader extends AbstractLoader {
      * @param resultMaps the result maps
      * @return the do mapper
      */
-    private DoMapper preDOMapper(Gen gen, CfTable cfTable, Table table, Do doClass,
+    private DoMapper preDoMapper(Gen gen, CfTable cfTable, Table table, Do doClass,
                                  Map<String, ResultMap> resultMaps) {
         DoMapper doMapper = new DoMapper();
         JavaConfig javaConfig = ConfigUtil.config.getDoMapperConfig();
@@ -1051,7 +1046,7 @@ public class BreeLoader extends AbstractLoader {
         // The implement array
         for (JavaProperty jp : config.getImplementArray()) {
             base.addImport(jp.getImportPath());
-            jp.setClassName(replaceValue(jp.getImportPath(), base));
+            jp.setClassName(replaceValue(jp.getClassName(), base));
         }
         base.setImplementArray(config.getImplementArray());
 

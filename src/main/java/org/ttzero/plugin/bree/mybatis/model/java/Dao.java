@@ -52,4 +52,14 @@ public class Dao extends DoMapper {
     public void setHasImpl(boolean hasImpl) {
         this.hasImpl = hasImpl;
     }
+
+    @Override
+    public Dao clone() {
+        try {
+            return (Dao) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
