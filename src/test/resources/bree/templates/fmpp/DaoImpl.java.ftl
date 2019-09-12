@@ -3,7 +3,6 @@
     <@pp.changeOutputFile name = "/main/java/${dao.classPath}/${dao.className}.java" />
 package ${dao.packageName};
 
-import org.springframework.beans.factory.annotation.Autowired;
 <#list dao.importLists as import>
 <#if import??>import ${import};</#if>
 </#list>

@@ -247,9 +247,7 @@ public class Gen {
      * @param daoImpl the dao implement
      */
     public void addDaoImpl(Dao daoImpl) {
-        if (daoImpl != null) {
-            this.daoImpls.add(daoImpl);
-        }
+        this.daoImpls.add(daoImpl);
     }
 
     /**
