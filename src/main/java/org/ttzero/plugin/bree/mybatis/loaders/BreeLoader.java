@@ -766,7 +766,7 @@ public class BreeLoader extends AbstractLoader {
             paging.setPackageName(packageName);
         }
 
-        paging.setDesc(StringUtil.join(table.getName(), cfTable.getRemark()));
+        paging.setDesc(table.getName() + " " + cfTable.getRemark());
         paging.setTableName(cfTable.getName());
         paging.setEntryName(toCamelCase(cfTable.getName()));
 

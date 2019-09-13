@@ -20,20 +20,6 @@ package org.ttzero.plugin.bree.mybatis.utils;
  * Created by guanquan.wang at 2019-05-24 123:57
  */
 public class StringUtil {
-    /**
-     * Join string with space character.
-     *
-     * @param p1 the p 1
-     * @param p2 the p 2
-     * @return the string
-     */
-    public static String join(String p1, String p2) {
-        if (p1 == null && p2 == null) {
-            return "";
-        }
-        String o1 = p1 == null ? "" : p1, o2 = p2 == null ? "" : p2;
-        return o1 + " " + o2;
-    }
 
     /**
      * Upper first string.
