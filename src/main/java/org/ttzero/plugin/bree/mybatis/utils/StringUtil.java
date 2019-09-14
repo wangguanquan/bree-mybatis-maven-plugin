@@ -28,7 +28,14 @@ public class StringUtil {
      * @return the string
      */
     public static String upperFirst(String str) {
-        return CamelCaseUtils.toCapitalizeCamelCase(CamelCaseUtils.toUnderlineName(str));
+        if (isEmpty(str)) return "";
+        char c = str.charAt(0);
+        if (c >= 'A' && c <= 'Z') {
+            char[] chars = str.toCharArray();
+            chars[0] += 32;
+            str = new String(chars);
+        }
+        return str;
     }
 
     /**
@@ -38,7 +45,14 @@ public class StringUtil {
      * @return the string
      */
     public static String lowerFirst(String str) {
-        return CamelCaseUtils.toCamelCase(CamelCaseUtils.toUnderlineName(str));
+        if (isEmpty(str)) return "";
+        char c = str.charAt(0);
+        if (c >= 'a' && c <= 'z') {
+            char[] chars = str.toCharArray();
+            chars[0] -= 32;
+            str = new String(chars);
+        }
+        return str;
     }
 
     /**
