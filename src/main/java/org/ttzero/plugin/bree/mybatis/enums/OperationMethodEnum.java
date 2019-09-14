@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.ttzero.plugin.bree.mybatis.model.config;
+package org.ttzero.plugin.bree.mybatis.enums;
 
 /**
  * Create by guanquan.wang at 2019-06-03 21:45
  */
-public enum OperationMethod {
+public enum OperationMethodEnum {
     insert,
     update,
     delete,
