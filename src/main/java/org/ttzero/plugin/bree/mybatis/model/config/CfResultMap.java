@@ -17,8 +17,8 @@
 package org.ttzero.plugin.bree.mybatis.model.config;
 
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
-import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,15 +42,15 @@ public class CfResultMap {
     /**
      * The Columns.
      */
-    private List<Column> columns = Lists.newArrayList();
+    private List<Column> columns = new ArrayList<>();
     /**
      * The Collection.
      */
-    private List<CfCollection> collections = Lists.newArrayList();
+    private List<CfCollection> collections = new ArrayList<>();
     /**
      * The Association.
      */
-    private List<CfAssociation> associations = Lists.newArrayList();
+    private List<CfAssociation> associations = new ArrayList<>();
 
     /**
      * Returns the result id.

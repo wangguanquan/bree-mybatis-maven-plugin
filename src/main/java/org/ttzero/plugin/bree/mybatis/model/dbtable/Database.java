@@ -16,9 +16,8 @@
 
 package org.ttzero.plugin.bree.mybatis.model.dbtable;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,16 @@ public class Database {
     /**
      * The Property map.
      */
-    private Map<String, String> propertyMap = Maps.newHashMap();
+    private Map<String, String> propertyMap = new HashMap<>();
     /**
      * The table prefix
      */
-    private List<String> prefixs = Lists.newArrayList();
+    private List<String> prefixs = new ArrayList<>();
 
     /**
      * The split table suffix
      */
-    private List<String> splitSuffixs = Lists.newArrayList();
+    private List<String> splitSuffixs = new ArrayList<>();
 
     /**
      * Gets gen package.

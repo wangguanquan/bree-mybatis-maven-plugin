@@ -16,9 +16,9 @@
 
 package org.ttzero.plugin.bree.mybatis.model.config;
 
-import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,16 +52,16 @@ public class CfAssociation {
     /**
      * The Columns.
      */
-    private List<Column> columns = Lists.newArrayList();
+    private List<Column> columns = new ArrayList<>();
 
     /**
      * The Association.
      */
-    private List<CfAssociation> associations = Lists.newArrayList();
+    private List<CfAssociation> associations = new ArrayList<>();
     /**
      * The Collection.
      */
-    private List<CfCollection> collections = Lists.newArrayList();
+    private List<CfCollection> collections = new ArrayList<>();
 
     public String getProperty() {
         return property;

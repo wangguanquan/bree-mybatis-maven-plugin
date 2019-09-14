@@ -16,8 +16,6 @@
 
 package org.ttzero.plugin.bree.mybatis.model.java;
 
-import org.ttzero.plugin.bree.mybatis.model.repository.JavaConfig;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

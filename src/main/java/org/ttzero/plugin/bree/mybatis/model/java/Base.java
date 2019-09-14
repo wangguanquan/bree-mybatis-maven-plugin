@@ -16,10 +16,10 @@
 
 package org.ttzero.plugin.bree.mybatis.model.java;
 
-import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.model.repository.JavaProperty;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,7 +54,7 @@ public class Base implements Serializable {
     /**
      * The Import lists.
      */
-    private List<String> importLists = Lists.newArrayList();
+    private List<String> importLists = new ArrayList<>();
 
     /**
      * The class extend from
@@ -69,11 +69,11 @@ public class Base implements Serializable {
     /**
      * The class implements
      */
-    private List<JavaProperty> implementArray = Lists.newArrayList();
+    private List<JavaProperty> implementArray = new ArrayList<>();
     /**
      * The class's annotation
      */
-    private List<JavaProperty> annotationArray = Lists.newArrayList();
+    private List<JavaProperty> annotationArray = new ArrayList<>();
 
     /**
      * Gets class name.

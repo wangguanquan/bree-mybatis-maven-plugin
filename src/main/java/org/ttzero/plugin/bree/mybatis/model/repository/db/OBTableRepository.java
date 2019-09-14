@@ -20,13 +20,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import com.google.common.collect.Maps;
 
 import org.ttzero.plugin.bree.mybatis.enums.DatabaseTypeEnum;
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
@@ -97,7 +97,7 @@ public class OBTableRepository implements ITableRepository {
                 String[] createSqlLines = createTableSql.split("\n");
 
                 // 准备字段
-                Map<String, Column> columnMap = Maps.newHashMap();
+                Map<String, Column> columnMap = new HashMap<>();
                 String primaryKeyLine = preColumns(table, columnMap, cfColumns, createSqlLines);
 
                 // 最后一行解析表注释

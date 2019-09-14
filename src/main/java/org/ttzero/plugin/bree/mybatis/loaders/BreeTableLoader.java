@@ -19,9 +19,9 @@ package org.ttzero.plugin.bree.mybatis.loaders;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
 import org.ttzero.plugin.bree.mybatis.model.Gen;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import org.apache.maven.plugin.logging.Log;
@@ -59,7 +59,7 @@ public class BreeTableLoader extends AbstractLoader {
         }
         String[] cmdTables = ConfigUtil.cmd.toUpperCase().split(",");
 
-        Set<String> existsTables = Sets.newHashSet();
+        Set<String> existsTables = new HashSet<>();
         File[] files = tablesFile.listFiles(file -> file.getName().endsWith(".xml"));
         if (files != null) {
             for (File file : files) {

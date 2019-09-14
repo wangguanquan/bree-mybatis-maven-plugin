@@ -16,9 +16,9 @@
 
 package org.ttzero.plugin.bree.mybatis.model.java;
 
-import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ public class ResultMap extends Do {
     /**
      * The Column list.
      */
-    private List<Column> columnList = Lists.newArrayList();
+    private List<Column> columnList = new ArrayList<>();
     /**
      * 内联xml（将内部的多层collection或association转换为xml）
      */

@@ -17,9 +17,9 @@
 package org.ttzero.plugin.bree.mybatis.model.java;
 
 import org.ttzero.plugin.bree.mybatis.model.java.domapper.DoMapperMethodParam;
-import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.model.java.domapper.DoMapperMethod;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +35,7 @@ public class DoMapper extends Base {
     /**
      * The Methods.
      */
-    private List<DoMapperMethod> methods = Lists.newArrayList();
+    private List<DoMapperMethod> methods = new ArrayList<>();
 
     /**
      * Gets methods.

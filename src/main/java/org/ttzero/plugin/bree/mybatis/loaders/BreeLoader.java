@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,13 +31,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.ttzero.plugin.bree.mybatis.BreeException;
+import org.ttzero.plugin.bree.mybatis.enums.OperationMethodEnum;
 import org.ttzero.plugin.bree.mybatis.model.Gen;
 import org.ttzero.plugin.bree.mybatis.model.config.CfAssociation;
 import org.ttzero.plugin.bree.mybatis.model.config.CfCollection;
 import org.ttzero.plugin.bree.mybatis.model.config.CfOperation;
 import org.ttzero.plugin.bree.mybatis.model.config.CfResultMap;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
-import org.ttzero.plugin.bree.mybatis.model.config.OperationMethod;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.model.java.Base;
@@ -64,8 +66,6 @@ import org.ttzero.plugin.bree.mybatis.enums.ParamTypeEnum;
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import org.ttzero.plugin.bree.mybatis.model.java.domapper.DoMapperMethod;
 import org.ttzero.plugin.bree.mybatis.model.java.domapper.DoMapperMethodParam;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
@@ -110,7 +110,7 @@ public class BreeLoader extends AbstractLoader {
     @Override
     public void load(Gen gen, Connection connection, File tablesFile) throws Exception {
         // 解析所有table.xml(为生成sqlMap.xml做准备)
-        Map<String, CfTable> cfTableMap = Maps.newHashMap();
+        Map<String, CfTable> cfTableMap = new HashMap<>();
         File[] files = tablesFile.listFiles((f, name) -> name.endsWith(".xml"));
         if (files == null) {
             LOG.error("缺少table.xml");
@@ -123,7 +123,7 @@ public class BreeLoader extends AbstractLoader {
         List<String> needGenTableNames = preNeedGenTableNames(ConfigUtil.cmd, cfTableMap);
 
         // 获取需要重新生成的表(为重新生成Mapper.xml,DO,Mapper.java 准备)
-        Map<String, Table> tableMap = Maps.newHashMap();
+        Map<String, Table> tableMap = new HashMap<>();
 
         for (String tbName : needGenTableNames) {
             tableMap.put(tbName,
@@ -149,7 +149,7 @@ public class BreeLoader extends AbstractLoader {
 //            for (Fields field : doClass.getFieldsList()) {
 //                fieldMap.put(field.getName(), field);
 //            }
-            Map<String, ResultMap> resultMaps = Maps.newHashMap();
+            Map<String, ResultMap> resultMaps = new HashMap<>();
 
             preResultMap(gen, tbName, cfTable, table, xmlMapper, resultMaps);
 
@@ -209,11 +209,14 @@ public class BreeLoader extends AbstractLoader {
      * @return the list
      */
     private List<String> preNeedGenTableNames(String cmd, Map<String, CfTable> cfTableMap) {
-        List<String> needGenTableNames = Lists.newArrayList();
         if ("*".equals(cmd.trim())) {
-            needGenTableNames = Lists.newArrayList(cfTableMap.keySet());
+            // TODO list all tables
+            throw new UnsupportedOperationException("* is not allow here.");
+//            needGenTableNames = Lists.newArrayList(cfTableMap.keySet());
         } else {
-            for (String tableName : cmd.toUpperCase().split(",")) {
+            String[] tables = cmd.toUpperCase().split(",");
+            List<String> needGenTableNames = new ArrayList<>(tables.length);
+            for (String tableName : tables) {
                 tableName = tableName.toUpperCase();
                 boolean flag = true;
                 for (String splitTableSuffix : ConfigUtil.getCurrentDb().getSplitSuffixs()) {
@@ -227,8 +230,8 @@ public class BreeLoader extends AbstractLoader {
                     needGenTableNames.add(tableName);
                 }
             }
+            return needGenTableNames;
         }
-        return needGenTableNames;
     }
 
     /**
@@ -508,7 +511,7 @@ public class BreeLoader extends AbstractLoader {
         // append java config
         addJavaConfig(dao, javaConfig, null);
 
-        Map<String, String> columnTypeMap = Maps.newHashMap();
+        Map<String, String> columnTypeMap = new HashMap<>();
 //        Map<String, String> columnDescMap = Maps.newHashMap();
         for (Column column : table.getColumnList()) {
             columnTypeMap.put(column.getProperty(), column.getJavaType());
@@ -658,8 +661,8 @@ public class BreeLoader extends AbstractLoader {
         // add java config
         addJavaConfig(doMapper, javaConfig, null);
 
-        Map<String, String> columnTypeMap = Maps.newHashMap();
-        Map<String, String> columnDescMap = Maps.newHashMap();
+        Map<String, String> columnTypeMap = new HashMap<>();
+        Map<String, String> columnDescMap = new HashMap<>();
         for (Column column : table.getColumnList()) {
             String fieldName = column.getProperty();
             columnTypeMap.put(fieldName, column.getJavaType());
@@ -783,7 +786,7 @@ public class BreeLoader extends AbstractLoader {
         boolean hasForeach = !operation.getPrimitiveForeachParams().isEmpty();
         Map<String, String> foreachMap = null;
         if (hasForeach) {
-            foreachMap = Maps.newHashMap();
+            foreachMap = new HashMap<>();
             for (Map.Entry<String, String> entry : operation.getPrimitiveForeachParams().entrySet()) {
                 foreachMap.put(entry.getValue(), entry.getKey());
             }
@@ -879,7 +882,7 @@ public class BreeLoader extends AbstractLoader {
      */
     private List<DoMapperMethodParam> preMethodParams(Base doMapper, CfOperation operation,
                                                       Map<String, String> columnMap) {
-        List<DoMapperMethodParam> params = Lists.newArrayList();
+        List<DoMapperMethodParam> params = new ArrayList<>();
         Map<String, String> foreachParams = operation.getPrimitiveForeachParams();
         java.util.Collection<String> foreachValues = foreachParams.values();
         for (Map.Entry pm : operation.getPrimitiveParams().entrySet()) {
@@ -934,9 +937,9 @@ public class BreeLoader extends AbstractLoader {
     private String operationResultType(Do doClass, Base base, CfOperation operation,
                                        Map<String, ResultMap> resultMaps) {
 
-        if (operation.getOperation() == OperationMethod.insert
-            || operation.getOperation() == OperationMethod.update
-            || operation.getOperation() == OperationMethod.delete) {
+        if (operation.getOperation() == OperationMethodEnum.insert
+            || operation.getOperation() == OperationMethodEnum.update
+            || operation.getOperation() == OperationMethodEnum.delete) {
             return "int";
         }
         String resultType;

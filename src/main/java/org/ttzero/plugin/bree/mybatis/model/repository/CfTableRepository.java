@@ -19,6 +19,7 @@ package org.ttzero.plugin.bree.mybatis.model.repository;
 import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.ttzero.plugin.bree.mybatis.enums.OperationMethodEnum;
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import org.ttzero.plugin.bree.mybatis.BreeException;
 import org.ttzero.plugin.bree.mybatis.model.config.CfAssociation;
@@ -33,10 +35,8 @@ import org.ttzero.plugin.bree.mybatis.model.config.CfCollection;
 import org.ttzero.plugin.bree.mybatis.model.config.CfOperation;
 import org.ttzero.plugin.bree.mybatis.model.config.CfResultMap;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
-import org.ttzero.plugin.bree.mybatis.model.config.OperationMethod;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import org.ttzero.plugin.bree.mybatis.utils.StringUtil;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.logging.Log;
@@ -50,7 +50,6 @@ import org.dom4j.io.SAXReader;
 import org.ttzero.plugin.bree.mybatis.enums.MultiplicityEnum;
 import org.ttzero.plugin.bree.mybatis.enums.ParamTypeEnum;
 import org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
-import com.google.common.collect.Lists;
 
 import static org.ttzero.plugin.bree.mybatis.utils.ConfigUtil.getAttr;
 
@@ -131,7 +130,7 @@ public class CfTableRepository {
     /**
      * Storage all node
      */
-    private Map<String, Element> nodeCache = Maps.newHashMap();
+    private Map<String, Element> nodeCache = new HashMap<>();
 
     /**
      * Gain cf table cf table.
@@ -186,8 +185,8 @@ public class CfTableRepository {
         }
 
         List<Element> allOperation = new ArrayList<>();
-        OperationMethod[] methods = OperationMethod.values();
-        for (OperationMethod method : methods) {
+        OperationMethodEnum[] methods = OperationMethodEnum.values();
+        for (OperationMethodEnum method : methods) {
             if (group.containsKey(method.name())) {
                 allOperation.addAll(group.get(method.name()));
             }
@@ -376,7 +375,7 @@ public class CfTableRepository {
         StringBuilder buf = new StringBuilder();
         for (Element e : elements) {
             CfOperation cfOperation = new CfOperation();
-            cfOperation.setOperation(OperationMethod.valueOf(e.getName().toLowerCase()));
+            cfOperation.setOperation(OperationMethodEnum.valueOf(e.getName().toLowerCase()));
             buf.delete(0, buf.length());
             // Loop properties
             @SuppressWarnings({"unchecked", "retype"})
@@ -508,7 +507,7 @@ public class CfTableRepository {
             return cdata;
         }
 //        cfTable.getColumns();
-        if (cfOperation.getOperation() == OperationMethod.insert) {
+        if (cfOperation.getOperation() == OperationMethodEnum.insert) {
             //TODO cdata中 insert ? 参数替换 不指定类型
             String sql = cdata;
             //sql 特殊处理一下
@@ -821,7 +820,7 @@ public class CfTableRepository {
         Element newElement = stringToXml(content);
         // #\\{(.*?)\\}
         Matcher m = PARAM_PATTERN.matcher(content);
-        List<String> params = Lists.newArrayList();
+        List<String> params = new ArrayList<>();
         while (m.find()) {
             params.add(m.group(1));
         }
@@ -998,7 +997,7 @@ public class CfTableRepository {
     }
 //
 //    // FIXME use tag name
-//    static OperationMethod testMethod(Element e) {
+//    static OperationMethodEnum testMethod(Element e) {
 //        @SuppressWarnings({"unchecked", "retype"})
 //        List<Element> sub = e.elements();
 //        String content = getContent(e);
@@ -1012,9 +1011,9 @@ public class CfTableRepository {
 //        int n = content.indexOf(' ');
 //        if (n > 0) {
 //            String key = content.substring(0, n);
-//            return OperationMethod.valueOf(key.toLowerCase());
+//            return OperationMethodEnum.valueOf(key.toLowerCase());
 //        }
-//        return OperationMethod.select;
+//        return OperationMethodEnum.select;
 //    }
 
 //    /**
