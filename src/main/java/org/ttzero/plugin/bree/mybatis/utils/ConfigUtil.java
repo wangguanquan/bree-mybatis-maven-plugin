@@ -31,7 +31,6 @@ import org.ttzero.plugin.bree.mybatis.model.repository.JavaProperty;
 import org.ttzero.plugin.bree.mybatis.BreeException;
 import org.ttzero.plugin.bree.mybatis.model.repository.Reserved;
 import org.ttzero.plugin.bree.mybatis.model.repository.VoConfig;
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -148,14 +147,14 @@ public class ConfigUtil {
             for (Element property : properties) {
                 dataBase.addProperty(getAttr(property, "name"), getValue(property));
             }
-            String genPackage = StringUtils.replace(defaultPackage, "${database.name}",
+            String genPackage = defaultPackage.replace("${database.name}",
                 dataBase.getName());
             dataBase.setGenPackage(genPackage);
-            dataBase.setGenPackagePath(StringUtils.replace(genPackage, ".", "/"));
-            String genCommonPackage = StringUtils.replace(defaultPackage, "${database.name}",
+            dataBase.setGenPackagePath(genPackage.replace('.', '/'));
+            String genCommonPackage = defaultPackage.replace("${database.name}",
                 "common");
             dataBase.setGenDalCommonPackage(genCommonPackage);
-            dataBase.setGenDalCommonPackagePath(StringUtils.replace(genCommonPackage, ".", "/"));
+            dataBase.setGenDalCommonPackagePath(genCommonPackage.replace('.', '/'));
 
             List<Element> prefixs = e.elements("prefix");
             for (Element prefix : prefixs) {

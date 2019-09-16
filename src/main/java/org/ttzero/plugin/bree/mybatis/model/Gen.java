@@ -21,8 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import org.ttzero.plugin.bree.mybatis.BreeException;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.model.java.Dao;
@@ -266,15 +264,6 @@ public class Gen {
      */
     public void setOutRoot(String outRoot) {
         this.outRoot = outRoot;
-    }
-
-    /**
-     * To string string.
-     *
-     * @return the string
-     */
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
     }
 
     /**

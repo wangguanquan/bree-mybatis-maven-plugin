@@ -28,7 +28,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.ttzero.plugin.bree.mybatis.BreeMojo;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
@@ -82,11 +81,12 @@ public class ConfInit {
      */
     private static void copyBreeConfig(JarEntry jarEntry) throws IOException {
         // Only copy files witch in config directory
-        if (!StringUtils.startsWithIgnoreCase(jarEntry.getName(), CONFIG_PATH)) {
+        String lowerName = jarEntry.getName().toLowerCase();
+        if (!lowerName.startsWith(CONFIG_PATH)) {
             return;
         }
-        if (!StringUtils.equalsIgnoreCase(jarEntry.getName(), CONFIG_PATH)) {
-            if (StringUtils.equalsIgnoreCase(jarEntry.getName(), CONFIG_PATH + "config.xml")) {
+        if (!lowerName.equals(CONFIG_PATH)) {
+            if (lowerName.equals(CONFIG_PATH + "config.xml")) {
                 if (!ConfInit.breeMojo.getConfig().exists()) {
                     copyAndOverWriteFile(jarEntry.getName(), breeMojo.getConfig());
                     System.out.println("初始化完成,下一步到" + breeMojo.getConfig() + "配置数据源");

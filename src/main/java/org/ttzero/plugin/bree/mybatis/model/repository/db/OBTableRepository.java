@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-
 import org.ttzero.plugin.bree.mybatis.enums.DatabaseTypeEnum;
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
@@ -102,7 +100,7 @@ public class OBTableRepository implements ITableRepository {
 
                 // 最后一行解析表注释
                 String lastLine = createSqlLines[createSqlLines.length - 1];
-                for (String comments : StringUtils.split(lastLine)) {
+                for (String comments : lastLine.split(",")) {
                     if (comments.startsWith("COMMENT=")) {
                         table.setRemark(comments.split("=", 2)[1]);
                     }
@@ -114,9 +112,9 @@ public class OBTableRepository implements ITableRepository {
                     while (m.find()) {
                         PrimaryKeys primaryKeys = new PrimaryKeys();
                         primaryKeys.setPkName("PrimaryKey");
-                        String[] pks = StringUtils.split(m.group(1));
+                        String[] pks = m.group(1).split(",");
                         for (String pk : pks) {
-                            pk = StringUtils.trim(pk);
+                            pk = pk.trim();
                             if (pks.length == 1) {
                                 primaryKeys.setPkName(CamelCaseUtils.toCapitalizeCamelCase(pk));
                                 primaryKeys.addColumn(columnMap.get(pk));
@@ -173,7 +171,7 @@ public class OBTableRepository implements ITableRepository {
                 continue;
             }
             Column column = new Column();
-            String[] columnArray = StringUtils.split(createSqlLine);
+            String[] columnArray = createSqlLine.split(",");
             column.setColumn(columnArray[0]);
             column.setJdbcType(TypeMapEnum.getByJdbcType(columnArray[1]).getJdbcType());
             column.setProperty(CamelCaseUtils.toCamelCase(columnArray[0]));
@@ -201,14 +199,14 @@ public class OBTableRepository implements ITableRepository {
     private String getJavaType(Column column, List<Column> cfColumns) {
         if (cfColumns != null && !cfColumns.isEmpty()) {
             for (Column cfColumn : cfColumns) {
-                if (StringUtils.endsWithIgnoreCase(column.getColumn(), cfColumn.getColumn())) {
+                if (column.getColumn().endsWith(cfColumn.getColumn())) {
                     return cfColumn.getJavaType();
                 }
             }
         }
         String javaType = TypeMapEnum.getByJdbcType(column.getJdbcType()).getJavaType();
         String custJavaType = ConfigUtil.config.getTypeMap().get(javaType);
-        return StringUtils.isBlank(custJavaType) ? javaType : custJavaType;
+        return StringUtil.isEmpty(custJavaType) ? javaType : custJavaType;
     }
 
     /**

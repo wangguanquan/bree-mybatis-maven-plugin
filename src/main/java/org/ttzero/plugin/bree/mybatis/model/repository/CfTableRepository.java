@@ -37,8 +37,6 @@ import org.ttzero.plugin.bree.mybatis.model.config.CfResultMap;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 import org.ttzero.plugin.bree.mybatis.utils.StringUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.dom4j.Attribute;
@@ -413,7 +411,8 @@ public class CfTableRepository {
                 // Test if it is a paging counter
                 String key = cfTable.getName() + '_' + id.substring(0, id.length() - 5);
                 Element element = nodeCache.get(key);
-                Validate.notNull(element, "Miss the paging operation [" + key + "]");
+                assert element != null;
+//                Validate.notNull(element, "Miss the paging operation [" + key + "]");
 
                 String vo = getAttr(element, "vo");
                 cfOperation.setVo(vo != null ? vo : getAttr(element, "id"));
@@ -470,13 +469,13 @@ public class CfTableRepository {
 
         String text = e.getTextTrim();
         // 替换select *
-        if (StringUtils.indexOf(text, "*") > 0) {
+        if (text.indexOf('*') > 0) {
             // \\((\\s*\\*\\s*)\\)
             Matcher m = STAR_BRACKET.matcher(text);
             if (!m.find()) {
-                if (StringUtils.isEmpty(cfOperation.getResultMap())) {
+                if (StringUtil.isEmpty(cfOperation.getResultMap())) {
                     // TODO 替换*前要找到指定的表或子查询
-                    cdata = StringUtils.replace(cdata, "*", "<include refid=\"Base_Column_List\" />");
+                    cdata = cdata.replace("*", "<include refid=\"Base_Column_List\" />");
                 }
             }
         }
@@ -503,7 +502,7 @@ public class CfTableRepository {
      */
     private String delQuestionMarkParam(String cdata, CfOperation cfOperation, CfTable cfTable) {
         //
-        if (!StringUtils.contains(cdata, '?')) {
+        if (cdata.indexOf('?') < 0) {
             return cdata;
         }
 //        cfTable.getColumns();
@@ -516,11 +515,11 @@ public class CfTableRepository {
             sql = sql.replaceAll("\\(", "\n(\n");
             sql = sql.replaceAll("\\)", "\n)\n");
 
-            String[] sqlLines = StringUtils.split(sql, "\n");
+            String[] sqlLines = sql.split("\n");
 
             int i = 0;
             for (String sqlLine : sqlLines) {
-                if (StringUtils.startsWith(sqlLine, "(")) {
+                if (sqlLine.startsWith("(")) {
                     break;
                 }
                 i++;
@@ -528,14 +527,14 @@ public class CfTableRepository {
             String insertLine = sqlLines[i + 1];
             String valueLine = sqlLines[i + 5];
             valueLine = valueLine.replaceAll("\\w{1},\\w{1}", "");
-            String[] columns = StringUtils.split(insertLine, ',');
-            String[] params = StringUtils.split(valueLine, ',');
+            String[] columns = insertLine.split(",");
+            String[] params = valueLine.split(",");
 
             for (int j = 0; j < params.length; j++) {
-                if (StringUtils.equals(params[j], "?")) {
+                if ("?".equals(params[j])) {
                     try {
                         String columnParam = CamelCaseUtils.toCamelCase(columns[j]);
-                        cdata = StringUtils.replace(cdata, "?", "#{" + columnParam + "}", 1);
+                        cdata = cdata.replaceFirst("\\?", "#{" + columnParam + "}");
                     } catch (ArrayIndexOutOfBoundsException e) {
                         throw new BreeException("参数设置错误#{}中,未正确使用 table=" + cfTable.getName());
                     }
@@ -552,7 +551,7 @@ public class CfTableRepository {
                     .group());
                 while (columnMatcher.find()) {
                     String columnParam = CamelCaseUtils.toCamelCase(columnMatcher.group());
-                    cdata = StringUtils.replace(cdata, "?", "#{" + columnParam + "}", 1);
+                    cdata = cdata.replaceFirst("\\?", "#{" + columnParam + "}");
                     cfOperation.addPrimitiveParam(columnParam, "");
                 }
             }
@@ -611,11 +610,12 @@ public class CfTableRepository {
                     String[] groupBy = markGroupBy(forCount);
                     if (groupBy != null) {
                         String group = groupBy[0];
+                        String lowerCaseGroup = group.toLowerCase();
                         forCount = groupBy[1];
-                        int index = StringUtils.indexOfIgnoreCase(forCount, " from ") + 6;
+                        int index = forCount.toLowerCase().indexOf(" from ") + 6;
 
                         int g;
-                        boolean having = (g = StringUtils.indexOfIgnoreCase(group, " having ")) > -1;
+                        boolean having = (g = lowerCaseGroup.indexOf( " having ")) > -1;
                         // 如果having子句有聚合函数，则不能将group by去掉
                         if (having && group.indexOf('(', g) > -1) {
                             forCount = "SELECT\n        COUNT(*) AS total\n        FROM (\n        " + forCount + "\n        ) t";
@@ -628,7 +628,7 @@ public class CfTableRepository {
                                 group = group.substring(0, g);
                             }
                             forCount = "SELECT\n        COUNT(DISTINCT "
-                                + group.substring(StringUtils.indexOfIgnoreCase(group, " by ") + 4)
+                                + group.substring(lowerCaseGroup.indexOf(" by ") + 4)
                                 + ") AS total \n        FROM\n        " + forCount.substring(index);
                         }
 
@@ -671,7 +671,8 @@ public class CfTableRepository {
         }
         final String from = " from ";
         String queryString = forCount.replaceAll("\t|\n", " ").replace("\r\n", "  ");
-        int fromIndex = StringUtils.lastIndexOfIgnoreCase(queryString, from, hIndex);
+        String lowerCaseQuery = queryString.toLowerCase();
+        int fromIndex = lowerCaseQuery.lastIndexOf(from, hIndex);
         if (fromIndex > -1) {
             return forCount;
         }
@@ -703,14 +704,14 @@ public class CfTableRepository {
             if (hIndex == -1) {
                 break;
             }
-            fromIndex = StringUtils.lastIndexOfIgnoreCase(queryString, from, hIndex);
+            fromIndex = lowerCaseQuery.lastIndexOf(from, hIndex);
             if (fromIndex > -1) {
                 break;
             }
         } while (true);
 
         // from 后面的语句保留格式
-        int index = StringUtils.indexOfIgnoreCase(queryString, from);
+        int index = lowerCaseQuery.indexOf(from);
         return buf.delete(index, buf.length()).append(forCount.substring(index + delete_count)).toString();
     }
 
@@ -722,24 +723,25 @@ public class CfTableRepository {
      */
     private String[] markGroupBy(String forCount) {
         String queryString = forCount.replaceAll("\t|\n", " ").replace("\r\n", "  ");
-        int andIndex = StringUtils.lastIndexOfIgnoreCase(queryString, " and "), eIndex = queryString.lastIndexOf(')');
+        String lowerCaseQuery = queryString.toLowerCase();
+        int andIndex = lowerCaseQuery.lastIndexOf(" and "), eIndex = lowerCaseQuery.lastIndexOf(')');
         // 无子查询
         if (andIndex == -1) {
-            andIndex = StringUtils.lastIndexOfIgnoreCase(queryString, " where ");
+            andIndex = lowerCaseQuery.lastIndexOf(" where ");
         }
         // 最后出来的and 或 where
         int index = andIndex < eIndex ? eIndex : andIndex;
 
         Matcher groupByMatcher = GROUP_BY_PATTERN.matcher(queryString.substring(index));
         if (groupByMatcher.find()) {
-            int orderBy = StringUtils.indexOfIgnoreCase(queryString, " order ", index);
+            int orderBy = lowerCaseQuery.indexOf(" order ", index);
             if (orderBy == -1) {
-                orderBy = StringUtils.indexOfIgnoreCase(queryString, " limit ", index);
+                orderBy = lowerCaseQuery.indexOf(" limit ", index);
             }
             if (orderBy == -1) {
                 orderBy = queryString.length();
             }
-            index = StringUtils.indexOfIgnoreCase(queryString, " group ", index);
+            index = lowerCaseQuery.indexOf(" group ", index);
             String groupBy = queryString.substring(index, orderBy);
             String t = forCount.substring(0, index);
             if (orderBy != queryString.length()) {
@@ -827,12 +829,11 @@ public class CfTableRepository {
         for (String p : params) {
             String getAttr = null;
             String type = null;
-            for (String s : StringUtils.split(p, ",")) {
+            for (String s : p.split(",")) {
                 if (s.indexOf('=') > -1) {
-                    s = StringUtils.trim(s);
-                    if (StringUtils.startsWithIgnoreCase(s, "javaType")
-                        || StringUtils.startsWithIgnoreCase(s, "jdbcType")) {
-                        type = StringUtils.split(s, "=")[1].trim().replace("\"", "");
+                    s = s.trim();
+                    if (s.startsWith("javaType") || s.startsWith("jdbcType")) {
+                        type = s.split("=")[1].trim().replace("\"", "");
                     }
                 } else {
                     getAttr = s;
@@ -847,9 +848,11 @@ public class CfTableRepository {
         ifs.addAll(whens);
         for (Element ele : ifs) {
             Attribute getAttr = ele.attribute("test");
-            Validate.notNull(getAttr, "<if> 或 <when> 元素未配置test属性 id=" + cfOperation.getId());
+            assert getAttr != null;
+//            Validate.notNull(getAttr, "<if> 或 <when> 元素未配置test属性 id=" + cfOperation.getId());
             String test = getAttr.getValue();
-            Validate.notEmpty(test, "<if> 或 <when> 元素配置test属性值空 id=" + cfOperation.getId());
+            assert StringUtil.isNotEmpty(test);
+//            Validate.notEmpty(test, "<if> 或 <when> 元素配置test属性值空 id=" + cfOperation.getId());
             String[] tests = test.split(" and | or | AND | OR ");
             for (String t : tests) {
                 String[] kv = getKV(t.trim());
@@ -880,9 +883,11 @@ public class CfTableRepository {
         List<Element> items = newElement.selectNodes(XPATH_FOREACH);
         for (Element item : items) {
             String collName = getAttr(item, "collection");
+            assert StringUtil.isNotEmpty(collName);
             String itemName = getAttr(item, "item");
-            Validate.notEmpty(collName, "foreach 元素设置错误 id=" + cfOperation.getId());
-            Validate.notEmpty(itemName, "foreach 元素设置错误 id=" + cfOperation.getId());
+            assert StringUtil.isNotEmpty(itemName);
+//            Validate.notEmpty(collName, "foreach 元素设置错误 id=" + cfOperation.getId());
+//            Validate.notEmpty(itemName, "foreach 元素设置错误 id=" + cfOperation.getId());
             cfOperation.addPrimitiveForeachParam(itemName, collName);
         }
     }
@@ -896,7 +901,7 @@ public class CfTableRepository {
     private String[] getKV(String getAttr) {
         String[] kvs = getAttr.split("!=|==|=");
         if (kvs.length == 1) {
-            kvs[0] = StringUtils.trim(kvs[0]);
+            kvs[0] = kvs[0].trim();
         } else {
             String k = kvs[0].replace('(', ' ').trim();
             char c = k.charAt(0);
@@ -905,8 +910,8 @@ public class CfTableRepository {
                 kvs[1] = k;
                 kvs[0] = v.trim();
             } else {
-                kvs[0] = StringUtils.trim(kvs[0]);
-                kvs[1] = StringUtils.trim(kvs[1]);
+                kvs[0] = kvs[0].trim();
+                kvs[1] = kvs[1].trim();
             }
         }
         return kvs;

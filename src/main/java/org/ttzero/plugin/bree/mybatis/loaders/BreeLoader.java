@@ -56,8 +56,6 @@ import org.ttzero.plugin.bree.mybatis.model.repository.TableRepository;
 import org.ttzero.plugin.bree.mybatis.model.repository.VoConfig;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import org.ttzero.plugin.bree.mybatis.utils.StringUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 
@@ -337,12 +335,12 @@ public class BreeLoader extends AbstractLoader {
 
     private void deepCollection(Gen gen, String tbName, CfCollection coll, Element e, String namespace, String prefix, String suffix) {
         Element subEle = e.addElement("collection");
-        if (StringUtils.isNotEmpty(coll.getProperty())) {
+        if (StringUtil.isNotEmpty(coll.getProperty())) {
             subEle.addAttribute("property", coll.getProperty());
         }
-        if (StringUtils.isNotEmpty(coll.getOfType())) {
+        if (StringUtil.isNotEmpty(coll.getOfType())) {
             subEle.addAttribute("ofType", ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace + "."  + coll.getOfType());
-        } else if (StringUtils.isNotEmpty(coll.getResultMap())) {
+        } else if (StringUtil.isNotEmpty(coll.getResultMap())) {
             subEle.addAttribute("resultMap", coll.getResultMap());
         }
 
@@ -370,18 +368,18 @@ public class BreeLoader extends AbstractLoader {
 
     private void deepAssociation(Gen gen, String tbName, CfAssociation assoc, Element e, String namespace, String prefix, String suffix) {
         Element subEle = e.addElement("association");
-        if (StringUtils.isNotEmpty(assoc.getProperty())) {
+        if (StringUtil.isNotEmpty(assoc.getProperty())) {
             subEle.addAttribute("property", assoc.getProperty());
         }
-        if (StringUtils.isNotEmpty(assoc.getJavaType())) {
+        if (StringUtil.isNotEmpty(assoc.getJavaType())) {
             subEle.addAttribute("javaType", ConfigUtil.getCurrentDb().getGenPackage() + "." + namespace + "." + assoc.getJavaType());
-        } else if (StringUtils.isNotEmpty(assoc.getResultMap())) {
+        } else if (StringUtil.isNotEmpty(assoc.getResultMap())) {
             subEle.addAttribute("resultMap", assoc.getResultMap());
         }
-        if (StringUtils.isNotEmpty(assoc.getColumn())) {
+        if (StringUtil.isNotEmpty(assoc.getColumn())) {
             subEle.addAttribute("column", assoc.getColumn());
         }
-        if (StringUtils.isNotEmpty(assoc.getSelect())) {
+        if (StringUtil.isNotEmpty(assoc.getSelect())) {
             subEle.addAttribute("select", assoc.getSelect());
         }
 
@@ -441,8 +439,9 @@ public class BreeLoader extends AbstractLoader {
      */
     private void doColumn(Gen gen, String tbName, ResultMap resultMap, List<Column> cfColumns, Element e) {
         for (Column column : cfColumns) {
-            Validate.notEmpty(column.getColumn(), tbName
-                + ".xml 配置有误 BreeLoader.preResultMap Gen=" + gen);
+            assert StringUtil.isNotEmpty(column.getColumn());
+//            Validate.notEmpty(column.getColumn(), tbName
+//                + ".xml 配置有误 BreeLoader.preResultMap Gen=" + gen);
             // 生成XML <resultMap> 标签使用
 //            Column column = new Column();
 //            column.setJavaName(CamelCaseUtils.toCamelCase(cfColumn.getName()));
@@ -893,7 +892,7 @@ public class BreeLoader extends AbstractLoader {
 
             TypeMapEnum typeMapEnum = TypeMapEnum.getByJdbcTypeWithOther(pmType);
 
-            if (StringUtils.isBlank(columnType)) {
+            if (StringUtil.isEmpty(columnType)) {
                 columnType = typeMapEnum == TypeMapEnum.OTHER ? pmType : typeMapEnum.getJavaType();
 
             }
@@ -902,7 +901,7 @@ public class BreeLoader extends AbstractLoader {
             String paramType = getClassAndImport(doMapper, custJavaType == null ? columnType : custJavaType);
 
             String foreachName = foreachParams.get(pmName);
-            boolean isNotForeach = StringUtils.isBlank(foreachName);
+            boolean isNotForeach = StringUtil.isEmpty(foreachName);
             if (isNotForeach && !foreachValues.contains(pmName)) {
                 params.add(new DoMapperMethodParam(paramType, pmName));
             } else if (!isNotForeach) {
@@ -943,13 +942,14 @@ public class BreeLoader extends AbstractLoader {
             return "int";
         }
         String resultType;
-        if (!StringUtils.isBlank(operation.getResultType())) {
+        if (!StringUtil.isEmpty(operation.getResultType())) {
             resultType = getClassAndImport(base, operation.getResultType());
-        } else if (!StringUtils.isBlank(operation.getResultMap())) {
+        } else if (!StringUtil.isEmpty(operation.getResultMap())) {
             if (!"BaseResultMap".equals(operation.getResultMap())) {
                 ResultMap resultMap = resultMaps.get(operation.getResultMap());
-                Validate.notNull(resultMap, "BreeLoader.operationResultType 自定义ResultMap出错 table = "
-                    + doClass.getTableName() + " DO=" + doClass);
+                assert resultMap != null;
+//                Validate.notNull(resultMap, "BreeLoader.operationResultType 自定义ResultMap出错 table = "
+//                    + doClass.getTableName() + " DO=" + doClass);
                 resultType = getClassAndImport(base,
                     resultMap.getPackageName() + "." + resultMap.getClassName());
             } else {
@@ -1001,7 +1001,7 @@ public class BreeLoader extends AbstractLoader {
         // 不在DO中输出地字段
         Set<String> ignoreField = doConfig.getIgnoreFields();
         for (Column cfColumn : cfColumns) {
-            if (!StringUtils.isBlank(cfColumn.getRelatedColumn())) {
+            if (!StringUtil.isEmpty(cfColumn.getRelatedColumn())) {
                 ignoreField.add(cfColumn.getRelatedColumn());
             }
         }
@@ -1035,15 +1035,15 @@ public class BreeLoader extends AbstractLoader {
         // TODO 类型不指定可以被允许
 //        Validate.notEmpty(classType,
 //                "BreeLoader.getClassAndImport error classType 不能为 null Base=" + base);
-        if (StringUtils.isEmpty(classType)) {
+        if (StringUtil.isEmpty(classType)) {
             return TypeMapEnum.OTHER.getJavaType();
         }
-        int lastIdx = StringUtils.lastIndexOf(classType, ".");
+        int lastIdx = classType.lastIndexOf('.');
         if (lastIdx > 0) {
             base.addImport(classType);
         }
         // 返回方法
-        return StringUtils.substring(classType, lastIdx + 1);
+        return classType.substring(lastIdx + 1);
     }
 
     /**
