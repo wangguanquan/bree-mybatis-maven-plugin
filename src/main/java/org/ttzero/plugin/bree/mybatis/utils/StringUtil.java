@@ -30,9 +30,9 @@ public class StringUtil {
     public static String upperFirst(String str) {
         if (isEmpty(str)) return "";
         char c = str.charAt(0);
-        if (c >= 'A' && c <= 'Z') {
+        if (c >= 'a' && c <= 'z') {
             char[] chars = str.toCharArray();
-            chars[0] += 32;
+            chars[0] -= 32;
             str = new String(chars);
         }
         return str;
@@ -47,9 +47,9 @@ public class StringUtil {
     public static String lowerFirst(String str) {
         if (isEmpty(str)) return "";
         char c = str.charAt(0);
-        if (c >= 'a' && c <= 'z') {
+        if (c >= 'A' && c <= 'Z') {
             char[] chars = str.toCharArray();
-            chars[0] -= 32;
+            chars[0] += 32;
             str = new String(chars);
         }
         return str;
