@@ -16,6 +16,8 @@
 
 package org.ttzero.plugin.bree.mybatis.utils;
 
+import static org.ttzero.plugin.bree.mybatis.utils.StringUtil.upperFirst;
+
 /**
  * Created by guanquan.wang at 2019-05-24 23:56
  */
@@ -26,17 +28,12 @@ public class CamelCaseUtils {
     private static final char SEPARATOR = '_';
 
     /**
-     * The constant SEPARATOR.
-     */
-    private static final char IN_LINE = '-';
-
-    /**
      * To underline name string.
      *
      * @param s the s
      * @return the string
      */
-    public static String toLineName(String s,char sp) {
+    public static String toLineName(String s, char sp) {
         if (s == null) {
             return null;
         }
@@ -79,15 +76,6 @@ public class CamelCaseUtils {
     }
 
     /**
-     * To Inline name string.
-     *
-     * @param s the s
-     * @return the string
-     */
-    public static String toInlineName(String s) {
-        return toLineName(s,IN_LINE);
-    }
-    /**
      * To camel case string.
      *
      * @param s the s
@@ -129,18 +117,6 @@ public class CamelCaseUtils {
             return null;
         }
         s = toCamelCase(s);
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
+        return upperFirst(s);
     }
-
-    public static void main(String[] args) {
-        System.out.println(CamelCaseUtils.toInlineName("ISOCertifiedStaff"));
-        System.out.println(CamelCaseUtils.toUnderlineName("ISOCertifiedStaff"));
-        System.out.println(CamelCaseUtils.toUnderlineName("CertifiedStaff"));
-        System.out.println(CamelCaseUtils.toUnderlineName("UserID"));
-        System.out.println(CamelCaseUtils.toCamelCase("iso_certified_staff"));
-        System.out.println(CamelCaseUtils.toCamelCase("certified_staff"));
-        System.out.println(CamelCaseUtils.toCamelCase("user_id"));
-        System.out.println(CamelCaseUtils.toCapitalizeCamelCase("user_id"));
-    }
-
 }
