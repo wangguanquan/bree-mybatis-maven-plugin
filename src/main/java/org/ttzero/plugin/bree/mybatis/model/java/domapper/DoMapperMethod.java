@@ -16,7 +16,6 @@
 
 package org.ttzero.plugin.bree.mybatis.model.java.domapper;
 
-import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.BreeException;
 
 import java.io.ByteArrayInputStream;
@@ -25,6 +24,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -67,7 +67,7 @@ public class DoMapperMethod implements Serializable {
     /**
      * The Params.
      */
-    private List<DoMapperMethodParam> params = Lists.newArrayList();
+    private List<DoMapperMethodParam> params = new ArrayList<>();
 
     /**
      * Gets return class.

@@ -16,14 +16,13 @@
 
 package org.ttzero.plugin.bree.mybatis.model.repository;
 
-import com.google.common.collect.Lists;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,11 +49,11 @@ public class JavaConfig implements Serializable {
     /**
      * The class implements
      */
-    private List<JavaProperty> implementArray = Lists.newArrayList();
+    private List<JavaProperty> implementArray = new ArrayList<>();
     /**
      * The class's annotation
      */
-    private List<JavaProperty> annotationArray = Lists.newArrayList();
+    private List<JavaProperty> annotationArray = new ArrayList<>();
     /**
      * Impl config
      */

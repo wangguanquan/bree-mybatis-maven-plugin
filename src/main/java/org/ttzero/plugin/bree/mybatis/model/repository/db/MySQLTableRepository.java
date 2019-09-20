@@ -18,6 +18,7 @@ package org.ttzero.plugin.bree.mybatis.model.repository.db;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -27,7 +28,6 @@ import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.utils.ConfigUtil;
 import org.ttzero.plugin.bree.mybatis.utils.StringUtil;
-import org.apache.ibatis.type.JdbcType;
 
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
@@ -130,7 +130,7 @@ public class MySQLTableRepository implements ITableRepository {
             while (resultSet.next()) {
                 Column column = new Column();
                 column.setColumn(resultSet.getString("COLUMN_NAME").toUpperCase());
-                column.setJdbcType(JdbcType.forCode(resultSet.getInt("DATA_TYPE")).name());
+                column.setJdbcType(JDBCType.valueOf(resultSet.getInt("DATA_TYPE")).name());
                 column.setDefaultValue(resultSet.getString("COLUMN_DEF"));
                 column.setProperty(CamelCaseUtils.toCamelCase(column.getColumn()));
                 column.setJavaType(getJavaType(column, cfColumns));

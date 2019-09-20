@@ -20,20 +20,6 @@ package org.ttzero.plugin.bree.mybatis.utils;
  * Created by guanquan.wang at 2019-05-24 123:57
  */
 public class StringUtil {
-    /**
-     * Join string with space character.
-     *
-     * @param p1 the p 1
-     * @param p2 the p 2
-     * @return the string
-     */
-    public static String join(String p1, String p2) {
-        if (p1 == null && p2 == null) {
-            return "";
-        }
-        String o1 = p1 == null ? "" : p1, o2 = p2 == null ? "" : p2;
-        return o1 + " " + o2;
-    }
 
     /**
      * Upper first string.
@@ -42,7 +28,14 @@ public class StringUtil {
      * @return the string
      */
     public static String upperFirst(String str) {
-        return CamelCaseUtils.toCapitalizeCamelCase(CamelCaseUtils.toUnderlineName(str));
+        if (isEmpty(str)) return "";
+        char c = str.charAt(0);
+        if (c >= 'a' && c <= 'z') {
+            char[] chars = str.toCharArray();
+            chars[0] -= 32;
+            str = new String(chars);
+        }
+        return str;
     }
 
     /**
@@ -52,7 +45,14 @@ public class StringUtil {
      * @return the string
      */
     public static String lowerFirst(String str) {
-        return CamelCaseUtils.toCamelCase(CamelCaseUtils.toUnderlineName(str));
+        if (isEmpty(str)) return "";
+        char c = str.charAt(0);
+        if (c >= 'A' && c <= 'Z') {
+            char[] chars = str.toCharArray();
+            chars[0] += 32;
+            str = new String(chars);
+        }
+        return str;
     }
 
     /**

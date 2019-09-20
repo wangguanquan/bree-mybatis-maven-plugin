@@ -16,10 +16,10 @@
 
 package org.ttzero.plugin.bree.mybatis.model.java;
 
-import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,7 +48,7 @@ public class XmlMapper {
     /**
      * The Result maps.
      */
-    private List<ResultMap> resultMaps = Lists.newArrayList();
+    private List<ResultMap> resultMaps = new ArrayList<>();
 
     /**
      * The Class path.

@@ -16,13 +16,11 @@
 
 package org.ttzero.plugin.bree.mybatis.model;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.BreeException;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.model.java.Dao;
@@ -71,44 +69,44 @@ public class Gen {
     /**
      * The Tables.
      */
-    private List<Table> tables = Lists.newArrayList();
+    private List<Table> tables = new ArrayList<>();
 
     /**
      * The Result maps.
      */
-    private List<ResultMap> resultMaps = Lists.newArrayList();
+    private List<ResultMap> resultMaps = new ArrayList<>();
 
     /**
      * The Dos.
      */
-    private List<Do> dos = Lists.newArrayList();
+    private List<Do> dos = new ArrayList<>();
 
     /**
      * The Daos.
      */
-    private List<Dao> daos = Lists.newArrayList();
+    private List<Dao> daos = new ArrayList<>();
 
     /**
      * The Do mappers.
      */
-    private List<DoMapper> doMappers = Lists.newArrayList();
+    private List<DoMapper> doMappers = new ArrayList<>();
 
     /**
      * The Xml mappers.
      */
-    private List<XmlMapper> xmlMappers = Lists.newArrayList();
+    private List<XmlMapper> xmlMappers = new ArrayList<>();
 
     /**
      * The vo list.
      */
-    private List<Vo> voList = Lists.newArrayList();
+    private List<Vo> voList = new ArrayList<>();
 
-    private Set<String> existVoPath = Sets.newHashSet();
+    private Set<String> existVoPath = new HashSet<>();
 
     /**
      * The DaoImpls.
      */
-    private List<Dao> daoImpls = Lists.newArrayList();
+    private List<Dao> daoImpls = new ArrayList<>();
 
     /**
      * Paging base vo
@@ -266,15 +264,6 @@ public class Gen {
      */
     public void setOutRoot(String outRoot) {
         this.outRoot = outRoot;
-    }
-
-    /**
-     * To string string.
-     *
-     * @return the string
-     */
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
     }
 
     /**

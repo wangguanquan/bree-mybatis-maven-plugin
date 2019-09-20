@@ -17,9 +17,10 @@
 package org.ttzero.plugin.bree.mybatis.model.config;
 
 import org.ttzero.plugin.bree.mybatis.enums.MultiplicityEnum;
+import org.ttzero.plugin.bree.mybatis.enums.OperationMethodEnum;
 import org.ttzero.plugin.bree.mybatis.enums.ParamTypeEnum;
-import com.google.common.collect.Maps;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -88,12 +89,12 @@ public class CfOperation {
     /**
      * The Primitive params.
      */
-    private Map<String, String> primitiveParams = Maps.newHashMap();
+    private Map<String, String> primitiveParams = new HashMap<>();
 
     /**
      * The Primitive foreach params.
      */
-    private Map<String, String> primitiveForeachParams = Maps.newHashMap();
+    private Map<String, String> primitiveForeachParams = new HashMap<>();
 
     /**
      * If exist customize count operation
@@ -101,9 +102,9 @@ public class CfOperation {
     private boolean customizeCount;
 
     /**
-     * The operation method. see {@link OperationMethod}
+     * The operation method. see {@link OperationMethodEnum}
      */
-    private OperationMethod operation;
+    private OperationMethodEnum operation;
 
     /**
      * Returns operation id.
@@ -381,11 +382,11 @@ public class CfOperation {
         this.customizeCount = customizeCount;
     }
 
-    public OperationMethod getOperation() {
+    public OperationMethodEnum getOperation() {
         return operation;
     }
 
-    public void setOperation(OperationMethod operation) {
+    public void setOperation(OperationMethodEnum operation) {
         this.operation = operation;
     }
 

@@ -16,8 +16,7 @@
 
 package org.ttzero.plugin.bree.mybatis.model.repository;
 
-import com.google.common.collect.Sets;
-
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -27,7 +26,7 @@ public class DataObjectConfig extends JavaConfig {
     /**
      * Ignore fields in do
      */
-    private Set<String> ignoreFields = Sets.newHashSet();
+    private Set<String> ignoreFields = new HashSet<>();
 
     public static DataObjectConfig of(JavaConfig config) {
         if (config.getClass() == DataObjectConfig.class) {

@@ -16,8 +16,7 @@
 
 package org.ttzero.plugin.bree.mybatis.model.dbtable;
 
-import com.google.common.collect.Lists;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,7 +41,7 @@ public class Table {
     /**
      * The Column list.
      */
-    private List<Column> columnList = Lists.newArrayList();
+    private List<Column> columnList = new ArrayList<>();
 
     /**
      * The Primary keys.

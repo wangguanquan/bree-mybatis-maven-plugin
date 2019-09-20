@@ -19,6 +19,7 @@ package org.ttzero.plugin.bree.mybatis.model.repository;
 import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.ttzero.plugin.bree.mybatis.enums.OperationMethodEnum;
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import org.ttzero.plugin.bree.mybatis.BreeException;
 import org.ttzero.plugin.bree.mybatis.model.config.CfAssociation;
@@ -33,12 +35,9 @@ import org.ttzero.plugin.bree.mybatis.model.config.CfCollection;
 import org.ttzero.plugin.bree.mybatis.model.config.CfOperation;
 import org.ttzero.plugin.bree.mybatis.model.config.CfResultMap;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
-import org.ttzero.plugin.bree.mybatis.model.config.OperationMethod;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
+import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.utils.StringUtil;
-import com.google.common.collect.Maps;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.dom4j.Attribute;
@@ -50,7 +49,6 @@ import org.dom4j.io.SAXReader;
 import org.ttzero.plugin.bree.mybatis.enums.MultiplicityEnum;
 import org.ttzero.plugin.bree.mybatis.enums.ParamTypeEnum;
 import org.ttzero.plugin.bree.mybatis.utils.CamelCaseUtils;
-import com.google.common.collect.Lists;
 
 import static org.ttzero.plugin.bree.mybatis.utils.ConfigUtil.getAttr;
 
@@ -131,16 +129,24 @@ public class CfTableRepository {
     /**
      * Storage all node
      */
-    private Map<String, Element> nodeCache = Maps.newHashMap();
+    private Map<String, Element> nodeCache = new HashMap<>();
+
+    /**
+     * The table mapping
+     */
+    @SuppressWarnings("unused")
+    private Map<String, Table> tableMap;
 
     /**
      * Gain cf table cf table.
      *
      * @param tableFile the table file
+     * @param tableMap the table base info map
      * @return the cf table
      * @throws DocumentException the document exception
      */
-    public CfTable gainCfTable(File tableFile) throws DocumentException {
+    public CfTable gainCfTable(File tableFile, Map<String, Table> tableMap) throws DocumentException {
+        this.tableMap = tableMap;
         CfTable cfTable = new CfTable();
 
         SAXReader saxReader = new SAXReader();
@@ -186,8 +192,8 @@ public class CfTableRepository {
         }
 
         List<Element> allOperation = new ArrayList<>();
-        OperationMethod[] methods = OperationMethod.values();
-        for (OperationMethod method : methods) {
+        OperationMethodEnum[] methods = OperationMethodEnum.values();
+        for (OperationMethodEnum method : methods) {
             if (group.containsKey(method.name())) {
                 allOperation.addAll(group.get(method.name()));
             }
@@ -376,7 +382,7 @@ public class CfTableRepository {
         StringBuilder buf = new StringBuilder();
         for (Element e : elements) {
             CfOperation cfOperation = new CfOperation();
-            cfOperation.setOperation(OperationMethod.valueOf(e.getName().toLowerCase()));
+            cfOperation.setOperation(OperationMethodEnum.valueOf(e.getName().toLowerCase()));
             buf.delete(0, buf.length());
             // Loop properties
             @SuppressWarnings({"unchecked", "retype"})
@@ -414,7 +420,8 @@ public class CfTableRepository {
                 // Test if it is a paging counter
                 String key = cfTable.getName() + '_' + id.substring(0, id.length() - 5);
                 Element element = nodeCache.get(key);
-                Validate.notNull(element, "Miss the paging operation [" + key + "]");
+                assert element != null;
+//                Validate.notNull(element, "Miss the paging operation [" + key + "]");
 
                 String vo = getAttr(element, "vo");
                 cfOperation.setVo(vo != null ? vo : getAttr(element, "id"));
@@ -471,13 +478,13 @@ public class CfTableRepository {
 
         String text = e.getTextTrim();
         // 替换select *
-        if (StringUtils.indexOf(text, "*") > 0) {
+        if (text.indexOf('*') > 0) {
             // \\((\\s*\\*\\s*)\\)
             Matcher m = STAR_BRACKET.matcher(text);
             if (!m.find()) {
-                if (StringUtils.isEmpty(cfOperation.getResultMap())) {
+                if (StringUtil.isEmpty(cfOperation.getResultMap())) {
                     // TODO 替换*前要找到指定的表或子查询
-                    cdata = StringUtils.replace(cdata, "*", "<include refid=\"Base_Column_List\" />");
+                    cdata = cdata.replace("*", "<include refid=\"Base_Column_List\" />");
                 }
             }
         }
@@ -504,11 +511,11 @@ public class CfTableRepository {
      */
     private String delQuestionMarkParam(String cdata, CfOperation cfOperation, CfTable cfTable) {
         //
-        if (!StringUtils.contains(cdata, '?')) {
+        if (cdata.indexOf('?') < 0) {
             return cdata;
         }
 //        cfTable.getColumns();
-        if (cfOperation.getOperation() == OperationMethod.insert) {
+        if (cfOperation.getOperation() == OperationMethodEnum.insert) {
             //TODO cdata中 insert ? 参数替换 不指定类型
             String sql = cdata;
             //sql 特殊处理一下
@@ -517,11 +524,11 @@ public class CfTableRepository {
             sql = sql.replaceAll("\\(", "\n(\n");
             sql = sql.replaceAll("\\)", "\n)\n");
 
-            String[] sqlLines = StringUtils.split(sql, "\n");
+            String[] sqlLines = sql.split("\n");
 
             int i = 0;
             for (String sqlLine : sqlLines) {
-                if (StringUtils.startsWith(sqlLine, "(")) {
+                if (sqlLine.startsWith("(")) {
                     break;
                 }
                 i++;
@@ -529,14 +536,14 @@ public class CfTableRepository {
             String insertLine = sqlLines[i + 1];
             String valueLine = sqlLines[i + 5];
             valueLine = valueLine.replaceAll("\\w{1},\\w{1}", "");
-            String[] columns = StringUtils.split(insertLine, ',');
-            String[] params = StringUtils.split(valueLine, ',');
+            String[] columns = insertLine.split(",");
+            String[] params = valueLine.split(",");
 
             for (int j = 0; j < params.length; j++) {
-                if (StringUtils.equals(params[j], "?")) {
+                if ("?".equals(params[j])) {
                     try {
                         String columnParam = CamelCaseUtils.toCamelCase(columns[j]);
-                        cdata = StringUtils.replace(cdata, "?", "#{" + columnParam + "}", 1);
+                        cdata = cdata.replaceFirst("\\?", "#{" + columnParam + "}");
                     } catch (ArrayIndexOutOfBoundsException e) {
                         throw new BreeException("参数设置错误#{}中,未正确使用 table=" + cfTable.getName());
                     }
@@ -553,7 +560,7 @@ public class CfTableRepository {
                     .group());
                 while (columnMatcher.find()) {
                     String columnParam = CamelCaseUtils.toCamelCase(columnMatcher.group());
-                    cdata = StringUtils.replace(cdata, "?", "#{" + columnParam + "}", 1);
+                    cdata = cdata.replaceFirst("\\?", "#{" + columnParam + "}");
                     cfOperation.addPrimitiveParam(columnParam, "");
                 }
             }
@@ -612,11 +619,12 @@ public class CfTableRepository {
                     String[] groupBy = markGroupBy(forCount);
                     if (groupBy != null) {
                         String group = groupBy[0];
+                        String lowerCaseGroup = group.toLowerCase();
                         forCount = groupBy[1];
-                        int index = StringUtils.indexOfIgnoreCase(forCount, " from ") + 6;
+                        int index = forCount.toLowerCase().indexOf(" from ") + 6;
 
                         int g;
-                        boolean having = (g = StringUtils.indexOfIgnoreCase(group, " having ")) > -1;
+                        boolean having = (g = lowerCaseGroup.indexOf( " having ")) > -1;
                         // 如果having子句有聚合函数，则不能将group by去掉
                         if (having && group.indexOf('(', g) > -1) {
                             forCount = "SELECT\n        COUNT(*) AS total\n        FROM (\n        " + forCount + "\n        ) t";
@@ -629,7 +637,7 @@ public class CfTableRepository {
                                 group = group.substring(0, g);
                             }
                             forCount = "SELECT\n        COUNT(DISTINCT "
-                                + group.substring(StringUtils.indexOfIgnoreCase(group, " by ") + 4)
+                                + group.substring(lowerCaseGroup.indexOf(" by ") + 4)
                                 + ") AS total \n        FROM\n        " + forCount.substring(index);
                         }
 
@@ -672,7 +680,8 @@ public class CfTableRepository {
         }
         final String from = " from ";
         String queryString = forCount.replaceAll("\t|\n", " ").replace("\r\n", "  ");
-        int fromIndex = StringUtils.lastIndexOfIgnoreCase(queryString, from, hIndex);
+        String lowerCaseQuery = queryString.toLowerCase();
+        int fromIndex = lowerCaseQuery.lastIndexOf(from, hIndex);
         if (fromIndex > -1) {
             return forCount;
         }
@@ -704,14 +713,14 @@ public class CfTableRepository {
             if (hIndex == -1) {
                 break;
             }
-            fromIndex = StringUtils.lastIndexOfIgnoreCase(queryString, from, hIndex);
+            fromIndex = lowerCaseQuery.lastIndexOf(from, hIndex);
             if (fromIndex > -1) {
                 break;
             }
         } while (true);
 
         // from 后面的语句保留格式
-        int index = StringUtils.indexOfIgnoreCase(queryString, from);
+        int index = lowerCaseQuery.indexOf(from);
         return buf.delete(index, buf.length()).append(forCount.substring(index + delete_count)).toString();
     }
 
@@ -723,24 +732,25 @@ public class CfTableRepository {
      */
     private String[] markGroupBy(String forCount) {
         String queryString = forCount.replaceAll("\t|\n", " ").replace("\r\n", "  ");
-        int andIndex = StringUtils.lastIndexOfIgnoreCase(queryString, " and "), eIndex = queryString.lastIndexOf(')');
+        String lowerCaseQuery = queryString.toLowerCase();
+        int andIndex = lowerCaseQuery.lastIndexOf(" and "), eIndex = lowerCaseQuery.lastIndexOf(')');
         // 无子查询
         if (andIndex == -1) {
-            andIndex = StringUtils.lastIndexOfIgnoreCase(queryString, " where ");
+            andIndex = lowerCaseQuery.lastIndexOf(" where ");
         }
         // 最后出来的and 或 where
         int index = andIndex < eIndex ? eIndex : andIndex;
 
         Matcher groupByMatcher = GROUP_BY_PATTERN.matcher(queryString.substring(index));
         if (groupByMatcher.find()) {
-            int orderBy = StringUtils.indexOfIgnoreCase(queryString, " order ", index);
+            int orderBy = lowerCaseQuery.indexOf(" order ", index);
             if (orderBy == -1) {
-                orderBy = StringUtils.indexOfIgnoreCase(queryString, " limit ", index);
+                orderBy = lowerCaseQuery.indexOf(" limit ", index);
             }
             if (orderBy == -1) {
                 orderBy = queryString.length();
             }
-            index = StringUtils.indexOfIgnoreCase(queryString, " group ", index);
+            index = lowerCaseQuery.indexOf(" group ", index);
             String groupBy = queryString.substring(index, orderBy);
             String t = forCount.substring(0, index);
             if (orderBy != queryString.length()) {
@@ -818,39 +828,51 @@ public class CfTableRepository {
 //        LOG.info("---------------" + cfOperation.getName() + "-----------------");
 
         String content = getReplaceInclude(e, tableName);
+//        String cleanContent = null;
         Element newElement = stringToXml(content);
         // #\\{(.*?)\\}
         Matcher m = PARAM_PATTERN.matcher(content);
-        List<String> params = Lists.newArrayList();
+        List<String> params = new ArrayList<>();
         while (m.find()) {
             params.add(m.group(1));
         }
         for (String p : params) {
             String getAttr = null;
             String type = null;
-            for (String s : StringUtils.split(p, ",")) {
+            for (String s : p.split(",")) {
                 if (s.indexOf('=') > -1) {
-                    s = StringUtils.trim(s);
-                    if (StringUtils.startsWithIgnoreCase(s, "javaType")
-                        || StringUtils.startsWithIgnoreCase(s, "jdbcType")) {
-                        type = StringUtils.split(s, "=")[1].trim().replace("\"", "");
+                    s = s.trim();
+                    if (s.startsWith("javaType") || s.startsWith("jdbcType")) {
+                        type = s.split("=")[1].trim().replace("\"", "");
                     }
                 } else {
                     getAttr = s;
                 }
+            }
+            if (type == null) {
+                type = TypeMapEnum.OTHER.getJdbcType();
+//                if (cleanContent == null) {
+//                    cleanContent = content.replace("<![CDATA[", "").replace("]]>", "").replace("\r\n", " ").replace("\n", " ");
+//                    cleanContent = removeAllTags(cleanContent);
+//                }
+//                type = resetType(cleanContent, p);
             }
             cfOperation.addPrimitiveParam(getAttr, type);
         }
 
         // if & when 语句上 test 参数添加
         @SuppressWarnings({"unchecked", "retype"})
-        List<Element> ifs = newElement.selectNodes(XPATH_IF), whens = newElement.selectNodes(XPATH_WHEN);
+        List<Element> ifs = newElement.selectNodes(XPATH_IF);
+        @SuppressWarnings({"unchecked", "retype"})
+        List<Element> whens = newElement.selectNodes(XPATH_WHEN);
         ifs.addAll(whens);
         for (Element ele : ifs) {
             Attribute getAttr = ele.attribute("test");
-            Validate.notNull(getAttr, "<if> 或 <when> 元素未配置test属性 id=" + cfOperation.getId());
+            assert getAttr != null;
+//            Validate.notNull(getAttr, "<if> 或 <when> 元素未配置test属性 id=" + cfOperation.getId());
             String test = getAttr.getValue();
-            Validate.notEmpty(test, "<if> 或 <when> 元素配置test属性值空 id=" + cfOperation.getId());
+            assert StringUtil.isNotEmpty(test);
+//            Validate.notEmpty(test, "<if> 或 <when> 元素配置test属性值空 id=" + cfOperation.getId());
             String[] tests = test.split(" and | or | AND | OR ");
             for (String t : tests) {
                 String[] kv = getKV(t.trim());
@@ -881,9 +903,11 @@ public class CfTableRepository {
         List<Element> items = newElement.selectNodes(XPATH_FOREACH);
         for (Element item : items) {
             String collName = getAttr(item, "collection");
+            assert StringUtil.isNotEmpty(collName);
             String itemName = getAttr(item, "item");
-            Validate.notEmpty(collName, "foreach 元素设置错误 id=" + cfOperation.getId());
-            Validate.notEmpty(itemName, "foreach 元素设置错误 id=" + cfOperation.getId());
+            assert StringUtil.isNotEmpty(itemName);
+//            Validate.notEmpty(collName, "foreach 元素设置错误 id=" + cfOperation.getId());
+//            Validate.notEmpty(itemName, "foreach 元素设置错误 id=" + cfOperation.getId());
             cfOperation.addPrimitiveForeachParam(itemName, collName);
         }
     }
@@ -897,7 +921,7 @@ public class CfTableRepository {
     private String[] getKV(String getAttr) {
         String[] kvs = getAttr.split("!=|==|=");
         if (kvs.length == 1) {
-            kvs[0] = StringUtils.trim(kvs[0]);
+            kvs[0] = kvs[0].trim();
         } else {
             String k = kvs[0].replace('(', ' ').trim();
             char c = k.charAt(0);
@@ -906,8 +930,8 @@ public class CfTableRepository {
                 kvs[1] = k;
                 kvs[0] = v.trim();
             } else {
-                kvs[0] = StringUtils.trim(kvs[0]);
-                kvs[1] = StringUtils.trim(kvs[1]);
+                kvs[0] = kvs[0].trim();
+                kvs[1] = kvs[1].trim();
             }
         }
         return kvs;
@@ -964,6 +988,7 @@ public class CfTableRepository {
             for (Element ic : includeArray) {
                 String refid = getAttr(ic, "refid");
                 if ("Base_Column_List".equals(refid) || "BaseResultMap".equals(refid)) {
+                    cdata = cdata.replace(ic.asXML(), "*");
                     continue;
                 }
                 if (StringUtil.isEmpty(refid)) {
@@ -996,56 +1021,29 @@ public class CfTableRepository {
             throw new BreeException("", e);
         }
     }
-//
-//    // FIXME use tag name
-//    static OperationMethod testMethod(Element e) {
-//        @SuppressWarnings({"unchecked", "retype"})
-//        List<Element> sub = e.elements();
-//        String content = getContent(e);
-//        if (sub != null && !sub.isEmpty()) {
-//            for (Element el : sub) {
-//                content = content.replace(el.asXML(), "");
-//            }
-//        }
-//
-//        content = content.trim();
-//        int n = content.indexOf(' ');
-//        if (n > 0) {
-//            String key = content.substring(0, n);
-//            return OperationMethod.valueOf(key.toLowerCase());
-//        }
-//        return OperationMethod.select;
-//    }
 
-//    /**
-//     * List all operation elements in mapping, contains 'select', 'insert', 'update' and 'delete'
-//     *
-//     * @param root the root element
-//     * @return all operation elements
-//     */
-//    @SuppressWarnings({"unchecked", "retype"})
-//    private List<Element> findAllOperations(Element root) {
-//        List<Element> elements = new ArrayList<>();
-//        List<Element> selects = root.elements("select");
-//        if (selects != null && !selects.isEmpty()) {
-//            elements.addAll(selects);
-//        }
+//    private String resetType(String content, String param) {
+//        System.out.println(content);
+//        int index = content.indexOf(param);
+//        if (index < 0) return TypeMapEnum.OTHER.getJdbcType();
 //
-//        List<Element> inserts = root.elements("insert");
-//        if (inserts != null && !inserts.isEmpty()) {
-//            elements.addAll(inserts);
-//        }
 //
-//        List<Element> updates = root.elements("update");
-//        if (updates != null && !updates.isEmpty()) {
-//            elements.addAll(updates);
-//        }
+//        return TypeMapEnum.OTHER.getJdbcType();
+//    }
 //
-//        List<Element> deletes = root.elements("delete");
-//        if (deletes != null && !deletes.isEmpty()) {
-//            elements.addAll(deletes);
+//    public static String removeAllTags(String content) {
+//        int i = content.lastIndexOf('>'), j = content.lastIndexOf('<', i);
+//        if (j < i && j >= 0) {
+//            char[] chars = content.toCharArray();
+//            int len = chars.length;
+//            do {
+//                System.arraycopy(chars, i + 1, chars, j, len - i - 1);
+//                len -= i - j + 1;
+//                i = content.lastIndexOf('>', j);
+//                j = content.lastIndexOf('<', i);
+//            } while (j < i && j >= 0);
+//            content = new String(chars, 0, len);
 //        }
-//
-//        return elements;
+//        return content.replaceAll(" +", " ");
 //    }
 }

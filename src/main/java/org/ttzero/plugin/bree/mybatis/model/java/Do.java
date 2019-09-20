@@ -16,8 +16,7 @@
 
 package org.ttzero.plugin.bree.mybatis.model.java;
 
-import com.google.common.collect.Lists;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,7 +27,7 @@ public class Do extends Base {
     /**
      * The do field array
      */
-    private List<Field> fieldList = Lists.newArrayList();
+    private List<Field> fieldList = new ArrayList<>();
 
     /**
      * Gets the do field array.

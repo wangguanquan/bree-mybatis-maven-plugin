@@ -16,13 +16,13 @@
 
 package org.ttzero.plugin.bree.mybatis.model;
 
-import com.google.common.collect.Maps;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Database;
 import org.ttzero.plugin.bree.mybatis.model.repository.DataObjectConfig;
 import org.ttzero.plugin.bree.mybatis.model.repository.JavaConfig;
 import org.ttzero.plugin.bree.mybatis.model.repository.VoConfig;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,11 +33,11 @@ public class Config {
     /**
      * The Data source map.
      */
-    private Map<String, Database> dataSourceMap = Maps.newHashMap();
+    private Map<String, Database> dataSourceMap = new HashMap<>();
     /**
      * The Type map.
      */
-    private Map<String, String> typeMap = Maps.newHashMap();
+    private Map<String, String> typeMap = new HashMap<>();
 
     /**
      * The Data object map.

@@ -17,9 +17,9 @@
 package org.ttzero.plugin.bree.mybatis.model.config;
 
 import org.ttzero.plugin.bree.mybatis.model.java.domapper.Sql;
-import com.google.common.collect.Lists;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,27 +46,26 @@ public class CfTable {
     /**
      * The Columns.
      */
-    private List<Column> columns = Lists.newArrayList();
+    private List<Column> columns = new ArrayList<>();
     /**
      * The Result maps.
      */
-    private List<CfResultMap> resultMaps = Lists.newArrayList();
+    private List<CfResultMap> resultMaps = new ArrayList<>();
 
     /**
      * The Operations.
      */
-    private List<CfOperation> operations = Lists.newArrayList();
+    private List<CfOperation> operations = new ArrayList<>();
 
     /**
      * The Db columns.
      */
-    private List<Column> dbColumns = Lists.newArrayList();
+    private List<Column> dbColumns = new ArrayList<>();
 
     /**
      * The sql tag
      */
-    private List<Sql> sqlList = Lists.newArrayList();
-
+    private List<Sql> sqlList = new ArrayList<>();
     /**
      * Returns table name.
      *

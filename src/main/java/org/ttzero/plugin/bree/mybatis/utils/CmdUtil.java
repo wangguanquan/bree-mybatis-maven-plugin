@@ -19,8 +19,6 @@ package org.ttzero.plugin.bree.mybatis.utils;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * Desc 控制台输入
  * Created by guanquan.wang at 2019-05-24 09:00
@@ -77,7 +75,7 @@ public class CmdUtil {
         System.out.println("-- q 退出");
         System.out.println("===========输入需要生成的表==============");
         String _cmd = cmdIn.next();
-        if (StringUtils.isBlank(_cmd)) {
+        if (StringUtil.isEmpty(_cmd)) {
             System.out.println("空输入默认为 * ");
             _cmd = "*";
         }

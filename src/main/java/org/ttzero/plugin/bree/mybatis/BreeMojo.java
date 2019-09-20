@@ -117,6 +117,10 @@ public class BreeMojo extends AbstractMojo {
                 getLog().info("Bye!");
                 return;
             }
+            if ("*".equals(_cmd)) {
+                getLog().info("暂时不支持`*`");
+                return;
+            }
 
             // Load reserved
             ConfigUtil.reserved = ReservedUtil.load(templateDirectory.toPath().getParent().resolve("reserved"));

@@ -16,9 +16,8 @@
 
 package org.ttzero.plugin.bree.mybatis.model.repository;
 
-import com.google.common.collect.Sets;
-
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,7 +36,7 @@ public class JavaProperty implements Serializable {
     /**
      * Conditions
      */
-    private Set<String> conditionSet = Sets.newHashSet();
+    private Set<String> conditionSet = new HashSet<>();
 
     public JavaProperty(String className, String importPath) {
         this.className = className;
