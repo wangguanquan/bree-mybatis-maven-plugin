@@ -36,6 +36,7 @@ import org.ttzero.plugin.bree.mybatis.model.config.CfOperation;
 import org.ttzero.plugin.bree.mybatis.model.config.CfResultMap;
 import org.ttzero.plugin.bree.mybatis.model.config.CfTable;
 import org.ttzero.plugin.bree.mybatis.model.dbtable.Column;
+import org.ttzero.plugin.bree.mybatis.model.dbtable.Table;
 import org.ttzero.plugin.bree.mybatis.utils.StringUtil;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -131,13 +132,21 @@ public class CfTableRepository {
     private Map<String, Element> nodeCache = new HashMap<>();
 
     /**
+     * The table mapping
+     */
+    @SuppressWarnings("unused")
+    private Map<String, Table> tableMap;
+
+    /**
      * Gain cf table cf table.
      *
      * @param tableFile the table file
+     * @param tableMap the table base info map
      * @return the cf table
      * @throws DocumentException the document exception
      */
-    public CfTable gainCfTable(File tableFile) throws DocumentException {
+    public CfTable gainCfTable(File tableFile, Map<String, Table> tableMap) throws DocumentException {
+        this.tableMap = tableMap;
         CfTable cfTable = new CfTable();
 
         SAXReader saxReader = new SAXReader();
@@ -819,6 +828,7 @@ public class CfTableRepository {
 //        LOG.info("---------------" + cfOperation.getName() + "-----------------");
 
         String content = getReplaceInclude(e, tableName);
+//        String cleanContent = null;
         Element newElement = stringToXml(content);
         // #\\{(.*?)\\}
         Matcher m = PARAM_PATTERN.matcher(content);
@@ -839,12 +849,22 @@ public class CfTableRepository {
                     getAttr = s;
                 }
             }
+            if (type == null) {
+                type = TypeMapEnum.OTHER.getJdbcType();
+//                if (cleanContent == null) {
+//                    cleanContent = content.replace("<![CDATA[", "").replace("]]>", "").replace("\r\n", " ").replace("\n", " ");
+//                    cleanContent = removeAllTags(cleanContent);
+//                }
+//                type = resetType(cleanContent, p);
+            }
             cfOperation.addPrimitiveParam(getAttr, type);
         }
 
         // if & when 语句上 test 参数添加
         @SuppressWarnings({"unchecked", "retype"})
-        List<Element> ifs = newElement.selectNodes(XPATH_IF), whens = newElement.selectNodes(XPATH_WHEN);
+        List<Element> ifs = newElement.selectNodes(XPATH_IF);
+        @SuppressWarnings({"unchecked", "retype"})
+        List<Element> whens = newElement.selectNodes(XPATH_WHEN);
         ifs.addAll(whens);
         for (Element ele : ifs) {
             Attribute getAttr = ele.attribute("test");
@@ -968,6 +988,7 @@ public class CfTableRepository {
             for (Element ic : includeArray) {
                 String refid = getAttr(ic, "refid");
                 if ("Base_Column_List".equals(refid) || "BaseResultMap".equals(refid)) {
+                    cdata = cdata.replace(ic.asXML(), "*");
                     continue;
                 }
                 if (StringUtil.isEmpty(refid)) {
@@ -1000,56 +1021,29 @@ public class CfTableRepository {
             throw new BreeException("", e);
         }
     }
-//
-//    // FIXME use tag name
-//    static OperationMethodEnum testMethod(Element e) {
-//        @SuppressWarnings({"unchecked", "retype"})
-//        List<Element> sub = e.elements();
-//        String content = getContent(e);
-//        if (sub != null && !sub.isEmpty()) {
-//            for (Element el : sub) {
-//                content = content.replace(el.asXML(), "");
-//            }
-//        }
-//
-//        content = content.trim();
-//        int n = content.indexOf(' ');
-//        if (n > 0) {
-//            String key = content.substring(0, n);
-//            return OperationMethodEnum.valueOf(key.toLowerCase());
-//        }
-//        return OperationMethodEnum.select;
-//    }
 
-//    /**
-//     * List all operation elements in mapping, contains 'select', 'insert', 'update' and 'delete'
-//     *
-//     * @param root the root element
-//     * @return all operation elements
-//     */
-//    @SuppressWarnings({"unchecked", "retype"})
-//    private List<Element> findAllOperations(Element root) {
-//        List<Element> elements = new ArrayList<>();
-//        List<Element> selects = root.elements("select");
-//        if (selects != null && !selects.isEmpty()) {
-//            elements.addAll(selects);
-//        }
+//    private String resetType(String content, String param) {
+//        System.out.println(content);
+//        int index = content.indexOf(param);
+//        if (index < 0) return TypeMapEnum.OTHER.getJdbcType();
 //
-//        List<Element> inserts = root.elements("insert");
-//        if (inserts != null && !inserts.isEmpty()) {
-//            elements.addAll(inserts);
-//        }
 //
-//        List<Element> updates = root.elements("update");
-//        if (updates != null && !updates.isEmpty()) {
-//            elements.addAll(updates);
-//        }
+//        return TypeMapEnum.OTHER.getJdbcType();
+//    }
 //
-//        List<Element> deletes = root.elements("delete");
-//        if (deletes != null && !deletes.isEmpty()) {
-//            elements.addAll(deletes);
+//    public static String removeAllTags(String content) {
+//        int i = content.lastIndexOf('>'), j = content.lastIndexOf('<', i);
+//        if (j < i && j >= 0) {
+//            char[] chars = content.toCharArray();
+//            int len = chars.length;
+//            do {
+//                System.arraycopy(chars, i + 1, chars, j, len - i - 1);
+//                len -= i - j + 1;
+//                i = content.lastIndexOf('>', j);
+//                j = content.lastIndexOf('<', i);
+//            } while (j < i && j >= 0);
+//            content = new String(chars, 0, len);
 //        }
-//
-//        return elements;
+//        return content.replaceAll(" +", " ");
 //    }
 }
