@@ -114,18 +114,18 @@ public class BreeLoader extends AbstractLoader {
             LOG.error("缺少table.xml");
             return;
         }
-        for (File file : files) {
-            cfTableMap.put(file2DbName(file), cfTableRepository.gainCfTable(file));
-        }
 
-        List<String> needGenTableNames = preNeedGenTableNames(ConfigUtil.cmd, cfTableMap);
-
+        List<String> needGenTableNames = preNeedGenTableNames(ConfigUtil.cmd);
         // 获取需要重新生成的表(为重新生成Mapper.xml,DO,Mapper.java 准备)
         Map<String, Table> tableMap = new HashMap<>();
 
         for (String tbName : needGenTableNames) {
-            tableMap.put(tbName,
+            tableMap.put(tbName.toUpperCase(),
                 tableRepository.gainTable(connection, tbName, cfTableMap.get(tbName)));
+        }
+
+        for (File file : files) {
+            cfTableMap.put(file2DbName(file), cfTableRepository.gainCfTable(file, tableMap));
         }
 
         // 根据需要重新生成的表 准备数据
@@ -203,10 +203,9 @@ public class BreeLoader extends AbstractLoader {
      * Pre need gen table names list.
      *
      * @param cmd        the cmd
-     * @param cfTableMap the cf table map
      * @return the list
      */
-    private List<String> preNeedGenTableNames(String cmd, Map<String, CfTable> cfTableMap) {
+    private List<String> preNeedGenTableNames(String cmd) {
         if ("*".equals(cmd.trim())) {
             // TODO list all tables
             throw new UnsupportedOperationException("* is not allow here.");
