@@ -9,7 +9,8 @@ package ${Do.packageName};
 
 /**
  * The table ${Do.desc!}
- * 注意:此结构由系统生成, 禁止手工修改以免被覆盖, 请通过bree-mybatis插件生成
+ * 注意: 此结构由系统生成, 禁止手工修改以免被覆盖, 请通过bree-mybatis插件生成
+ *
  * @author ${bree.author}
  */
 <#if Do.annotationArray.size() gt 0>

@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.dom4j.Node;
 import org.ttzero.plugin.bree.mybatis.enums.OperationMethodEnum;
 import org.ttzero.plugin.bree.mybatis.enums.TypeMapEnum;
 import org.ttzero.plugin.bree.mybatis.BreeException;
@@ -861,13 +862,11 @@ public class CfTableRepository {
         }
 
         // if & when 语句上 test 参数添加
-        @SuppressWarnings({"unchecked", "retype"})
-        List<Element> ifs = newElement.selectNodes(XPATH_IF);
-        @SuppressWarnings({"unchecked", "retype"})
-        List<Element> whens = newElement.selectNodes(XPATH_WHEN);
+        List<Node> ifs = newElement.selectNodes(XPATH_IF);
+        List<Node> whens = newElement.selectNodes(XPATH_WHEN);
         ifs.addAll(whens);
-        for (Element ele : ifs) {
-            Attribute getAttr = ele.attribute("test");
+        for (Node ele : ifs) {
+            Attribute getAttr = ((Element) ele).attribute("test");
             assert getAttr != null;
 //            Validate.notNull(getAttr, "<if> 或 <when> 元素未配置test属性 id=" + cfOperation.getId());
             String test = getAttr.getValue();
@@ -899,12 +898,12 @@ public class CfTableRepository {
         }
 
         // 使用XPath匹配foreach
-        @SuppressWarnings({"unchecked", "retype"})
-        List<Element> items = newElement.selectNodes(XPATH_FOREACH);
-        for (Element item : items) {
-            String collName = getAttr(item, "collection");
+        List<Node> items = newElement.selectNodes(XPATH_FOREACH);
+        for (Node item : items) {
+            Element el = (Element) item;
+            String collName = getAttr(el, "collection");
             assert StringUtil.isNotEmpty(collName);
-            String itemName = getAttr(item, "item");
+            String itemName = getAttr(el, "item");
             assert StringUtil.isNotEmpty(itemName);
 //            Validate.notEmpty(collName, "foreach 元素设置错误 id=" + cfOperation.getId());
 //            Validate.notEmpty(itemName, "foreach 元素设置错误 id=" + cfOperation.getId());

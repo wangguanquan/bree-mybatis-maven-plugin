@@ -8,9 +8,10 @@ package ${dao.packageName};
 </#list>
 
 /**
-* The Table ${dao.tableName!}.
-* 注意:此结构由系统生成, 禁止手工修改以免被覆盖, 请通过bree-mybatis插件生成<#if dao.tableName != dao.desc>
-* ${dao.desc!}</#if>
+ * The Table ${dao.tableName!}.
+ * 注意: 此结构由系统生成, 禁止手工修改以免被覆盖, 请通过bree-mybatis插件生成<#if dao.tableName != dao.desc>
+ * ${dao.desc!}</#if>
+ *
  * @author ${bree.author}
 */
 <#if dao.annotationArray.size() gt 0>
@@ -27,6 +28,7 @@ public class ${dao.className}<#if dao.extend??> extends ${dao.extend.className}<
 
     /**
      * ${method.desc!method.name!}.
+     *
         <#list  method.params as param>
      * @param ${param.param} ${param.param}
         </#list>
@@ -59,6 +61,7 @@ public interface ${dao.className}<#if dao.extend??> extends ${dao.extend.classNa
 
     /**
      * ${method.desc!method.name!}.
+     *
     <#list method.params as param>
      * @param ${param.param} ${param.param}
     </#list>

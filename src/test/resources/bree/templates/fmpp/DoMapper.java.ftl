@@ -12,9 +12,10 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * 由于需要对分页支持,请直接使用对应的DAO类
- * 注意:此结构由系统生成, 禁止手工修改以免被覆盖, 请通过bree-mybatis插件生成
+ * 注意: 此结构由系统生成, 禁止手工修改以免被覆盖, 请通过bree-mybatis插件生成
  * The Table ${doMapper.tableName!}.<#if doMapper.tableName != doMapper.desc>
  * ${doMapper.desc!}</#if>
+ *
  * @author ${bree.author}
  */
 <#if doMapper.annotationArray.size() gt 0>
@@ -27,6 +28,7 @@ public interface ${doMapper.className}<#if doMapper.extend??> extends ${doMapper
 
     /**
      * ${method.desc!method.name!}.
+     *
     <#list  method.params as param>
      * @param ${param.param} ${param.param}
     </#list>
